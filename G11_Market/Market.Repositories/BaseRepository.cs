@@ -1,47 +1,88 @@
 ﻿using System.Data;
 using System.Data.Common;
 using Dapper;
-using Market.DTO;
+using Market.Extensions;
 
 namespace Market.Repositories;
 
-public abstract class BaseRepository<T> : IDisposable where T : BaseDTO
+public interface IRepository<T> 
 {
-    protected readonly DbConnection _connection;
-    protected readonly string _tableName;
+    T? GetById(object id);
+    int Insert(T entity);
+    void Update(T entity);
+    void Delete(object id);
+    IEnumerable<T> GetAll();
+    IEnumerable<T> Search(Predicate<T> predicate);
+}
+
+public abstract class BaseRepository<T> : IDisposable
+{
+    private readonly DbConnection _connection;
     private bool _disposed = false;
+    private readonly string _entityName;
+    private readonly string _entityPluralName;
 
-    protected BaseRepository(DbConnection connection, string tableName)
+    protected BaseRepository(DbConnection connection)
     {
-        _connection = connection;
-        _tableName = tableName;
-    }
-    protected T? GetById(int id)
-    {
-        return _connection.QueryFirstOrDefault<T>($"sp_Get{_tableName}ById", new { Id = id }, commandType: CommandType.StoredProcedure);
-    }
-
-    protected IEnumerable<T> GetAll()
-    {
-        return _connection.Query<T>($"sp_GetAll{_tableName}", commandType: CommandType.StoredProcedure);
+        _connection = connection ?? throw new ArgumentNullException(nameof(connection));
+        _entityName = typeof(T).Name;
+        _entityPluralName = _entityName.ToPlural();
     }
 
-    protected int Insert(T tableModel)
+    public T? GetById(object id)
     {
-        var parameters = new DynamicParameters(tableModel);
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+
+        return _connection.QueryFirstOrDefault<T>(
+            $"sp_Get{_entityName}ById",
+            new { Id = id },
+            commandType: CommandType.StoredProcedure);
+    }
+
+    public IEnumerable<T> GetAll()
+    {
+        return _connection.Query<T>(
+            $"sp_GetAll{_entityPluralName}", 
+            commandType: CommandType.StoredProcedure);
+    }
+
+    public int Insert(T entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+
+        var parameters = new DynamicParameters(entity);
         parameters.Add("@Id", dbType: DbType.Int32, direction: ParameterDirection.Output);
-        _connection.Execute($"sp_Insert{_tableName}", parameters, commandType: CommandType.StoredProcedure);
+        // todo: take parameters using reflection from entity and pass to sp_Insert{_entityName}
+
+        _connection.Execute(
+            $"sp_Insert{_entityName}", 
+            parameters, 
+            commandType: CommandType.StoredProcedure);
+
         return parameters.Get<int>("@Id");
     }
 
-    protected int Delete(int id)
+    public void Update(T entity)
     {
-        return _connection.Execute($"sp_Delete{_tableName}", new { Id = id }, commandType: CommandType.StoredProcedure);
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+
+        var parameters = new DynamicParameters(entity);
+        // todo: take parameters using reflection from entity and pass to sp_Update{_entityName}
+
+        _connection.Execute(
+            $"sp_Update{_entityName}",
+            parameters,
+            commandType: CommandType.StoredProcedure);
     }
 
-    protected int Update(T tableModel)
+    public void Delete(object id)
     {
-        return _connection.Execute($"sp_Update{_tableName}", tableModel, commandType: CommandType.StoredProcedure);
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+
+        _connection.Execute(
+            $"sp_Delete{_entityName}", 
+            new { Id = id },
+            commandType: CommandType.StoredProcedure);
     }
 
     public IEnumerable<T> Search(Predicate<T> predicate)
@@ -50,29 +91,32 @@ public abstract class BaseRepository<T> : IDisposable where T : BaseDTO
         return allItems.Where(item => predicate(item));
     }
 
+    #region IDisposable Support
+
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (_disposed) 
+            return;
+        if (disposing)
         {
-            if (disposing)
-            {
-                if (_connection != null)
-                {
-                    _connection.Dispose();
-                }
-            }
-            _disposed = true;
+            //if (_connection != null)
+            //{
+            //    _connection.Dispose();
+            //}
         }
+        _disposed = true;
     }
 
     ~BaseRepository()
     {
         Dispose(false);
     }
+
+    #endregion
 }

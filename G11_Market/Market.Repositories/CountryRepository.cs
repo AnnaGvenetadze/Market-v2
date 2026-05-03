@@ -3,6 +3,15 @@ using Market.DTO;
 
 namespace Market.Repositories;
 
-public sealed class CountryRepository(DbConnection connection, string tableName) : BaseRepository<Country>(connection, tableName)
+public interface ICountryRepository : IRepository<Country>
 {
+
+}
+
+public sealed class CountryRepository : BaseRepository<Country>, ICountryRepository
+{
+    public CountryRepository(DbConnection connection) : base(connection)
+    {
+
+    }
 }

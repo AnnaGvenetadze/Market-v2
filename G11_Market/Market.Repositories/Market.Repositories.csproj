@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Market.DTO\Market.DTO.csproj" />
+    <ProjectReference Include="..\Market.Extensions\Market.Extensions.csproj" />
     <ProjectReference Include="..\Market.Services\Market.Services.csproj" />
   </ItemGroup>
 
