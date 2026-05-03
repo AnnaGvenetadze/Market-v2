@@ -16,12 +16,14 @@ public abstract class BaseRepository<TDto,TInsert,TUpdate> : IBaseRepository<TDt
     private bool _disposed = false;
     private readonly string _entityName;
     private readonly string _entityPluralName;
+    private bool _keepConnectionOpen = true;
 
-    protected BaseRepository(DbConnection connection)
+    protected BaseRepository(DbConnection connection, bool keepConnectionOpen)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _entityName = typeof(TDto).Name;
         _entityPluralName = _entityName.ToPlural();
+        _keepConnectionOpen = keepConnectionOpen;
     }
 
     public TDto? GetById(object id)
@@ -96,10 +98,10 @@ public abstract class BaseRepository<TDto,TInsert,TUpdate> : IBaseRepository<TDt
             return;
         if (disposing)
         {
-            //if (_connection != null)
-            //{
-            //    _connection.Dispose();
-            //}
+            if (!_keepConnectionOpen)
+            {
+                _connection.Dispose();
+            }
         }
         _disposed = true;
     }
