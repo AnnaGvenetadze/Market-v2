@@ -6,5 +6,4 @@
     IsDeleted bit not null default(0),
     CreateDate datetime not null default(GetDate()),
     UpdateDate datetime null
-    primary key (Id)
 )
