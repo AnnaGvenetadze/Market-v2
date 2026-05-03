@@ -6,6 +6,6 @@ using Market.Repositories.Interfaces;
 
 namespace Market.Repositories.Implementations;
 
-public sealed class CountryRepository(DbConnection connection) : BaseRepository<CountryDTO, CountryInsert, CountryUpdate>(connection), ICountryRepository
+public sealed class CountryRepository(DbConnection connection, bool keepConnectionOpen) : BaseRepository<CountryDTO, CountryInsert, CountryUpdate>(connection, keepConnectionOpen), ICountryRepository
 {
 }
