@@ -79,5 +79,12 @@
     <Build Include="dbo\Tables\Clients.sql" />
     <Build Include="dbo\Tables\CorporateClientDetails.sql" />
     <Build Include="dbo\Tables\InventoryManagerDetails.sql" />
+    <Build Include="dbo\Tables\StockMovements.sql" />
+    <Build Include="dbo\Tables\SaleItems.sql" />
+    <Build Include="dbo\Tables\Sales.sql" />
+    <Build Include="dbo\Stored Procedures\sp_InsertAccount.sql" />
+    <Build Include="dbo\Stored Procedures\sp_InsertEmployee.sql" />
+    <Build Include="dbo\Stored Procedures\sp_InsertClient.sql" />
+    <Build Include="dbo\Stored Procedures\sp_InsertCorporateClientDetails.sql" />
   </ItemGroup>
 </Project>

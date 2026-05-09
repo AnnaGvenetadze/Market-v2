@@ -4,6 +4,7 @@
     Username nvarchar(50) not null unique,
     PasswordHash nvarchar(255) not null,
     Email nvarchar(255) not null unique,
+    AccountType tinyint not null,
     FirstName nvarchar(50) not null,
     LastName nvarchar(50) not null,
     IsDeleted bit not null default 0,
