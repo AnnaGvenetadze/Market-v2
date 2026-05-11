@@ -1,8 +1,11 @@
-﻿create table Categories (
-    Id          int identity(1, 1) not null,
-    Name        nvarchar(255) not null unique,
-    Description nvarchar(max) null,
-    ParentId    int null,
-    primary key (Id),
-    foreign key (ParentId) references Categories(Id)
+CREATE TABLE Categories (
+    ID INT PRIMARY KEY IDENTITY(1,1),
+    ParentID INT NULL,
+    CategoryName NVARCHAR(100) NOT NULL UNIQUE,
+    Description NVARCHAR(1000) NULL,
+    IsActive BIT NOT NULL DEFAULT 1,
+    CreatedDate DATETIME NOT NULL DEFAULT GETDATE(),
+    UpdatedDate DATETIME NULL,
+    FOREIGN KEY (ParentID) REFERENCES Categories(ID)
 );
+GO
