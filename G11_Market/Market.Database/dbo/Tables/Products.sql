@@ -1,9 +1,11 @@
-﻿create table Products (
-    Id          int identity(1, 1) not null,
-    Name        nvarchar(255) not null unique,
-    Description nvarchar(max) null,
-    Price       decimal(18, 2) not null,
-    CategoryId  int not null,
-    primary key (Id),
-    foreign key (CategoryId) references Categories(Id)
+CREATE TABLE Products (
+    ID INT PRIMARY KEY IDENTITY(1,1),
+    CategoryID INT NOT NULL,
+    ProductName NVARCHAR(100) NOT NULL UNIQUE,
+    Price DECIMAL(18,2) NOT NULL,
+    IsActive BIT NOT NULL DEFAULT 1,
+    CreatedDate DATETIME NOT NULL DEFAULT GETDATE(),
+    UpdatedDate DATETIME NULL,
+    FOREIGN KEY (CategoryID) REFERENCES Categories(ID)
 );
+GO
