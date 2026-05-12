@@ -4,7 +4,7 @@ using Market.DTO.DbEntities.UpdateEntities;
 using Market.DTO.DTOs;
 using Market.Repositories.Interfaces;
 
-namespace Market.Repositories.Implementations;
+namespace Market.Repositories;
 
 public sealed class CountryRepository(DbConnection connection, bool keepConnectionOpen) : BaseRepository<CountryDTO, CountryInsert, CountryUpdate>(connection, keepConnectionOpen), ICountryRepository
 {
