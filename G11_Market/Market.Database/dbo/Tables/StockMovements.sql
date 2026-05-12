@@ -8,7 +8,7 @@
     SaleItemId          int null,
     ChangedByEmployeeId int not null,
     Reason              nvarchar(200) null check (Reason is null or len(ltrim(rtrim(Reason))) > 0),
-    CreatedAt           datetime not null default getdate(),
+    CreatedDate          datetime not null default getdate(),
 
     foreign key (ProductId) references dbo.Products(Id),
     foreign key (SaleItemId) references dbo.SaleItems(Id),

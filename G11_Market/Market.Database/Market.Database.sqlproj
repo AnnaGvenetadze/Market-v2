@@ -95,5 +95,8 @@
     <None Include="dbo\Stored Procedures\sp_GetCategories.sql" />
     <None Include="dbo\Views\vw_CategoriesWithParent.sql" />
     <None Include="dbo\Stored Procedures\sp_GetCategoryById.sql" />
+    <None Include="dbo\Stored Procedures\sp_ActivateCategory.sql" />
+    <None Include="dbo\Stored Procedures\sp_GetCategoryAttributes.sql" />
+    <None Include="dbo\Stored Procedures\sp_DeleteCategoryAttribute.sql" />
   </ItemGroup>
 </Project>
