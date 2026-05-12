@@ -87,4 +87,9 @@
     <Build Include="dbo\Stored Procedures\sp_InsertClient.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertCorporateClientDetails.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="dbo\Stored Procedures\sp_ValidateCategory.sql" />
+    <None Include="dbo\Stored Procedures\sp_InsertCategory.sql" />
+    <None Include="dbo\Stored Procedures\sp_DeactivateCategory.sql" />
+  </ItemGroup>
 </Project>
