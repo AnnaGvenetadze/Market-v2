@@ -98,5 +98,9 @@
     <None Include="dbo\Stored Procedures\sp_ActivateCategory.sql" />
     <None Include="dbo\Stored Procedures\sp_GetCategoryAttributes.sql" />
     <None Include="dbo\Stored Procedures\sp_DeleteCategoryAttribute.sql" />
+    <None Include="dbo\Stored Procedures\sp_GetClients.sql" />
+    <None Include="dbo\Stored Procedures\sp_UpdateClient.sql" />
+    <None Include="dbo\Stored Procedures\sp_DeleteClient.sql" />
+    <None Include="dbo\Stored Procedures\sp_GetSalesByEmployeeId.sql" />
   </ItemGroup>
 </Project>
