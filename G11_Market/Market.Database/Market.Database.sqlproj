@@ -60,6 +60,7 @@
     <Folder Include="dbo\Tables\" />
     <Folder Include="dbo\Stored Procedures\" />
     <Folder Include="Scripts\" />
+    <Folder Include="dbo\Views" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Countries.sql" />
@@ -91,5 +92,8 @@
     <None Include="dbo\Stored Procedures\sp_ValidateCategory.sql" />
     <None Include="dbo\Stored Procedures\sp_InsertCategory.sql" />
     <None Include="dbo\Stored Procedures\sp_DeactivateCategory.sql" />
+    <None Include="dbo\Stored Procedures\sp_GetCategories.sql" />
+    <None Include="dbo\Views\vw_CategoriesWithParent.sql" />
+    <None Include="dbo\Stored Procedures\sp_GetCategoryById.sql" />
   </ItemGroup>
 </Project>
