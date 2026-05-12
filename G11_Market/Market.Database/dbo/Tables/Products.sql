@@ -1,11 +1,11 @@
 CREATE TABLE Products (
-    ID INT PRIMARY KEY IDENTITY(1,1),
-    CategoryID INT NOT NULL,
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    CategoryId INT NOT NULL,
     ProductName NVARCHAR(100) NOT NULL UNIQUE,
     Price DECIMAL(18,2) NOT NULL,
     IsActive BIT NOT NULL DEFAULT 1,
     CreatedDate DATETIME NOT NULL DEFAULT GETDATE(),
     UpdatedDate DATETIME NULL,
-    FOREIGN KEY (CategoryID) REFERENCES Categories(ID)
+    FOREIGN KEY (CategoryId) REFERENCES Categories(Id)
 );
 GO
