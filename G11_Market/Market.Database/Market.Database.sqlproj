@@ -60,6 +60,7 @@
     <Folder Include="dbo\Tables\" />
     <Folder Include="dbo\Stored Procedures\" />
     <Folder Include="Scripts\" />
+    <Folder Include="dbo\User-Defined Function" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Countries.sql" />
@@ -97,5 +98,6 @@
     <Build Include="dbo\Stored Procedures\sp_InsertSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_CompleteSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_CancelSale.sql" />
+    <Build Include="dbo\User-Defined Function\fn_IsCircularCategory.sql" />
   </ItemGroup>
 </Project>
