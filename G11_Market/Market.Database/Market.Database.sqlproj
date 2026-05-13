@@ -61,6 +61,7 @@
     <Folder Include="dbo\Stored Procedures\" />
     <Folder Include="Scripts\" />
     <Folder Include="dbo\Views" />
+    <Folder Include="dbo\User-Defined Function" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Countries.sql" />
@@ -87,6 +88,19 @@
     <Build Include="dbo\Stored Procedures\sp_InsertEmployee.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertClient.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertCorporateClientDetails.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CancelSale.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CompleteSale.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAccountByUsername.sql" />
+    <Build Include="dbo\Stored Procedures\sp_InsertSale.sql" />
+    <Build Include="dbo\Stored Procedures\sp_LoginAccount.sql" />
+    <Build Include="dbo\Stored Procedures\sp_ResetAccountPassword.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateAccount.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateEmployee.sql" />
+    <Build Include="dbo\Tables\Attributes.sql" />
+    <Build Include="dbo\Tables\CategoryAttributes.sql" />
+    <Build Include="dbo\Tables\ProductAttributeValues.sql" />
+    <Build Include="dbo\User-Defined Function\fn_IsCircularCategory.sql" />
+    <Build Include="dbo\Attributes.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dbo\Stored Procedures\sp_ValidateCategory.sql" />
