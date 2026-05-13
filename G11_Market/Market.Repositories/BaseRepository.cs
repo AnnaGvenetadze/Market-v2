@@ -5,7 +5,7 @@ using Market.Extensions;
 using Market.DTO.Interfaces;
 using Market.Repositories.Interfaces;
 
-namespace Market.Repositories.Implementations;
+namespace Market.Repositories;
 
 public abstract class BaseRepository<TDto,TInsert,TUpdate> : IBaseRepository<TDto, TInsert, TUpdate>, IDisposable
     where TDto : IDto
@@ -16,14 +16,12 @@ public abstract class BaseRepository<TDto,TInsert,TUpdate> : IBaseRepository<TDt
     private bool _disposed = false;
     private readonly string _entityName;
     private readonly string _entityPluralName;
-    private bool _keepConnectionOpen = true;
 
-    protected BaseRepository(DbConnection connection, bool keepConnectionOpen)
+    protected BaseRepository(DbConnection connection)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _entityName = typeof(TDto).Name;
         _entityPluralName = _entityName.ToPlural();
-        _keepConnectionOpen = keepConnectionOpen;
     }
 
     public TDto? GetById(object id)
@@ -98,10 +96,7 @@ public abstract class BaseRepository<TDto,TInsert,TUpdate> : IBaseRepository<TDt
             return;
         if (disposing)
         {
-            if (!_keepConnectionOpen)
-            {
-                _connection.Dispose();
-            }
+
         }
         _disposed = true;
     }

@@ -17,8 +17,21 @@
 as 
 begin 
     set nocount on;
+    set xact_abort on;
     begin try
         begin tran;
+        set @Username = trim(@Username);
+        set @Email = trim(@Email);
+        set @FirstName = trim(@FirstName);
+        set @LastName = trim(@LastName);
+        if @Username = '' throw 50013, 'Username cannot be empty.', 1;
+        if @Email = '' throw 50014, 'Email cannot be empty.', 1;
+        if @Email not like '%_@_%._%' throw 50015, 'Invalid email format.', 1;
+        if @ClientTypeId is not null and not exists (select 1 from ClientTypes where Id = @ClientTypeId) throw 50017, 'Invalid ClientTypeId.', 1;
+        if @ManagerEmployeeId is not null and not exists (select 1 from Employees where Id = @ManagerEmployeeId) throw 50018, 'Invalid ManagerEmployeeId.', 1;
+        if exists (select 1 from Accounts where Username = @Username) throw 50005, 'Username already exists.', 1;
+        if @HireDate > getdate() throw 50019, 'HireDate cannot be in the future.', 1;
+
         if @AccountType not in (1, 2, 3) throw 50000, 'Invalid account type. Use 1 for Employee, 2 for Individual Client, 3 for Corporate Client', 1;
         insert into Accounts (Username, PasswordHash, Email, FirstName, LastName, AccountType, IsDeleted, CreateDate)
         values (@Username, @PasswordHash, @Email, @FirstName, @LastName, @AccountType, 0, getdate());

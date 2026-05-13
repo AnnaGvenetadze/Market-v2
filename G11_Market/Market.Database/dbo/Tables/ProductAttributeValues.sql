@@ -1,4 +1,4 @@
-CREATE TABLE ProductAttributeValues (
+﻿CREATE TABLE ProductAttributeValues (
     ProductID INT NOT NULL,
     AttributeID INT NOT NULL,
     TextValue NVARCHAR(500) NULL,
@@ -9,4 +9,4 @@ CREATE TABLE ProductAttributeValues (
     FOREIGN KEY(ProductID) REFERENCES Products(ID),
     PRIMARY KEY(ProductID, AttributeID)
 );
-GO
+
