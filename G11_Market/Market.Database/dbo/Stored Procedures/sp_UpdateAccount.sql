@@ -3,9 +3,10 @@
     @Username nvarchar(50),
     @PasswordHash nvarchar(255),
     @Email nvarchar(255),
+    @AccountType tinyint,
     @FirstName nvarchar(50),
-    @LastName nvarchar(50),
-    @AccountType tinyint
+    @LastName nvarchar(50)
+    
 as 
 begin 
     set nocount on;
@@ -36,7 +37,7 @@ begin
             LastName = @LastName,
             AccountType = @AccountType,
             UpdateDate = getdate()
-     where Id = @Id;
+     where Id = @Id and IsDeleted = 0;
       
     return 0;
 end

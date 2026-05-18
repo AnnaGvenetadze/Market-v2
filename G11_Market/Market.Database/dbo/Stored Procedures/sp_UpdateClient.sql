@@ -35,7 +35,7 @@ begin
         PhoneNumber = @PhoneNumber,
         ContactEmail = @ContactEmail,
         UpdateDate = getdate()
-    where Id = @Id;
+    where Id = @Id and IsDeleted = 0;
       
     return 0;
 end

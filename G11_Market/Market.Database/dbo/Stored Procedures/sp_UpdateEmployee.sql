@@ -42,7 +42,7 @@ begin
         EmployeeCode = @EmployeeCode,
         HireDate = @HireDate,
         UpdateDate = getdate()
-    where Id = @Id;
+    where Id = @Id and IsDeleted = 0;
       
     return 0;
 end

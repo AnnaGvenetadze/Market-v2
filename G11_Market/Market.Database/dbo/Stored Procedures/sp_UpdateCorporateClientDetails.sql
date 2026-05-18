@@ -23,7 +23,7 @@ begin
         LegalAddress = @LegalAddress,
         ContactPersonName = @ContactPersonName,
         UpdateDate = getdate()
-    where Id = @AccountId;
+    where Id = @AccountId and IsDeleted = 0;
       
     return 0;
 end
