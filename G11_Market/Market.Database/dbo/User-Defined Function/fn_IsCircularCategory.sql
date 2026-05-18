@@ -13,7 +13,7 @@ begin
     begin
         if @SearchID = @CategoryID return 1;
         select @SearchID = ParentID from Categories where ID = @SearchID;
-        if @@rowcount = 0 break; 
     end
+
     return 0;
 end;
