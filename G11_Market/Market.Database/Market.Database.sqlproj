@@ -90,7 +90,6 @@
     <Build Include="dbo\Stored Procedures\sp_InsertCorporateClientDetails.sql" />
     <Build Include="dbo\Stored Procedures\sp_CancelSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_CompleteSale.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetAccountByUsername.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_LoginAccount.sql" />
     <Build Include="dbo\Stored Procedures\sp_ResetAccountPassword.sql" />
@@ -100,7 +99,13 @@
     <Build Include="dbo\Tables\CategoryAttributes.sql" />
     <Build Include="dbo\Tables\ProductAttributeValues.sql" />
     <Build Include="dbo\User-Defined Function\fn_IsCircularCategory.sql" />
-    <Build Include="dbo\Attributes.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetEmployeeByAcountId.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteEmployee_1.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteAccountById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteEmployeesRoles.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetEmployeeRolesByEmployeeId.sql" />
+    <Build Include="dbo\Stored Procedures\sp_InsertClientType.sql" />
+    <Build Include="dbo\Stored Procedures\sp_InsertEmployeeRole.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dbo\Stored Procedures\sp_ValidateCategory.sql" />
