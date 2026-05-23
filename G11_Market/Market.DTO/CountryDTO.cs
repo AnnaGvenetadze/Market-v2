@@ -1,8 +1,6 @@
-﻿using Market.DTO.Interfaces;
+﻿namespace Market.DTO;
 
-namespace Market.DTO.DTOs;
-
-public sealed class CountryDTO : IDto
+public sealed class CountryDTO 
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;

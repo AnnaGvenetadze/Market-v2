@@ -1,11 +1,11 @@
 ﻿namespace Market.Repositories.Interfaces;
 
-public interface IBaseRepository<TDto, TInsert, TUpdate>
+public interface IBaseRepository<T>
 {
-    TDto? GetById(object id);
-    int Insert(TInsert entity);
-    void Update(TUpdate entity);
+    T? GetById(object id);
+    int Insert(T entity);
+    void Update(T entity);
     void Delete(object id);
-    IEnumerable<TDto> GetAll();
-    IEnumerable<TDto> Search(Predicate<TDto> predicate);
+    IEnumerable<T> GetAll();
+    IEnumerable<T> Search(Predicate<T> predicate);
 }
