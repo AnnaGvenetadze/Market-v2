@@ -106,6 +106,26 @@
     <Build Include="dbo\Stored Procedures\sp_GetEmployeeRolesByEmployeeId.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertClientType.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertEmployeeRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteProductAttributeValue.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeactivateProduct.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteAccount.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteCorporateClientDetails.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteEmployee.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAccountById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllAccounts.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllClients.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllCorporateClientDetails.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllEmployees.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetClientById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetCorporateClientDetailsById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetSaleTotal.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetSalesByStatus.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetProductAttributeValuesByProductId.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetSaleItemsBySaleId.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetEmployeeById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetSalesByDateRange.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateCorporateClientDetails.sql" />
+    <Build Include="dbo\Stored Procedures\sp_ValidateAttribute.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dbo\Stored Procedures\sp_ValidateCategory.sql" />
