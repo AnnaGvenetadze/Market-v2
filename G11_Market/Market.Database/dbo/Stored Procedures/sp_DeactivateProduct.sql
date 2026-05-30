@@ -1,24 +1,19 @@
-﻿create procedure sp_DeactivateProduct
-	@ProductID int
+﻿create or alter procedure dbo.sp_DeactivateProduct
+    @ProductID int
 as
 begin
-	set nocount on;
+    set nocount on;
 
-	if not exists (
-		select 1
-		from Products
-		where ID = @ProductID
-	)
-	begin
-		raiserror('Product not found.', 16,1 );
-      return -1;
-	end
+    update dbo.Products
+    set
+        IsActive = 0,
+        UpdatedDate = getdate()
+    where ID = @ProductID;
 
-	update Products
-	set
-		IsActive = 0,
-		UpdatedDate = GETDATE()
-	where ID = @ProductID
-
-	return 0;
-end
+    if @@rowcount = 0
+    begin
+        raiserror('product not found.', 16, 1);
+        return;
+    end;
+end;
+go
