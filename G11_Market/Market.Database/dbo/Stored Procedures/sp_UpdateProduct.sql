@@ -1,4 +1,4 @@
-create or alter procedure dbo.sp_UpdateProduct
+create procedure dbo.sp_UpdateProduct
     @ProductID int,
     @CategoryID int,
     @ProductName nvarchar(100),

@@ -1,4 +1,4 @@
-create or alter procedure dbo.sp_InsertProduct
+create procedure dbo.sp_InsertProduct
     @CategoryID int,
     @ProductName nvarchar(100),
     @Price decimal(18, 2)

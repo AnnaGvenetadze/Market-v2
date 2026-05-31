@@ -41,18 +41,21 @@ public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
     public int Insert(T entity)
     {
         var parameters = new DynamicParameters();
-        var propsToInsert = typeof(T).GetProperties().Where(p => !Attribute.IsDefined(p, typeof(IgnoreOnInsertAttribute)));
+        var propsToInsert = typeof(T)
+            .GetProperties()
+            .Where(p => !Attribute.IsDefined(p, typeof(IgnoreOnInsertAttribute)));
         foreach (var prop in propsToInsert)
         {
-            parameters.Add($"@{prop.Name}", prop.GetValue(entity));
+            parameters.Add(prop.Name, prop.GetValue(entity));
         }
-        parameters.Add("@IdOut", dbType: DbType.Int32, direction: ParameterDirection.Output);
+        parameters.Add("Id", dbType: DbType.Int32, direction: ParameterDirection.Output);
+        
         _connection.Execute(
             $"sp_Insert{_entityName}",
             parameters,
             commandType: CommandType.StoredProcedure);
 
-        return parameters.Get<int>("@IdOut");
+        return parameters.Get<int>("Id");
     }
 
     public void Update(T entity)
@@ -60,11 +63,14 @@ public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
         ArgumentNullException.ThrowIfNull(entity, nameof(entity));
 
         var parameters = new DynamicParameters();
-        var propsToUpdate = typeof(T).GetProperties().Where(p => !Attribute.IsDefined(p, typeof(IgnoreOnUpdateAttribute)));
+        var propsToUpdate = typeof(T)
+            .GetProperties()
+            .Where(p => !Attribute.IsDefined(p, typeof(IgnoreOnUpdateAttribute)));
         foreach (var prop in propsToUpdate)
         {
-            parameters.Add($"@{prop.Name}", prop.GetValue(entity));
+            parameters.Add(prop.Name, prop.GetValue(entity));
         }
+
         _connection.Execute(
             $"sp_Update{_entityName}",
             parameters,
@@ -81,6 +87,7 @@ public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
             commandType: CommandType.StoredProcedure);
     }
 
+    // todo: we need to translate predicate to sql query. 
     public IEnumerable<T> Search(Predicate<T> predicate)
     {
         var allItems = GetAll();

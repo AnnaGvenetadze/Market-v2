@@ -1,4 +1,4 @@
-﻿create or alter procedure dbo.sp_DeactivateProduct
+﻿create procedure dbo.sp_DeactivateProduct
     @ProductID int
 as
 begin

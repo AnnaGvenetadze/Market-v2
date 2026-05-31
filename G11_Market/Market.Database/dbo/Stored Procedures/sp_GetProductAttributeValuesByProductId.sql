@@ -1,4 +1,4 @@
-﻿create or alter procedure dbo.sp_GetProductAttributeValuesByProductId
+﻿create procedure dbo.sp_GetProductAttributeValuesByProductId
     @ProductID int
 as
 begin

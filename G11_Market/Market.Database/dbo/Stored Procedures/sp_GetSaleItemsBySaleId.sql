@@ -8,7 +8,7 @@ begin
         sd.Id,
         sd.SaleId,
         sd.ProductId,
-        p.Name as ProductName,
+        p.ProductName,
         sd.Quantity,
         sd.UnitPrice,
         sd.Quantity * sd.UnitPrice as TotalPrice
