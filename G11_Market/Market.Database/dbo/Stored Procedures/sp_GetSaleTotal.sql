@@ -1,19 +1,16 @@
-﻿create procedure dbo.sp_GetSalesByStatus
-    @Status tinyint
+﻿create procedure dbo.sp_GetSaleTotal
+    @Id int
 as
 begin
     set nocount on;
 
     select
-        Id,
-        CreatedEmployeeId,
-        CancelledByEmployeeId,
-        Status,
-        CreatedAt,
-        CancelledAt,
-        CancelReason
-    from dbo.Sales
-    where Status = @Status
-    order by CreatedAt, Id;
+        s.Id,
+        sum(si.Quantity * si.UnitPrice - si.DiscountAmount) as Total
+
+        from dbo.Sales s
+        inner join dbo.SaleItems si on s.Id = si.SaleId
+        where s.Id = @Id
+        group by s.Id;
 end;
 go

@@ -12,13 +12,13 @@ begin
         e.LastName,
         s.CancelledByEmployeeId,
         s.Status,
-        s.CreatedAt,
-        s.CancelledAt,
+        s.CreatedDate,
+        s.CancelledDate,
         s.CancelReason
 
     from dbo.Sales s
     inner join dbo.Employees e on s.CreatedEmployeeId = e.Id
     where s.CreatedEmployeeId = @EmployeeId
-    order by s.CreatedAt desc;
+    order by s.CreatedDate;
 end
 go

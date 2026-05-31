@@ -1,18 +1,20 @@
 ﻿create procedure dbo.sp_GetSaleItemsBySaleId
-    @SaleId int
+    @Id int
 as
 begin
     set nocount on;
 
     select
-        Id,
-        SaleId,
-        ProductId,
-        Quantity,
-        UnitPrice,
-        TotalPrice
-    from dbo.SaleItems
-    where SaleId = @SaleId
-    order by Id;
+        sd.Id,
+        sd.SaleId,
+        sd.ProductId,
+        p.Name as ProductName,
+        sd.Quantity,
+        sd.UnitPrice,
+        sd.Quantity * sd.UnitPrice as TotalPrice
+
+        from dbo.SaleItems sd
+        inner join dbo.Products p on sd.ProductId = p.Id
+        where sd.SaleId = @Id;
 end;
 go  

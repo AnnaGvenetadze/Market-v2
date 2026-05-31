@@ -15,12 +15,12 @@ begin
         CreatedEmployeeId,
         CancelledByEmployeeId,
         Status,
-        CreatedAt,
-        CancelledAt,
+        CreatedDate,
+        CancelledDate,
         CancelReason
     from dbo.Sales
-    where CreatedAt >= @DateFrom
-      and CreatedAt <= @DateTo
-    order by CreatedAt, Id;
+    where CreatedDate >= @DateFrom
+      and CreatedDate <= @DateTo
+    order by CreatedDate, Id;
 end;
 go
