@@ -7,7 +7,7 @@ using Market.Repositories.Interfaces;
 
 namespace Market.Repositories;
 
-public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
+public abstract class BaseRepository<T> : IBaseRepository<T>//, IDisposable
 {
     private readonly DbConnection _connection;
     private bool _disposed = false;
@@ -94,29 +94,29 @@ public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
         return allItems.Where(item => predicate(item));
     }
 
-    #region IDisposable Support
+    // #region IDisposable Support
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
+    //public void Dispose()
+    //{
+    //    Dispose(true);
+    //    GC.SuppressFinalize(this);
+    //}
 
-    private void Dispose(bool disposing)
-    {
-        if (_disposed)
-            return;
-        if (disposing)
-        {
+    //private void Dispose(bool disposing)
+    //{
+    //    if (_disposed)
+    //        return;
+    //    if (disposing)
+    //    {
 
-        }
-        _disposed = true;
-    }
+    //    }
+    //    _disposed = true;
+    //}
 
-    ~BaseRepository()
-    {
-        Dispose(false);
-    }
+    //~BaseRepository()
+    //{
+    //    Dispose(false);
+    //}
 
-    #endregion
+    //#endregion
 }
