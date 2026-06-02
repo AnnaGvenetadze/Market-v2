@@ -17,7 +17,7 @@ public abstract class BaseRepository<T> : IBaseRepository<T>//, IDisposable
     protected BaseRepository(DbConnection connection)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
-        _entityName = typeof(T).Name;
+        _entityName = typeof(T).Name[..^3]; // removing "DTO" suffix
         _entityPluralName = _entityName.ToPlural();
     }
 
@@ -49,7 +49,7 @@ public abstract class BaseRepository<T> : IBaseRepository<T>//, IDisposable
             parameters.Add(prop.Name, prop.GetValue(entity));
         }
         parameters.Add("Id", dbType: DbType.Int32, direction: ParameterDirection.Output);
-        
+
         _connection.Execute(
             $"sp_Insert{_entityName}",
             parameters,
