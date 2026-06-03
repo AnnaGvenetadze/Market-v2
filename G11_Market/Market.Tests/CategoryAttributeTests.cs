@@ -25,12 +25,12 @@ public class CategoryAttributeRepositoryTests
 
         var category = new CategoryDTO
         {
-            CategoryName = TestDataHelper.GenerateName("TestCategory"),
+            CategoryName = TestDataHelper.AddGuid("TestCategory"),
             Description = "Test category description"
         };
         var attribute = new AttributeDTO
         {
-            AttributeName = TestDataHelper.GenerateName("TestAttributeName"),
+            AttributeName = TestDataHelper.AddGuid("TestAttributeName"),
             AttributeType = 1
         };
 

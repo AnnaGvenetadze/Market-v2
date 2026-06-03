@@ -21,11 +21,11 @@ public abstract class BaseRepository<T> : IBaseRepository<T>//, IDisposable
         _entityPluralName = _entityName.ToPlural();
     }
 
-    public T? GetById(object id)
+    public T GetById(object id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
-        return _connection.QueryFirstOrDefault<T>(
+        return _connection.QueryFirst<T>(
             $"sp_Get{_entityName}ById",
             new { Id = id },
             commandType: CommandType.StoredProcedure);

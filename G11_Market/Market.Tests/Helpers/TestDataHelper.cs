@@ -2,9 +2,10 @@
 
 public static class TestDataHelper
 {
-    public static string GenerateName(string prefix)
+
+    public static string AddGuid(this string text)
     {
-        return $"{prefix}_{Guid.NewGuid():N}";
+        return $"{text}_{Guid.NewGuid():N}";
     }
 
     public static string GenerateCode(int length = 3)

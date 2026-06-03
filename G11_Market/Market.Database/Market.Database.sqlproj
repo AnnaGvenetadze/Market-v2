@@ -150,5 +150,7 @@
     <None Include="dbo\Stored Procedures\sp_InsertProductAttributeValue.sql" />
     <None Include="dbo\Stored Procedures\sp_ValidateAttributeValue.sql" />
     <None Include="dbo\Stored Procedures\sp_UpdateProductAttributeValue.sql" />
+    <None Include="DEV.Database.publish.xml" />
+    <None Include="TEST.Database.publish.xml" />
   </ItemGroup>
 </Project>

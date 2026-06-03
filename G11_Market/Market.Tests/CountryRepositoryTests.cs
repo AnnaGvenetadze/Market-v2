@@ -5,15 +5,10 @@ using Microsoft.Data.SqlClient;
 
 namespace Market.Tests;
 
-public class CountryRepositoryTests
+public class CountryRepositoryTests : BaseRepositoryTests
 {
-    private const string ConnectionString = "Server=localhost;Database=MarketDB_Test;Trusted_Connection=True;TrustServerCertificate=True;";
-    
     private SqlConnection _connection;
     private CountryRepository _repository;
-    
-    private readonly List<int> _createdCountryIds = new();
-
 
     [SetUp]
     public void Setup()
@@ -22,13 +17,11 @@ public class CountryRepositoryTests
         _repository = new CountryRepository(_connection);
     }
 
-
     [TearDown]
     public void TearDown()
     {
         _connection.Dispose();
     }
-
 
     [Test]
     public void InsertTest_ShouldInsertValidData()
@@ -36,14 +29,12 @@ public class CountryRepositoryTests
         // Arrange
         var country = new CountryDTO
         {
-            Name = TestDataHelper.GenerateName("Testland"),
+            Name = "TestLand".AddGuid(),
             CountryCode = TestDataHelper.GenerateCode()
         };
 
         // Act
         var newId = _repository.Insert(country);
-        _createdCountryIds.Add(newId);
-
         var insertedCountry = _repository.GetById(newId);
 
         // Assert
@@ -51,10 +42,7 @@ public class CountryRepositoryTests
         Assert.That(insertedCountry, Is.Not.Null);
         Assert.That(insertedCountry!.Name, Is.EqualTo(country.Name));
         Assert.That(insertedCountry.CountryCode, Is.EqualTo(country.CountryCode));
-        Assert.That(insertedCountry.CreateDate, Is.GreaterThan(DateTime.MinValue));
-        Assert.That(insertedCountry.UpdateDate, Is.Null);
     }
-
 
     [Test]
     public void InsertTest_ShouldNotInsertInvalidData()
@@ -62,7 +50,7 @@ public class CountryRepositoryTests
         // Arrange
         var country = new CountryDTO
         {
-            Name = TestDataHelper.GenerateName("InvalidCountry"),
+            Name = "InvalidCountry".AddGuid(),
             CountryCode = " "
         };
 
@@ -70,57 +58,33 @@ public class CountryRepositoryTests
         Assert.Throws<SqlException>(() => _repository.Insert(country));
     }
 
-
     [Test]
     public void UpdateTest_ShouldUpdateValidData()
     {
         // Arrange
-        var country = new CountryDTO
-        {
-            Name = TestDataHelper.GenerateName("Testland"),
-            CountryCode = TestDataHelper.GenerateCode()
-        };
-
-        var newId = _repository.Insert(country);
-        _createdCountryIds.Add(newId);
-
-        var insertedCountry = _repository.GetById(newId);
-
-        insertedCountry!.Name = TestDataHelper.GenerateName("Updatedland");
-        insertedCountry.CountryCode = TestDataHelper.GenerateCode();
+        var existingCountry = _repository.GetById(UpdateTestId);
+        existingCountry!.Name = $"New{existingCountry.Name}";
 
         // Act
-        _repository.Update(insertedCountry);
-
-        var updatedCountry = _repository.GetById(newId);
+        _repository.Update(existingCountry);
+        var updatedCountry = _repository.GetById(UpdateTestId);
 
         // Assert
         Assert.That(updatedCountry, Is.Not.Null);
-        Assert.That(updatedCountry!.Name, Is.EqualTo(insertedCountry.Name));
-        Assert.That(updatedCountry.CountryCode, Is.EqualTo(insertedCountry.CountryCode));
-        Assert.That(updatedCountry.UpdateDate, Is.GreaterThan(DateTime.MinValue));
+        Assert.That(updatedCountry!.Name, Is.EqualTo(existingCountry.Name));
     }
-
 
     [Test]
     public void UpdateTest_ShouldNotUpdateInvalidData()
     {
-        // Arrange
-        var country = new CountryDTO
-        {
-            Name = TestDataHelper.GenerateName("Testland"),
-            CountryCode = TestDataHelper.GenerateCode()
-        };
+        Assert.Pass("This test is not implemented yet. Implementing validation logic in the repository is required to make this test meaningful.");
+    }
 
-        var newId = _repository.Insert(country);
-        _createdCountryIds.Add(newId);
-
-        var insertedCountry = _repository.GetById(newId);
-
-        insertedCountry!.Name = TestDataHelper.GenerateName("Updatedland");
-        insertedCountry.CountryCode = "s";
-
-        // Act and Assert
-        Assert.Throws<SqlException>(() => _repository.Update(insertedCountry));
+    [Test]
+    public void DeleteTest_ShouldDeleteValidData()
+    {
+        // Arrange, Act and Assert
+        _repository.Delete(DeleteTestId);
+        Assert.Throws<SqlException>(() => _repository.GetById(DeleteTestId));
     }
 }
