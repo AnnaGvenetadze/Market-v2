@@ -127,6 +127,10 @@
     <Build Include="dbo\Stored Procedures\sp_ValidateAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertProduct.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateProduct.sql" />
+    <None Include="dbo\Stored Procedures\sp_GetCategoryAttributeById.sql" />
+    <None Include="dbo\Stored Procedures\sp_InsertAttribute.sql" />
+    <None Include="dbo\Stored Procedures\sp_InsertCategoryAttribute.sql" />
+    <None Include="dbo\Stored Procedures\sp_UpdateCategoryAttribute.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dbo\Stored Procedures\sp_ValidateCategory.sql" />
@@ -142,9 +146,6 @@
     <None Include="dbo\Stored Procedures\sp_UpdateClient.sql" />
     <None Include="dbo\Stored Procedures\sp_DeleteClient.sql" />
     <None Include="dbo\Stored Procedures\sp_GetSalesByEmployeeId.sql" />
-    <None Include="sp_InsertAttribute.sql" />
-    <None Include="sp_InsertCategoryAttribute.sql" />
-    <None Include="sp_GetCategoryAttributeById.sql" />
     <None Include="sp_UpdateCategoryAttribute.sql" />
   </ItemGroup>
 </Project>
