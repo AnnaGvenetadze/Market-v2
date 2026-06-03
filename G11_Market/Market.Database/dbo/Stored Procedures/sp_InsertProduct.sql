@@ -1,5 +1,5 @@
 create procedure dbo.sp_InsertProduct
-    @CategoryID int,
+    @CategoryId int,
     @ProductName nvarchar(100),
     @Price decimal(18, 2)
 as
@@ -7,16 +7,16 @@ begin
     set nocount on;
 
     insert into dbo.Products (
-        CategoryID,
+        CategoryId,
         ProductName,
         Price
     )
     values (
-        @CategoryID,
+        @CategoryId,
         @ProductName,
         @Price
     );
 
-    select scope_identity() as ProductID;
+    select scope_identity() as ProductId;
 end;
 go

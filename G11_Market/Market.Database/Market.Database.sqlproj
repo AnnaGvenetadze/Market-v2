@@ -147,5 +147,8 @@
     <None Include="dbo\Stored Procedures\sp_DeleteClient.sql" />
     <None Include="dbo\Stored Procedures\sp_GetSalesByEmployeeId.sql" />
     <None Include="sp_UpdateCategoryAttribute.sql" />
+    <None Include="dbo\Stored Procedures\sp_InsertProductAttributeValue.sql" />
+    <None Include="dbo\Stored Procedures\sp_ValidateAttributeValue.sql" />
+    <None Include="dbo\Stored Procedures\sp_UpdateProductAttributeValue.sql" />
   </ItemGroup>
 </Project>

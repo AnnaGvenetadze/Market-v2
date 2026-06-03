@@ -1,14 +1,14 @@
 ﻿create procedure dbo.sp_DeleteProduct
-    @ProductID int
+    @ProductId int
 as
 begin
     set nocount on;
 
     update dbo.Products
     set
-        IsActive = 0,
+        IsDeleted = 0,
         UpdatedDate = getdate()
-    where ID = @ProductID;
+    where Id = @ProductId;
 
     if @@rowcount = 0
     begin

@@ -1,6 +1,6 @@
 create procedure dbo.sp_UpdateProduct
-    @ProductID int,
-    @CategoryID int,
+    @ProductId int,
+    @CategoryId int,
     @ProductName nvarchar(100),
     @Price decimal(18, 2)
 as
@@ -9,12 +9,12 @@ begin
 
     update dbo.Products
     set
-        CategoryID = @CategoryID,
+        CategoryId = @CategoryId,
         ProductName = @ProductName,
         Price = @Price,
         UpdatedDate = getdate()
-    where ID = @ProductID;
+    where Id = @ProductId;
 
-    select @ProductID as ProductID;
+    select @ProductId as ProductId;
 end;
 go
