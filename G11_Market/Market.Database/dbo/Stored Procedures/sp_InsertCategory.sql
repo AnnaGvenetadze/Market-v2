@@ -2,12 +2,12 @@
     @CategoryName nvarchar(100),
     @ParentId int = null,
     @Description nvarchar(1000) = null,
-    @NewCategoryId int output
+    @Id int output
 as
 begin
     set nocount on;
 
-    set @NewCategoryId = null;
+    set @Id = null;
 
     if @ParentId is not null
     begin
@@ -28,18 +28,18 @@ begin
     begin try
         insert into dbo.Categories
         (
-            ParentID,
+            ParentId,
             CategoryName,
             Description
         )
         values
         (
-            @ParentID,
+            @ParentId,
             @CategoryName,
             @Description
         );
 
-        set @NewCategoryID = convert(int, scope_identity());
+        set @Id = convert(int, scope_identity());
     end try
     begin catch
         if error_number() in (2601, 2627)

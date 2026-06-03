@@ -88,7 +88,7 @@
     <Build Include="dbo\Stored Procedures\sp_InsertEmployee.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertClient.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertCorporateClientDetails.sql" />
-    <Build Include="dbo\Stored Procedures\sp_CancelSale.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_CompleteSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_LoginAccount.sql" />
@@ -106,7 +106,7 @@
     <Build Include="dbo\Stored Procedures\sp_InsertClientType.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertEmployeeRole.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteProductAttributeValue.sql" />
-    <Build Include="dbo\Stored Procedures\sp_DeactivateProduct.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteProduct.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteAccount.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteCorporateClientDetails.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteEmployee.sql" />
@@ -131,7 +131,7 @@
   <ItemGroup>
     <None Include="dbo\Stored Procedures\sp_ValidateCategory.sql" />
     <None Include="dbo\Stored Procedures\sp_InsertCategory.sql" />
-    <None Include="dbo\Stored Procedures\sp_DeactivateCategory.sql" />
+    <None Include="dbo\Stored Procedures\sp_DeleteCategory.sql" />
     <None Include="dbo\Stored Procedures\sp_GetCategories.sql" />
     <None Include="dbo\Views\vw_CategoriesWithParent.sql" />
     <None Include="dbo\Stored Procedures\sp_GetCategoryById.sql" />
@@ -142,5 +142,9 @@
     <None Include="dbo\Stored Procedures\sp_UpdateClient.sql" />
     <None Include="dbo\Stored Procedures\sp_DeleteClient.sql" />
     <None Include="dbo\Stored Procedures\sp_GetSalesByEmployeeId.sql" />
+    <None Include="sp_InsertAttribute.sql" />
+    <None Include="sp_InsertCategoryAttribute.sql" />
+    <None Include="sp_GetCategoryAttributeById.sql" />
+    <None Include="sp_UpdateCategoryAttribute.sql" />
   </ItemGroup>
 </Project>

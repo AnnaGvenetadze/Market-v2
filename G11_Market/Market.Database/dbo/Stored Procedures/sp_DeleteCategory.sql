@@ -1,4 +1,4 @@
-﻿create or alter procedure dbo.sp_DeactivateCategory
+﻿create or alter procedure dbo.sp_DeleteCategory
     @CategoryId int
 as
 begin

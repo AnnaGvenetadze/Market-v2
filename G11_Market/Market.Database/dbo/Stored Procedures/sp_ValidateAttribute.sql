@@ -1,31 +1,31 @@
-﻿create procedure sp_ValidateAttribute
-    @AttributeID int
-as
-begin
-    set nocount on;
+﻿CREATE PROCEDURE sp_ValidateAttribute
+    @AttributeId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    if not exists
+    IF NOT EXISTS
     (
-        select 1
-        from Attributes
-        where ID = @AttributeID
+        SELECT 1
+        FROM Attributes
+        WHERE Id = @AttributeId
     )
-    begin
-        raiserror('Attribute was not found.', 16, 1);
-        return -1;
-    end;
+    BEGIN
+        RAISERROR('Attribute was not found.', 16, 1);
+        RETURN -1;
+    END;
 
-    if exists
+    IF EXISTS
     (
-        select 1
-        from Attributes
-        where ID = @AttributeID
-          and IsActive = 0
+        SELECT 1
+        FROM Attributes
+        WHERE Id = @AttributeId
+          AND IsDeleted = 1
     )
-    begin
-        raiserror('Attribute is inactive.', 16, 1);
-        return -2;
-    end;
+    BEGIN
+        RAISERROR('Attribute is inactive.', 16, 1);
+        RETURN -2;
+    END;
 
-    return 0;
-end;
+    RETURN 0;
+END;
