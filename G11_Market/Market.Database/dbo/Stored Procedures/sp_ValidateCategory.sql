@@ -26,7 +26,7 @@ begin
             select 1
             from dbo.Categories
             where Id = @CategoryId
-              and IsActive = 1
+              and IsDeleted = 1
         )
         begin
             set @Message = N'Category is not active.';

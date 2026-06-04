@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE sp_DeleteCategoryAttribute
+﻿CREATE PROCEDURE sp_UpdateCategoryAttribute
     @CategoryId INT,
-    @AttributeId INT
+    @AttributeId INT,
+    @OrderPosition INT
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -17,6 +18,25 @@ BEGIN
         RETURN -2;
     END;
 
+    IF @OrderPosition IS NULL
+    BEGIN
+        SET @OrderPosition = 0;
+    END;
+
+    IF NOT EXISTS
+    (
+        SELECT 1
+        FROM Categories
+        WHERE Id = @CategoryId
+          AND IsDeleted = 0
+    )
+    BEGIN
+        RAISERROR('Category was not found.', 16, 1);
+        RETURN -3;
+    END;
+
+    EXEC sp_ValidateAttribute @AttributeId;
+
     IF NOT EXISTS
     (
         SELECT 1
@@ -26,10 +46,11 @@ BEGIN
     )
     BEGIN
         RAISERROR('Category attribute was not found.', 16, 1);
-        RETURN -3;
+        RETURN -4;
     END;
 
-    DELETE FROM CategoryAttributes
+    UPDATE CategoryAttributes
+    SET OrderPosition = @OrderPosition
     WHERE CategoryId = @CategoryId
       AND AttributeId = @AttributeId;
 

@@ -1,4 +1,4 @@
-﻿--create procedure dbo.sp_CancelSale
+﻿--create procedure dbo.sp_DeleteSale
 --    @SaleId int,
 --    @CancelledByEmployeeId int,
 --    @CancelReason nvarchar(200)

@@ -17,15 +17,15 @@ public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
     protected BaseRepository(DbConnection connection)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
-        _entityName = typeof(T).Name;
+        _entityName = typeof(T).Name[..^3]; // removing "DTO" suffix
         _entityPluralName = _entityName.ToPlural();
     }
 
-    public T? GetById(object id)
+    public T GetById(object id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
-        return _connection.QueryFirstOrDefault<T>(
+        return _connection.QueryFirst<T>(
             $"sp_Get{_entityName}ById",
             new { Id = id },
             commandType: CommandType.StoredProcedure);
@@ -49,7 +49,7 @@ public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
             parameters.Add(prop.Name, prop.GetValue(entity));
         }
         parameters.Add("Id", dbType: DbType.Int32, direction: ParameterDirection.Output);
-        
+
         _connection.Execute(
             $"sp_Insert{_entityName}",
             parameters,

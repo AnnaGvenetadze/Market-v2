@@ -1,6 +1,6 @@
 ﻿create procedure sp_DeleteProductAttributeValue
-	@ProductID int,
-	@AttributeID int
+	@ProductId int,
+	@AttributeId int
 as
 begin
 	set nocount on;
@@ -8,7 +8,7 @@ begin
 	if not exists (
 		select 1
 		from Products
-		where ID = @ProductID
+		where Id = @ProductId
 	)
 	begin
 		raiserror('Product was not found.', 16, 1);
@@ -18,7 +18,7 @@ begin
 	if not exists (
 		select 1
 		from Attributes
-		where ID = @AttributeID
+		where Id = @AttributeId
 	)
 	begin
 		raiserror('Attribute was not found.', 16, 1);
@@ -28,8 +28,8 @@ begin
 	if not exists (
 		select 1
 		from ProductAttributeValues
-		where AttributeID = @AttributeID
-		  AND ProductID = @ProductID
+		where AttributeId = @AttributeId
+		  AND ProductId = @ProductId
 	)
 	begin
 		raiserror('Attribute value was not found.', 16, 1);
@@ -37,8 +37,8 @@ begin
 	end
 
 	delete from ProductAttributeValues
-	where ProductID = @ProductID
-	  AND AttributeID = @AttributeID
+	where ProductId = @ProductId
+	  AND AttributeId = @AttributeId
 		
 	return 0;
 end

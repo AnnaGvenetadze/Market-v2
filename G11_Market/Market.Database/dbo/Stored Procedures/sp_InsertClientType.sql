@@ -1,7 +1,7 @@
 ﻿create procedure sp_InsertClientType
 	@Name nvarchar(100),
 	@Description nvarchar(max),
-	@id int output
+	@Id int output
 as
 begin
 	set nocount on;

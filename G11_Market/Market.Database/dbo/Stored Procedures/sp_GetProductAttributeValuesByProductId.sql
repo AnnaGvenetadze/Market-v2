@@ -1,5 +1,5 @@
 ﻿create procedure dbo.sp_GetProductAttributeValuesByProductId
-    @ProductID int
+    @ProductId int
 as
 begin
     set nocount on;
@@ -7,7 +7,7 @@ begin
     if not exists (
         select 1
         from dbo.Products
-        where ID = @ProductID
+        where Id = @ProductId
     )
     begin
         raiserror('product not found.', 16, 1);
@@ -15,9 +15,9 @@ begin
     end;
 
     select
-        pav.ProductID,
+        pav.ProductId,
         p.ProductName,
-        pav.AttributeID,
+        pav.AttributeId,
         a.AttributeName,
         a.AttributeType,
         pav.TextValue,
@@ -26,10 +26,10 @@ begin
         pav.BooleanValue
     from dbo.ProductAttributeValues as pav
     inner join dbo.Products as p
-        on pav.ProductID = p.ID
+        on pav.ProductId = p.Id
     inner join dbo.Attributes as a
-        on pav.AttributeID = a.ID
-    where pav.ProductID = @ProductID
+        on pav.AttributeId = a.Id
+    where pav.ProductId = @ProductId
     order by a.AttributeName;
 end;
 go
