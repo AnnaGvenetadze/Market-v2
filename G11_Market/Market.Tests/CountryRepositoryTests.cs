@@ -20,6 +20,7 @@ public class CountryRepositoryTests : BaseRepositoryTests
     [TearDown]
     public void TearDown()
     {
+        _repository.Dispose();
         _connection.Dispose();
     }
 

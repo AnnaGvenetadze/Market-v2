@@ -42,6 +42,8 @@ public class CategoryAttributeRepositoryTests
     [TearDown]
     public void TearDown()
     {
+        _categoryRepository.Dispose();
+        _attributeRepository.Dispose();
         _connection.Dispose();
     }
 
