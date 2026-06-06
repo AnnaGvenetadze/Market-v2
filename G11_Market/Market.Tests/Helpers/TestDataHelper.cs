@@ -2,7 +2,6 @@
 
 public static class TestDataHelper
 {
-
     public static string AddGuid(this string text)
     {
         return $"{text}_{Guid.NewGuid():N}";
@@ -19,5 +18,10 @@ public static class TestDataHelper
         }
 
         return new string(chars);
+    }
+
+    public static string CreatePhoneNumber()
+    {
+        return "568" + Random.Shared.Next(100000, 999999).ToString();
     }
 }

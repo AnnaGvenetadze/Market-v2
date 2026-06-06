@@ -5,9 +5,8 @@ using Microsoft.Data.SqlClient;
 
 namespace Market.Tests;
 
-public class SaleRepositoryTests
+public class SaleRepositoryTests : BaseRepositoryTests
 {
-    private const string ConnectionString = "Server=localhost;Database=MarketDB_Test;Trusted_Connection=True;TrustServerCertificate=True;";
     private SqlConnection _connection;
     private SaleRepository _saleRepository;
     private EmployeeRepository _employeeRepository;

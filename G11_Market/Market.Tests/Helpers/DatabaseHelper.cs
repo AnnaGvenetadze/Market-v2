@@ -4,7 +4,10 @@ namespace Market.Tests.Helpers;
 
 internal class DatabaseHelper
 {
-    private const string ConnectionString = "Server=.;Database=G11_Market_TEST;Integrated Security=True;TrustServerCertificate=True;";
+    private const string ConnectionString 
+        //= "Server=.;Database=G11_Market_TEST;Integrated Security=True;TrustServerCertificate=True;";
+        = "Server=.;Database=MarketDB_TEST;Integrated Security=True;TrustServerCertificate=True;";
+
     private const string ClearDatabaseScript = @"
         DELETE FROM Countries;
         DBCC CHECKIDENT ('Countries', RESEED, 0);";

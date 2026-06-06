@@ -5,9 +5,8 @@ using Microsoft.Data.SqlClient;
 
 namespace Market.Tests;
 
-public class AccountRepositoryTests
+public class AccountRepositoryTests : BaseRepositoryTests
 {
-    private const string ConnectionString = "Server=localhost;Database=MarketDB_Test;Trusted_Connection=True;TrustServerCertificate=True;";
     private SqlConnection _connection;
     private AccountRepository _accountRepository;
 
@@ -17,6 +16,7 @@ public class AccountRepositoryTests
         _connection = new SqlConnection(ConnectionString);
         _accountRepository = new AccountRepository(_connection);
     }
+
 
     [Test]
     public void InsertTest_ShouldInsertValidData()
@@ -45,6 +45,7 @@ public class AccountRepositoryTests
         Assert.That(insertedAccount.Email, Is.EqualTo(account.Email));
         Assert.That(insertedAccount.AccountType, Is.EqualTo(1));
     }
+
 
     [Test]
     public void UpdateTest_ShouldUpdateValidData()
@@ -76,6 +77,7 @@ public class AccountRepositoryTests
         Assert.That(updatedAccount.LastName, Is.EqualTo("NotMania"));
     }
 
+
     [Test]
     public void DeleteTest_ShouldDeleteValidData()
     {
@@ -95,8 +97,9 @@ public class AccountRepositoryTests
         _accountRepository.Delete(insertedId);
 
         // Assert
-        Assert.Throws<InvalidOperationException>(() => _accountRepository.GetById(insertedId));
+        Assert.Throws<SqlException>(() => _accountRepository.GetById(insertedId));
     }
+
 
     [Test]
     public void InsertTest_ShouldNotInsertDuplicateUsername()
@@ -128,6 +131,7 @@ public class AccountRepositoryTests
         Assert.Throws<SqlException>(() => _accountRepository.Insert(account2));
     }
 
+
     [Test]
     public void InsertTest_ShouldNotInsertDuplicateEmail()
     {
@@ -158,6 +162,7 @@ public class AccountRepositoryTests
         Assert.Throws<SqlException>(() => _accountRepository.Insert(account2));
     }
 
+
     [Test]
     public void GetByUsername_ShouldReturnCorrectAccount()
     {
@@ -182,6 +187,7 @@ public class AccountRepositoryTests
         Assert.That(result.Username, Is.EqualTo(wantedUsername));
     }
 
+
     [Test]
     public void GetByUsername_WhenNotFound_ShouldReturnNull()
     {
@@ -191,6 +197,7 @@ public class AccountRepositoryTests
         // Assert
         Assert.That(result, Is.Null);
     }
+
 
     [Test]
     public void GetByEmail_ShouldReturnCorrectAccount()
@@ -216,6 +223,7 @@ public class AccountRepositoryTests
         Assert.That(result.Email, Is.EqualTo(targetEmail));
     }
 
+
     [Test]
     public void GetByEmail_WhenNotFound_ShouldReturnNull()
     {
@@ -226,6 +234,7 @@ public class AccountRepositoryTests
         Assert.That(result, Is.Null);
     }
 
+
     [Test]
     public void GetByAccountType_ShouldReturnMatchingAccounts()
     {
@@ -233,11 +242,11 @@ public class AccountRepositoryTests
         byte targetType = 2;
         var account1 = new AccountDTO { Username = "U1".AddGuid(), PasswordHash = "H", Email = "E1".AddGuid() + "@gmail.com", AccountType = targetType, FirstName = "A", LastName = "B" };
         var account2 = new AccountDTO { Username = "U2".AddGuid(), PasswordHash = "H", Email = "E2".AddGuid() + "@gmail.com", AccountType = targetType, FirstName = "C", LastName = "D" };
-        var account3 = new AccountDTO { Username = "U3".AddGuid(), PasswordHash = "H", Email = "E3".AddGuid() + "@gmail.com", AccountType = 99, FirstName = "E", LastName = "F" }; 
+        var account3 = new AccountDTO { Username = "U3".AddGuid(), PasswordHash = "H", Email = "E3".AddGuid() + "@gmail.com", AccountType = 3, FirstName = "E", LastName = "F" }; 
 
         var id1 = _accountRepository.Insert(account1);
         var id2 = _accountRepository.Insert(account2);
-        _accountRepository.Insert(account3);
+        _accountRepository.Insert(account3); 
 
         // Act
         var results = _accountRepository.GetByAccountType(targetType).ToList();
@@ -249,11 +258,13 @@ public class AccountRepositoryTests
         Assert.That(results.All(x => x.AccountType == targetType), Is.True);
     }
 
+
     [Test]
     public void GetById_WhenIdIsNull_ShouldThrowException()
     {
         Assert.Throws<ArgumentNullException>(() => _accountRepository.GetById(null!));
     }
+
 
     [Test]
     public void Update_WhenEntityIsNull_ShouldThrowException()
@@ -261,11 +272,13 @@ public class AccountRepositoryTests
         Assert.Throws<ArgumentNullException>(() => _accountRepository.Update(null!));
     }
 
+
     [Test]
     public void Delete_WhenIdIsNull_ShouldThrowException()
     {
         Assert.Throws<ArgumentNullException>(() => _accountRepository.Delete(null!));
     }
+
 
     [Test]
     public void GetAll_ShouldReturnAllInsertedRecords()
@@ -283,6 +296,7 @@ public class AccountRepositoryTests
         // Assert
         Assert.That(allAccounts.Count, Is.AtLeast(2));
     }
+
 
     [TearDown]
     public void TearDown()
