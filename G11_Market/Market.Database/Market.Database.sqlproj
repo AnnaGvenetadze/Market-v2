@@ -149,5 +149,10 @@
     <None Include="dbo\Stored Procedures\sp_InsertProductAttributeValue.sql" />
     <None Include="dbo\Stored Procedures\sp_ValidateAttributeValue.sql" />
     <None Include="dbo\Stored Procedures\sp_UpdateProductAttributeValue.sql" />
+    <None Include="dbo\Stored Procedures\sp_InsertInventoryManager.sql" />
+    <None Include="dbo\Stored Procedures\sp_GetInventoryManagerById.sql" />
+    <None Include="dbo\Stored Procedures\sp_GetAllInventoryManagers.sql" />
+    <None Include="dbo\Stored Procedures\sp_UpdateInventoryManager.sql" />
+    <None Include="dbo\Stored Procedures\sp_DeleteInventoryManagers.sql" />
   </ItemGroup>
 </Project>
