@@ -5,7 +5,6 @@ namespace Market.DTO;
 public sealed class SaleDTO
 {
     [IgnoreOnInsert]
-    [IgnoreOnUpdate]
     public int Id { get; set; }
     [IgnoreOnUpdate]
     public int CreatedEmployeeId { get; set; }
