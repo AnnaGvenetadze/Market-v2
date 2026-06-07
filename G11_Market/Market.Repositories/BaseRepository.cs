@@ -1,9 +1,10 @@
-﻿using System.Data;
-using System.Data.Common;
-using Dapper;
+﻿using Dapper;
 using Market.Extensions;
 using Market.Extensions.Attributes;
 using Market.Repositories.Interfaces;
+using System.Data;
+using System.Data.Common;
+using System.Linq.Expressions;
 
 namespace Market.Repositories;
 
@@ -87,11 +88,15 @@ public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
             commandType: CommandType.StoredProcedure);
     }
 
-    // todo: we need to translate predicate to sql query. 
-    public IEnumerable<T> Search(Predicate<T> predicate)
+    public IEnumerable<T> Search(Expression<Func<T, bool>> expression)
     {
-        var allItems = GetAll();
-        return allItems.Where(item => predicate(item));
+        ExpressionTranslator<T> translator = new();
+        var (sql, parameters) = translator.Translate(expression);
+
+        return _connection.Query<T>(
+            $"sp_Search{_entityPluralName}",
+            parameters,
+            commandType: CommandType.StoredProcedure);
     }
 
     #region IDisposable Support
