@@ -152,5 +152,9 @@
     <None Include="dbo\Stored Procedures\sp_GetAllInventoryManagers.sql" />
     <None Include="dbo\Stored Procedures\sp_UpdateInventoryManager.sql" />
     <None Include="dbo\Stored Procedures\sp_DeleteInventoryManager.sql" />
+    <None Include="dbo\Stored Procedures\sp_DeleteSaleItem.sql" />
+    <None Include="dbo\Stored Procedures\sp_GetSaleItemById.sql" />
+    <None Include="dbo\Stored Procedures\sp_InsertSaleItem.sql" />
+    <None Include="dbo\Stored Procedures\sp_UpdateSaleItem.sql" />
   </ItemGroup>
 </Project>

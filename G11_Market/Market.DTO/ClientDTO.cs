@@ -5,7 +5,6 @@ namespace Market.DTO;
 public sealed class ClientDTO
 {
     [IgnoreOnInsert]
-    [IgnoreOnUpdate]
     public int Id { get; set; }
     public int AccountId { get; set; }
     public int ClientTypeId { get; set; }
