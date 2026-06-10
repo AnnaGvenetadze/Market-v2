@@ -128,6 +128,8 @@
     <None Include="dbo\Stored Procedures\sp_InsertCategoryAttribute.sql" />
     <None Include="dbo\Stored Procedures\sp_UpdateCategoryAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetSaleById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateSale.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllSales.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dbo\Stored Procedures\sp_ValidateCategory.sql" />
