@@ -1,26 +1,22 @@
-﻿--create procedure dbo.sp_DeleteSale
---    @SaleId int,
---    @CancelledByEmployeeId int,
---    @CancelReason nvarchar(200)
---as
---begin
---    set nocount on;
+﻿CREATE PROCEDURE dbo.sp_DeleteSale
+    @Id INT,
+    @EmployeeId INT,
+    @CancelReason NVARCHAR(200)
+AS
+BEGIN
+    SET NOCOUNT ON;
 
---    set @CancelReason = trim(@CancelReason);
---    if @CancelReason is null or @CancelReason = '' throw 50122, 'CancelReason is required.', 1;
+    UPDATE dbo.Sales
+    SET
+        Status = 2,
+        CancelledByEmployeeId = @EmployeeId,
+        CancelledDate = GETDATE(),
+        CancelReason = @CancelReason
+    WHERE Id = @Id
+      AND Status <> 2;
 
---    if not exists (select 1 from Sales where Id = @SaleId) throw 50123, 'Sale not found.', 1;
---    if not exists (select 1 from Employees where Id = @CancelledByEmployeeId) throw 50124, 'Cancelling employee not found.', 1;
---    if exists (select 1 from Sales where Id = @SaleId and Status = 1) throw 50125, 'Completed sale cannot be cancelled.', 1;
---    if exists (select 1 from Sales where Id = @SaleId and Status = 2) throw 50126, 'Sale is already cancelled.', 1;
+    IF @@ROWCOUNT = 0
+    throw 50116, 'Sale not found or already cancelled.', 1;
 
---    update Sales
---    set
---        Status = 2,
---        CancelledByEmployeeId = @CancelledByEmployeeId,
---        CancelledAt = getdate(),
---        CancelReason = @CancelReason
---    where Id = @SaleId;
-
---    return 0;
---end
+END
+GO

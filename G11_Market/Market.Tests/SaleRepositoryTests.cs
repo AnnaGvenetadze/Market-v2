@@ -14,6 +14,7 @@ public class SaleRepositoryTests : BaseRepositoryTests
     private int _employeeId;
     private int _secondEmployeeId;
     private int _accountId;
+    private int _secondAccountId;
 
     [SetUp]
     public void Setup()
@@ -25,7 +26,11 @@ public class SaleRepositoryTests : BaseRepositoryTests
         var account = new AccountDTO
         {
             Username = "User".AddGuid(),
-            PasswordHash = "SecureHash123"
+            PasswordHash = "SecureHash123",
+            Email = "lukamania".AddGuid() + "@gmail.com",
+            FirstName = "FirstSaxeli",
+            LastName = "LastSaxeli",
+            AccountType = 1,
         };
         _accountId = _accountRepository.Insert(account);
         var employee1 = new EmployeeDTO
@@ -34,16 +39,30 @@ public class SaleRepositoryTests : BaseRepositoryTests
             FirstName = "Test1",
             LastName = "Test1",
             EmployeeCode = "Test1".AddGuid(),
-            HireDate = DateTime.Today
+            HireDate = DateTime.Today,
+            PhoneNumber = Guid.NewGuid().ToString().Substring(0, 20), 
+            ContactEmail = "emp1".AddGuid() + "@market.com"
         };
         _employeeId = _employeeRepository.Insert(employee1);
+        var account2 = new AccountDTO
+        {
+            Username = "User2".AddGuid(),
+            PasswordHash = "SecureHash123",
+            Email = "lukamania".AddGuid() + "@gmail.com", 
+            FirstName = "ManagerFirstName",
+            LastName = "ManagerLastName",
+            AccountType = 1,
+        };
+        _secondAccountId = _accountRepository.Insert(account2);
         var employee2 = new EmployeeDTO
         {
-            AccountId = _accountId,
+            AccountId = _secondAccountId,
             FirstName = "Manager",
             LastName = "Boss",
             EmployeeCode = "Test2".AddGuid(),
-            HireDate = DateTime.Today
+            HireDate = DateTime.Today,
+            PhoneNumber = Guid.NewGuid().ToString().Substring(0, 20),
+            ContactEmail = "emp1".AddGuid() + "@market.com"
         };
         _secondEmployeeId = _employeeRepository.Insert(employee2);
     }

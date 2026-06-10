@@ -101,7 +101,7 @@
     <Build Include="dbo\User-Defined Function\fn_IsCircularCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetEmployeeByAcountId.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteAccountById.sql" />
-    <Build Include="dbo\Stored Procedures\sp_DeleteEmployeesRoles.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteEmployeesRole.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetEmployeeRolesByEmployeeId.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertClientType.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertEmployeeRole.sql" />
@@ -117,12 +117,8 @@
     <Build Include="dbo\Stored Procedures\sp_GetAllEmployees.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetClientById.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetCorporateClientDetailsById.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetSaleTotal.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetSalesByStatus.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetProductAttributeValuesByProductId.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetSaleItemsBySaleId.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetEmployeeById.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetSalesByDateRange.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateCorporateClientDetails.sql" />
     <Build Include="dbo\Stored Procedures\sp_ValidateAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertProduct.sql" />
@@ -131,6 +127,7 @@
     <None Include="dbo\Stored Procedures\sp_InsertAttribute.sql" />
     <None Include="dbo\Stored Procedures\sp_InsertCategoryAttribute.sql" />
     <None Include="dbo\Stored Procedures\sp_UpdateCategoryAttribute.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetSaleById.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dbo\Stored Procedures\sp_ValidateCategory.sql" />
@@ -145,7 +142,6 @@
     <None Include="dbo\Stored Procedures\sp_GetClients.sql" />
     <None Include="dbo\Stored Procedures\sp_UpdateClient.sql" />
     <None Include="dbo\Stored Procedures\sp_DeleteClient.sql" />
-    <None Include="dbo\Stored Procedures\sp_GetSalesByEmployeeId.sql" />
     <None Include="dbo\Stored Procedures\sp_InsertProductAttributeValue.sql" />
     <None Include="dbo\Stored Procedures\sp_ValidateAttributeValue.sql" />
     <None Include="dbo\Stored Procedures\sp_UpdateProductAttributeValue.sql" />
@@ -153,6 +149,6 @@
     <None Include="dbo\Stored Procedures\sp_GetInventoryManagerById.sql" />
     <None Include="dbo\Stored Procedures\sp_GetAllInventoryManagers.sql" />
     <None Include="dbo\Stored Procedures\sp_UpdateInventoryManager.sql" />
-    <None Include="dbo\Stored Procedures\sp_DeleteInventoryManagers.sql" />
+    <None Include="dbo\Stored Procedures\sp_DeleteInventoryManager.sql" />
   </ItemGroup>
 </Project>

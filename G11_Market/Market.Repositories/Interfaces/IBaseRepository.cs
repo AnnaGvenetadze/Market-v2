@@ -1,4 +1,6 @@
-﻿namespace Market.Repositories.Interfaces;
+﻿using System.Linq.Expressions;
+
+namespace Market.Repositories.Interfaces;
 
 public interface IBaseRepository<T>
 {
@@ -7,5 +9,5 @@ public interface IBaseRepository<T>
     void Update(T entity);
     void Delete(object id);
     IEnumerable<T> GetAll();
-    IEnumerable<T> Search(Predicate<T> predicate);
+    IEnumerable<T> Search(Expression<Func<T, bool>> expression);
 }
