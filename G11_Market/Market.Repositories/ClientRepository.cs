@@ -4,6 +4,7 @@ using Market.Repositories.Interfaces;
 
 namespace Market.Repositories;
 
-public sealed class ClientRepository(DbConnection connection) : BaseRepository<ClientDTO>(connection), IClientRepository
+public sealed class ClientRepository(DbConnection connection) 
+    : BaseRepository<ClientDTO>(connection), IClientRepository
 {
 }
