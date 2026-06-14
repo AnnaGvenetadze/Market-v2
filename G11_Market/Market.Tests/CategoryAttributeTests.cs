@@ -1,5 +1,6 @@
 ﻿using Market.DTO;
 using Market.Repositories;
+using Market.Repositories.Interfaces;
 using Market.Tests.Helpers;
 using Microsoft.Data.SqlClient;
 
@@ -9,7 +10,7 @@ public class CategoryAttributeRepositoryTests
 {
     private const string ConnectionString = "Server=localhost;Database=MarketDB_Test;Trusted_Connection=True;TrustServerCertificate=True;";
     private SqlConnection _connection;
-    private CategoryRepository _categoryRepository;
+    private ICategoryRepository _categoryRepository;
     private AttributeRepository _attributeRepository;
     private CategoryAttributeRepository _categoryAttributeRepository;
     private int _categoryId;
@@ -43,7 +44,7 @@ public class CategoryAttributeRepositoryTests
     [TearDown]
     public void TearDown()
     {
-        _categoryRepository.Dispose();
+        //_categoryRepository.Dispose();
         _attributeRepository.Dispose();
         _connection.Dispose();
     }
@@ -172,5 +173,11 @@ public class CategoryAttributeRepositoryTests
         // Act and Assert
         Assert.Throws<SqlException>(() =>
             _categoryAttributeRepository.Delete(-9, -9));
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is CategoryAttributeRepositoryTests tests &&
+               EqualityComparer<ICategoryRepository>.Default.Equals(_categoryRepository, tests._categoryRepository);
     }
 }

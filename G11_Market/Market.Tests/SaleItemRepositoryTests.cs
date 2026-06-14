@@ -6,31 +6,37 @@ namespace Market.Tests;
 
 public class SaleItemRepositoryTests : BaseRepositoryTests
 {
-    private const string ConnectionString = "Server=localhost;Database=Market.Database;Trusted_Connection=True;TrustServerCertificate=True;";
+    private const string ConnectionString // = "Server=localhost;Database=Market.Database;Trusted_Connection=True;TrustServerCertificate=True;";
+    = "Server=localhost;Database=MarketDB_Test;Trusted_Connection=True;TrustServerCertificate=True;";
     private SqlConnection _connection;
     private SaleItemRepository _repository;
 
     private const string ClearSaleItemDatabaseScript = @"
         DELETE FROM SaleItems;
         DELETE FROM Sales;
+
+        DELETE FROM ProductAttributeValues;
         DELETE FROM Products;
 
-        DELETE FROM Clients;
+        DELETE FROM CategoryAttributes;
+        DELETE FROM Categories;
+
+        DELETE FROM InventoryManagerDetails;
+        DELETE FROM EmployeeRoles;
         DELETE FROM Employees;
 
+        DELETE FROM Clients;
         DELETE FROM ClientTypes;
-        DELETE FROM Categories;
+
         DELETE FROM Accounts;
 
         DBCC CHECKIDENT ('SaleItems', RESEED, 0);
         DBCC CHECKIDENT ('Sales', RESEED, 0);
         DBCC CHECKIDENT ('Products', RESEED, 0);
-
-        DBCC CHECKIDENT ('Clients', RESEED, 0);
-        DBCC CHECKIDENT ('Employees', RESEED, 0);
-
-        DBCC CHECKIDENT ('ClientTypes', RESEED, 0);
         DBCC CHECKIDENT ('Categories', RESEED, 0);
+        DBCC CHECKIDENT ('Employees', RESEED, 0);
+        DBCC CHECKIDENT ('Clients', RESEED, 0);
+        DBCC CHECKIDENT ('ClientTypes', RESEED, 0);
         DBCC CHECKIDENT ('Accounts', RESEED, 0);
     ";
 
