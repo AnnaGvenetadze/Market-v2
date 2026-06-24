@@ -1,4 +1,4 @@
-﻿namespace Market.Repositories.Interfaces;
+﻿namespace Market.Services.Interfaces.Repositories;
 
 public interface ICompositeKeyBaseRepository<T>
 {

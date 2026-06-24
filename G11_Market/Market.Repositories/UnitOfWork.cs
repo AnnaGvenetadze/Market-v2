@@ -1,8 +1,8 @@
 using System.Data.Common;
-using Market.Repositories.Interfaces;
+using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
-
+// todo: First of all we need to fix all syntax errors and make sure that all units are passing.
 // todo: Create interface for UnitOfWork.
 // todo: We need to add transaction support to the UnitOfWork class.
 // todo: We need to develop factory class for UnitOfWork (not for now).

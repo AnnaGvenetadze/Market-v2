@@ -1,10 +1,10 @@
-﻿using Dapper;
-using Market.Extensions;
-using Market.Extensions.Attributes;
-using Market.Repositories.Interfaces;
-using System.Data;
+﻿using System.Data;
 using System.Data.Common;
 using System.Linq.Expressions;
+using Dapper;
+using Market.Extensions;
+using Market.Extensions.Attributes;
+using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 

@@ -1,10 +1,10 @@
-﻿using Market.DTO;
-using Market.Repositories.Interfaces;
-using System.Data.Common;
+﻿using System.Data.Common;
+using Market.DTO;
+using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-public class CategoryRepository(DbConnection connection)
+public sealed class CategoryRepository(DbConnection connection)
     : BaseRepository<CategoryDTO>(connection), ICategoryRepository
 {
 }

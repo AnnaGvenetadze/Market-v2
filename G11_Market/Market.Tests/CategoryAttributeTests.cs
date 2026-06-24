@@ -1,6 +1,6 @@
 ﻿using Market.DTO;
 using Market.Repositories;
-using Market.Repositories.Interfaces;
+using Market.Services.Interfaces.Repositories;
 using Market.Tests.Helpers;
 using Microsoft.Data.SqlClient;
 
