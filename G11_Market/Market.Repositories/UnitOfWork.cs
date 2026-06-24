@@ -3,25 +3,28 @@ using Market.Repositories.Interfaces;
 
 namespace Market.Repositories;
 
-public sealed class UnitOfWork
+// todo: Create interface for UnitOfWork.
+// todo: We need to add transaction support to the UnitOfWork class.
+// todo: We need to develop factory class for UnitOfWork (not for now).
+public sealed class UnitOfWork : IDisposable
 {
     private readonly DbConnection _connection;
 
     private readonly Lazy<CategoryRepository> _categoryRepository;
-    private readonly Lazy<EmployeesRepository> _employeeRepository;
-    private readonly Lazy<ProductsRepository> _productsRepository;
-    private readonly Lazy<StockMovementsRepository> _stockMovementsRepository;
-    private readonly Lazy<SalesRepository> _salesRepository;
-    private readonly Lazy<SaleItemsRepository> _saleItemsRepository;
-    private readonly Lazy<RolesRepository> _rolesRepository;
+    private readonly Lazy<EmployeeRepository> _employeeRepository;
+    private readonly Lazy<ProductRepository> _productsRepository;
+    //private readonly Lazy<StockMovementsRepository> _stockMovementsRepository;
+    private readonly Lazy<SaleRepository> _salesRepository;
+    private readonly Lazy<SaleItemRepository> _saleItemsRepository;
+    private readonly Lazy<RoleRepository> _rolesRepository;
     private readonly Lazy<InventoryManagerDetailsRepository> _inventoryManagerDetailsRepository;
-    private readonly Lazy<EmployeesRolesRepository> _employeesRolesRepository;
-    private readonly Lazy<CorporateClientDetailssRepository> _corporateClientDetailssRepository;
+    private readonly Lazy<RoleRepository> _employeesRolesRepository;
+    //private readonly Lazy<CorporateClientDetailRepository> _corporateClientDetailssRepository;
     private readonly Lazy<CountryRepository> _countryRepository;
-    private readonly Lazy<CityRepository> _cityRepository;
-    private readonly Lazy<AccountsRepository> _accountsRepository;
+    //private readonly Lazy<CityRepository> _cityRepository;
+    //private readonly Lazy<AccountsRepository> _accountsRepository;
     private readonly Lazy<ClientRepository> _clientRepository;
-    private readonly Lazy<ClientTypeRepository> _clientTypeRepository;
+    //private readonly Lazy<ClientTypeRepository> _clientTypeRepository;
     private readonly Lazy<AttributeRepository> _attributeRepository;
     private readonly Lazy<ProductAttributeValueRepository> _productAttributeValueRepository;
 
@@ -52,7 +55,16 @@ public sealed class UnitOfWork
         _disposed = false;
     }
 
-    public ICategory CategoryRepository => _categoryRepository.Value;
+    public ICategoryRepository CategoryRepository
+    {
+        get
+        {
+            // todo: move this to helper method to avoid code duplication.
+            ThrowIfDisposed();
+            return _categoryRepository.Value;
+        }
+    }
+
     public IEmployees EmployeeRepository => _employeeRepository.Value;
     public IProducts ProductsRepository => _productsRepository.Value;
     public IStockMovements StockMovementsRepository => _stockMovementsRepository.Value;
@@ -69,4 +81,34 @@ public sealed class UnitOfWork
     public IClientType ClientTypeRepository => _clientTypeRepository.Value;
     public IAttribute AttributeRepository => _attributeRepository.Value;
     public IProductAttributeValue ProductAttributeValueRepository => _productAttributeValueRepository.Value;
+   
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (_disposed) 
+            return;
+
+        if (disposing)
+        {
+            // Dispose managed resources here
+        }
+
+        _disposed = true;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed) 
+            throw new ObjectDisposedException("UnitOfWork is disposed");
+    }
+
+    ~UnitOfWork()
+    {
+        Dispose(false);
+    }
 }
