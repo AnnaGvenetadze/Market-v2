@@ -13,15 +13,15 @@ public sealed class UnitOfWork : IUnitOfWork
     private readonly Lazy<CategoryRepository> _categoryRepository;
     private readonly Lazy<EmployeeRepository> _employeeRepository;
     private readonly Lazy<ProductRepository> _productRepository;
-    //private readonly Lazy<StockMovementsRepository> _stockMovementsRepository;
+    private readonly Lazy<StockMovementRepository> _stockMovementRepository;
     private readonly Lazy<SaleRepository> _saleRepository;
     private readonly Lazy<SaleItemRepository> _saleItemRepository;
     private readonly Lazy<InventoryManagerDetailsRepository> _inventoryManagerDetailsRepository;
     private readonly Lazy<RoleRepository> _roleRepository;
-    //private readonly Lazy<EmployeeRolesRepository> _employeesRolesRepository;
-    //private readonly Lazy<CorporateClientDetailsRepository> _corporateClientDetailsRepository;
+    private readonly Lazy<EmployeeRoleRepository> _employeeRoleRepository;
+    private readonly Lazy<CorporateClientDetailsRepository> _corporateClientDetailsRepository;
     private readonly Lazy<CountryRepository> _countryRepository;
-    //private readonly Lazy<CityRepository> _cityRepository;
+    private readonly Lazy<CityRepository> _cityRepository;
     private readonly Lazy<AccountRepository> _accountRepository;
     private readonly Lazy<ClientRepository> _clientRepository;
     private readonly Lazy<AttributeRepository> _attributeRepository;
@@ -45,10 +45,10 @@ public sealed class UnitOfWork : IUnitOfWork
         _clientRepository = new Lazy<ClientRepository>(() => new ClientRepository(_connection));
         _attributeRepository = new Lazy<AttributeRepository>(() => new AttributeRepository(_connection));
         _productAttributeValueRepository = new Lazy<ProductAttributeValueRepository>(() => new ProductAttributeValueRepository(_connection));
-        //_stockMovementsRepository = new Lazy<StockMovementsRepository>(() => new StockMovementsRepository(_connection));
-        //_employeeRolesRepository = new Lazy<EmployeeRolesRepository>(() => new EmployeeRolesRepository(_connection));
-        //_corporateClientDetailsRepository = new Lazy<CorporateClientDetailsRepository>(() => new CorporateClientDetailsRepository(_connection));
-        //_cityRepository = new Lazy<CityRepository>(() => new CityRepository(_connection));
+        _stockMovementRepository = new Lazy<StockMovementRepository>(() => new StockMovementRepository(_connection));
+        _employeeRoleRepository = new Lazy<EmployeeRoleRepository>(() => new EmployeeRoleRepository(_connection));
+        _corporateClientDetailsRepository = new Lazy<CorporateClientDetailsRepository>(() => new CorporateClientDetailsRepository(_connection));
+        _cityRepository = new Lazy<CityRepository>(() => new CityRepository(_connection));
 
         _disposed = false;
     }
@@ -63,8 +63,8 @@ public sealed class UnitOfWork : IUnitOfWork
     public IProductRepository ProductRepository 
         => GetRepository(_productRepository);
 
-    //public IStockMovementRepository StockMovementsRepository
-    //    => GetRepository(_stockMovementsRepository);
+    public IStockMovementRepository StockMovementsRepository
+        => GetRepository(_stockMovementRepository);
 
     public ISaleRepository SaleRepository 
         => GetRepository(_saleRepository);
@@ -78,17 +78,17 @@ public sealed class UnitOfWork : IUnitOfWork
     public IInventoryManagerDetailsRepository InventoryManagerDetailsRepository 
         => GetRepository(_inventoryManagerDetailsRepository);
 
-    //public ICorporateClientDetailsRepository CorporateClientDetailsRepository
-    //    => GetRepository(_corporateClientDetailsRepository);
+    public ICorporateClientDetailsRepository CorporateClientDetailsRepository
+        => GetRepository(_corporateClientDetailsRepository);
 
     public ICountryRepository CountryRepository 
         => GetRepository(_countryRepository);
 
-    //public ICityRepository CityRepository
-    //    => GetRepository(_cityRepository);
+    public ICityRepository CityRepository
+        => GetRepository(_cityRepository);
 
-    //public IEmployeeRolesRepository EmployeeRolesRepository
-    //    => GetRepository(_employeeRolesRepository);
+    public IEmployeeRoleRepository EmployeeRolesRepository
+        => GetRepository(_employeeRoleRepository);
 
     public IAccountRepository AccountRepository 
         => GetRepository(_accountRepository);
@@ -102,7 +102,12 @@ public sealed class UnitOfWork : IUnitOfWork
     public IProductAttributeValueRepository ProductAttributeValueRepository 
         => GetRepository(_productAttributeValueRepository);
 
-   
+    public IStockMovementRepository StockMovementRepository
+         => GetRepository(_stockMovementRepository);
+
+    public IEmployeeRoleRepository EmployeeRoleRepository
+        => GetRepository(_employeeRoleRepository);
+
     public void Dispose()
     {
         Dispose(true);

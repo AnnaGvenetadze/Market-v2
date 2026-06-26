@@ -16,8 +16,8 @@ public interface IUnitOfWork : IDisposable
     IClientRepository ClientRepository { get; }
     IAttributeRepository AttributeRepository { get; }
     IProductAttributeValueRepository ProductAttributeValueRepository { get; }
-    //IStockMovementRepository StockMovementsRepository { get; }
-    //ICorporateClientDetailsRepository CorporateClientDetailsRepository { get; }
-    //IEmployeeRolesRepository EmployeeRolesRepository { get; }
-    //ICityRepository CityRepository { get; }
+    IStockMovementRepository StockMovementRepository { get; }
+    ICorporateClientDetailsRepository CorporateClientDetailsRepository { get; }
+    IEmployeeRoleRepository EmployeeRoleRepository { get; }
+    ICityRepository CityRepository { get; }
 }
