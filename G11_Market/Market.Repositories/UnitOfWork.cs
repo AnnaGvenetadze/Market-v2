@@ -1,12 +1,12 @@
 using System.Data.Common;
+using Market.Services.Interfaces;
 using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 // todo: Make sure that all units are passing.
-// todo: Create interface for UnitOfWork.
 // todo: We need to add transaction support to the UnitOfWork class.
 // todo: We need to develop factory class for UnitOfWork (not for now).
-public sealed class UnitOfWork : IDisposable
+public sealed class UnitOfWork : IUnitOfWork
 {
     private readonly DbConnection _connection;
 
