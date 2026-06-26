@@ -53,37 +53,69 @@ public sealed class UnitOfWork : IDisposable
         _disposed = false;
     }
 
-    public ICategoryRepository CategoryRepository
-    {
-        get
-        {
-            // todo: move this to helper method to avoid code duplication.
-            ThrowIfDisposed();
-            return _categoryRepository.Value;
-        }
-    }
 
-    public IEmployeeRepository EmployeeRepository => _employeeRepository.Value;
-    public IProductRepository ProductRepository => _productRepository.Value;
-    //public IStockMovementRepository StockMovementsRepository => _stockMovementsRepository.Value;
-    public ISaleRepository SaleRepository => _saleRepository.Value;
-    public ISaleItemRepository SaleItemRepository => _saleItemRepository.Value;
-    public IRoleRepository RoleRepository => _roleRepository.Value;
-    public IInventoryManagerDetailsRepository InventoryManagerDetailsRepository => _inventoryManagerDetailsRepository.Value;
-    //public ICorporateClientDetailsRepository CorporateClientDetailsRepository => _corporateClientDetailsRepository.Value;
-    public ICountryRepository CountryRepository => _countryRepository.Value;
-    //public ICityRepository CityRepository => _cityRepository.Value;
-    //public IEmployeeRolesRepository EmployeeRolesRepository => _employeeRolesRepository.Value;
-    public IAccountRepository AccountRepository => _accountRepository.Value;
-    public IClientRepository ClientRepository => _clientRepository.Value;
-    public IAttributeRepository AttributeRepository => _attributeRepository.Value;
-    public IProductAttributeValueRepository ProductAttributeValueRepository => _productAttributeValueRepository.Value;
+    public ICategoryRepository CategoryRepository
+        => GetRepository(_categoryRepository);
+
+    public IEmployeeRepository EmployeeRepository 
+        => GetRepository(_employeeRepository);
+
+    public IProductRepository ProductRepository 
+        => GetRepository(_productRepository);
+
+    //public IStockMovementRepository StockMovementsRepository
+    //    => GetRepository(_stockMovementsRepository);
+
+    public ISaleRepository SaleRepository 
+        => GetRepository(_saleRepository);
+
+    public ISaleItemRepository SaleItemRepository
+        => GetRepository(_saleItemRepository);
+
+    public IRoleRepository RoleRepository 
+        => GetRepository(_roleRepository);
+
+    public IInventoryManagerDetailsRepository InventoryManagerDetailsRepository 
+        => GetRepository(_inventoryManagerDetailsRepository);
+
+    //public ICorporateClientDetailsRepository CorporateClientDetailsRepository
+    //    => GetRepository(_corporateClientDetailsRepository);
+
+    public ICountryRepository CountryRepository 
+        => GetRepository(_countryRepository);
+
+    //public ICityRepository CityRepository
+    //    => GetRepository(_cityRepository);
+
+    //public IEmployeeRolesRepository EmployeeRolesRepository
+    //    => GetRepository(_employeeRolesRepository);
+
+    public IAccountRepository AccountRepository 
+        => GetRepository(_accountRepository);
+
+    public IClientRepository ClientRepository 
+        => GetRepository(_clientRepository);
+
+    public IAttributeRepository AttributeRepository 
+        => GetRepository(_attributeRepository);
+
+    public IProductAttributeValueRepository ProductAttributeValueRepository 
+        => GetRepository(_productAttributeValueRepository);
+
    
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
+
+
+    private T GetRepository<T>(Lazy<T> repository) where T : class
+    {
+        ThrowIfDisposed();
+        return repository.Value;
+    }
+
 
     private void Dispose(bool disposing)
     {
@@ -98,11 +130,13 @@ public sealed class UnitOfWork : IDisposable
         _disposed = true;
     }
 
+
     private void ThrowIfDisposed()
     {
         if (_disposed) 
             throw new ObjectDisposedException("UnitOfWork is disposed");
     }
+
 
     ~UnitOfWork()
     {
