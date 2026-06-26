@@ -1,7 +1,7 @@
 
 using System.Data.Common;
 using Market.DTO;
-using Market.Repositories.Interfaces;
+using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 

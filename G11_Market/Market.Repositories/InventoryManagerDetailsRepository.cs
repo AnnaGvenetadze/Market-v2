@@ -2,7 +2,7 @@
 using System.Data.Common;
 using Dapper;
 using Market.DTO;
-using Market.Repositories.Interfaces;
+using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 

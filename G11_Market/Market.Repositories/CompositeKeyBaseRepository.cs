@@ -3,7 +3,7 @@ using System.Data.Common;
 using Dapper;
 using Market.Extensions;
 using Market.Extensions.Attributes;
-using Market.Repositories.Interfaces;
+using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 

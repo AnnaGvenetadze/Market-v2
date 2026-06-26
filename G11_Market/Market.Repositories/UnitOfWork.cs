@@ -2,7 +2,7 @@ using System.Data.Common;
 using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
-// todo: First of all we need to fix all syntax errors and make sure that all units are passing.
+// todo: Make sure that all units are passing.
 // todo: Create interface for UnitOfWork.
 // todo: We need to add transaction support to the UnitOfWork class.
 // todo: We need to develop factory class for UnitOfWork (not for now).
@@ -12,19 +12,18 @@ public sealed class UnitOfWork : IDisposable
 
     private readonly Lazy<CategoryRepository> _categoryRepository;
     private readonly Lazy<EmployeeRepository> _employeeRepository;
-    private readonly Lazy<ProductRepository> _productsRepository;
+    private readonly Lazy<ProductRepository> _productRepository;
     //private readonly Lazy<StockMovementsRepository> _stockMovementsRepository;
-    private readonly Lazy<SaleRepository> _salesRepository;
-    private readonly Lazy<SaleItemRepository> _saleItemsRepository;
-    private readonly Lazy<RoleRepository> _rolesRepository;
+    private readonly Lazy<SaleRepository> _saleRepository;
+    private readonly Lazy<SaleItemRepository> _saleItemRepository;
     private readonly Lazy<InventoryManagerDetailsRepository> _inventoryManagerDetailsRepository;
-    private readonly Lazy<RoleRepository> _employeesRolesRepository;
-    //private readonly Lazy<CorporateClientDetailRepository> _corporateClientDetailssRepository;
+    private readonly Lazy<RoleRepository> _roleRepository;
+    //private readonly Lazy<EmployeeRolesRepository> _employeesRolesRepository;
+    //private readonly Lazy<CorporateClientDetailsRepository> _corporateClientDetailsRepository;
     private readonly Lazy<CountryRepository> _countryRepository;
     //private readonly Lazy<CityRepository> _cityRepository;
-    //private readonly Lazy<AccountsRepository> _accountsRepository;
+    private readonly Lazy<AccountRepository> _accountRepository;
     private readonly Lazy<ClientRepository> _clientRepository;
-    //private readonly Lazy<ClientTypeRepository> _clientTypeRepository;
     private readonly Lazy<AttributeRepository> _attributeRepository;
     private readonly Lazy<ProductAttributeValueRepository> _productAttributeValueRepository;
 
@@ -35,22 +34,21 @@ public sealed class UnitOfWork : IDisposable
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
         _categoryRepository = new Lazy<CategoryRepository>(() => new CategoryRepository(_connection));
-        _employeeRepository = new Lazy<EmployeesRepository>(() => new EmployeesRepository(_connection));
-        _productsRepository = new Lazy<ProductsRepository>(() => new ProductsRepository(_connection));
-        _stockMovementsRepository = new Lazy<StockMovementsRepository>(() => new StockMovementsRepository(_connection));
-        _salesRepository = new Lazy<SalesRepository>(() => new SalesRepository(_connection));
-        _saleItemsRepository = new Lazy<SaleItemsRepository>(() => new SaleItemsRepository(_connection));
-        _rolesRepository = new Lazy<RolesRepository>(() => new RolesRepository(_connection));
+        _employeeRepository = new Lazy<EmployeeRepository>(() => new EmployeeRepository(_connection));
+        _productRepository = new Lazy<ProductRepository>(() => new ProductRepository(_connection));
+        _saleRepository = new Lazy<SaleRepository>(() => new SaleRepository(_connection));
+        _saleItemRepository = new Lazy<SaleItemRepository>(() => new SaleItemRepository(_connection));
+        _roleRepository = new Lazy<RoleRepository>(() => new RoleRepository(_connection));
         _inventoryManagerDetailsRepository = new Lazy<InventoryManagerDetailsRepository>(() => new InventoryManagerDetailsRepository(_connection));
-        _employeesRolesRepository = new Lazy<EmployeesRolesRepository>(() => new EmployeesRolesRepository(_connection));
-        _corporateClientDetailssRepository = new Lazy<CorporateClientDetailssRepository>(() => new CorporateClientDetailssRepository(_connection));
         _countryRepository = new Lazy<CountryRepository>(() => new CountryRepository(_connection));
-        _cityRepository = new Lazy<CityRepository>(() => new CityRepository(_connection));
-        _accountsRepository = new Lazy<AccountsRepository>(() => new AccountsRepository(_connection));
+        _accountRepository = new Lazy<AccountRepository>(() => new AccountRepository(_connection));
         _clientRepository = new Lazy<ClientRepository>(() => new ClientRepository(_connection));
-        _clientTypeRepository = new Lazy<ClientTypeRepository>(() => new ClientTypeRepository(_connection));
         _attributeRepository = new Lazy<AttributeRepository>(() => new AttributeRepository(_connection));
         _productAttributeValueRepository = new Lazy<ProductAttributeValueRepository>(() => new ProductAttributeValueRepository(_connection));
+        //_stockMovementsRepository = new Lazy<StockMovementsRepository>(() => new StockMovementsRepository(_connection));
+        //_employeeRolesRepository = new Lazy<EmployeeRolesRepository>(() => new EmployeeRolesRepository(_connection));
+        //_corporateClientDetailsRepository = new Lazy<CorporateClientDetailsRepository>(() => new CorporateClientDetailsRepository(_connection));
+        //_cityRepository = new Lazy<CityRepository>(() => new CityRepository(_connection));
 
         _disposed = false;
     }
@@ -65,22 +63,21 @@ public sealed class UnitOfWork : IDisposable
         }
     }
 
-    public IEmployees EmployeeRepository => _employeeRepository.Value;
-    public IProducts ProductsRepository => _productsRepository.Value;
-    public IStockMovements StockMovementsRepository => _stockMovementsRepository.Value;
-    public ISales SalesRepository => _salesRepository.Value;
-    public ISaleItems SaleItemsRepository => _saleItemsRepository.Value;
-    public IRoles RolesRepository => _rolesRepository.Value;
-    public IInventoryManagerDetails InventoryManagerDetailsRepository => _inventoryManagerDetailsRepository.Value;
-    public IEmployeesRoles EmployeesRolesRepository => _employeesRolesRepository.Value;
-    public ICorporateClientDetails CorporateClientDetailssRepository => _corporateClientDetailssRepository.Value;
-    public ICountry CountryRepository => _countryRepository.Value;
-    public ICity CityRepository => _cityRepository.Value;
-    public IAccounts AccountsRepository => _accountsRepository.Value;
-    public IClient ClientRepository => _clientRepository.Value;
-    public IClientType ClientTypeRepository => _clientTypeRepository.Value;
-    public IAttribute AttributeRepository => _attributeRepository.Value;
-    public IProductAttributeValue ProductAttributeValueRepository => _productAttributeValueRepository.Value;
+    public IEmployeeRepository EmployeeRepository => _employeeRepository.Value;
+    public IProductRepository ProductRepository => _productRepository.Value;
+    //public IStockMovementRepository StockMovementsRepository => _stockMovementsRepository.Value;
+    public ISaleRepository SaleRepository => _saleRepository.Value;
+    public ISaleItemRepository SaleItemRepository => _saleItemRepository.Value;
+    public IRoleRepository RoleRepository => _roleRepository.Value;
+    public IInventoryManagerDetailsRepository InventoryManagerDetailsRepository => _inventoryManagerDetailsRepository.Value;
+    //public ICorporateClientDetailsRepository CorporateClientDetailsRepository => _corporateClientDetailsRepository.Value;
+    public ICountryRepository CountryRepository => _countryRepository.Value;
+    //public ICityRepository CityRepository => _cityRepository.Value;
+    //public IEmployeeRolesRepository EmployeeRolesRepository => _employeeRolesRepository.Value;
+    public IAccountRepository AccountRepository => _accountRepository.Value;
+    public IClientRepository ClientRepository => _clientRepository.Value;
+    public IAttributeRepository AttributeRepository => _attributeRepository.Value;
+    public IProductAttributeValueRepository ProductAttributeValueRepository => _productAttributeValueRepository.Value;
    
     public void Dispose()
     {
