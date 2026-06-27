@@ -9,6 +9,8 @@ namespace Market.Repositories;
 public sealed class UnitOfWork : IUnitOfWork
 {
     private readonly DbConnection _connection;
+    private DbTransaction? _transaction;
+    private readonly Stack<string> _transactionSavePoints = new();
 
     private readonly Lazy<CategoryRepository> _categoryRepository;
     private readonly Lazy<EmployeeRepository> _employeeRepository;
@@ -26,6 +28,8 @@ public sealed class UnitOfWork : IUnitOfWork
     private readonly Lazy<ClientRepository> _clientRepository;
     private readonly Lazy<AttributeRepository> _attributeRepository;
     private readonly Lazy<ProductAttributeValueRepository> _productAttributeValueRepository;
+
+
 
     private bool _disposed;
 
@@ -108,6 +112,112 @@ public sealed class UnitOfWork : IUnitOfWork
     public IEmployeeRoleRepository EmployeeRoleRepository
         => GetRepository(_employeeRoleRepository);
 
+    public void BeginTransaction()
+    {
+        ThrowIfDisposed();
+        if (_transaction != null)
+            throw new InvalidOperationException("Transaction already started");
+        _transaction = _connection.BeginTransaction();
+        _transactionSavePoints.Clear();
+    }
+
+    public void BeginNestedTransaction()
+    {
+        ThrowIfDisposed();
+        EnsureTransactionExists();
+        CreateSavePoint();
+    }
+
+    public void Commit()
+    {
+        EnsureTransactionExists();
+        if (_transactionSavePoints.Count > 0)
+        {
+            _transactionSavePoints.Pop();
+        }
+        else
+        {
+            CommitRootTransaction();
+        }
+    }
+
+    public void Rollback()
+    {
+        EnsureTransactionExists();
+        if (_transactionSavePoints.Count > 0)
+        {
+            RollbackToSavePoint();
+        }
+        else
+        {
+            RollbackToRoot();
+        }
+    }
+
+    public void RollbackToLastSavePoint()
+    {
+        EnsureTransactionExists();
+        if (_transactionSavePoints.Count == 0)
+            throw new InvalidOperationException("No savepoints available");
+        RollbackToSavePoint();
+    }
+
+    public void CommitRootTransaction()
+    {
+        EnsureTransactionExists();
+        _transaction!.Commit();
+        CleanUpTransaction();
+    }
+
+    private void CreateSavePoint()
+    {
+        string savePoint = $"sp_{Guid.NewGuid()}";
+        _transaction!.Save(savePoint);
+        _transactionSavePoints.Push(savePoint);
+    }
+
+    private void RollbackToSavePoint()
+    {
+        string savePoint = _transactionSavePoints.Pop();
+        _transaction!.Rollback(savePoint);
+    }
+
+    public void RollbackToSavePoint(string savePoint)
+    {
+        EnsureTransactionExists();
+        if (!_transactionSavePoints.Contains(savePoint))
+            throw new ArgumentException("Savepoint does not exist", nameof(savePoint));
+        while (_transactionSavePoints.Count > 0)
+        {
+            string sp = _transactionSavePoints.Peek();
+            if (sp == savePoint)
+            {
+                _transaction!.Rollback(sp);
+                break;
+            }
+            _transactionSavePoints.Pop();
+        }
+    }
+
+    private void RollbackToRoot()
+    {
+        _transaction!.Rollback();
+        CleanUpTransaction();
+    }
+
+    private void CleanUpTransaction()
+    {
+        _transaction?.Dispose();
+        _transaction = null;
+        _transactionSavePoints.Clear();
+    }
+
+    private void EnsureTransactionExists()
+    {
+        if (_transaction == null)
+            throw new InvalidOperationException("No active transaction");
+    }
+
     public void Dispose()
     {
         Dispose(true);
@@ -129,7 +239,9 @@ public sealed class UnitOfWork : IUnitOfWork
 
         if (disposing)
         {
-            // Dispose managed resources here
+            _transaction?.Dispose();
+            _transaction = null;
+            _transactionSavePoints.Clear();
         }
 
         _disposed = true;
