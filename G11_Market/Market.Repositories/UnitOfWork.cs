@@ -4,11 +4,12 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 // todo: Make sure that all units are passing.
-// todo: We need to add transaction support to the UnitOfWork class.
 // todo: We need to develop factory class for UnitOfWork (not for now).
 public sealed class UnitOfWork : IUnitOfWork
 {
     private readonly DbConnection _connection;
+    private DbTransaction? _transaction;
+    private readonly Stack<string> _transactionSavePoints = new();
 
     private readonly Lazy<CategoryRepository> _categoryRepository;
     private readonly Lazy<EmployeeRepository> _employeeRepository;
@@ -26,6 +27,8 @@ public sealed class UnitOfWork : IUnitOfWork
     private readonly Lazy<ClientRepository> _clientRepository;
     private readonly Lazy<AttributeRepository> _attributeRepository;
     private readonly Lazy<ProductAttributeValueRepository> _productAttributeValueRepository;
+
+
 
     private bool _disposed;
 
@@ -57,31 +60,31 @@ public sealed class UnitOfWork : IUnitOfWork
     public ICategoryRepository CategoryRepository
         => GetRepository(_categoryRepository);
 
-    public IEmployeeRepository EmployeeRepository 
+    public IEmployeeRepository EmployeeRepository
         => GetRepository(_employeeRepository);
 
-    public IProductRepository ProductRepository 
+    public IProductRepository ProductRepository
         => GetRepository(_productRepository);
 
     public IStockMovementRepository StockMovementsRepository
         => GetRepository(_stockMovementRepository);
 
-    public ISaleRepository SaleRepository 
+    public ISaleRepository SaleRepository
         => GetRepository(_saleRepository);
 
     public ISaleItemRepository SaleItemRepository
         => GetRepository(_saleItemRepository);
 
-    public IRoleRepository RoleRepository 
+    public IRoleRepository RoleRepository
         => GetRepository(_roleRepository);
 
-    public IInventoryManagerDetailsRepository InventoryManagerDetailsRepository 
+    public IInventoryManagerDetailsRepository InventoryManagerDetailsRepository
         => GetRepository(_inventoryManagerDetailsRepository);
 
     public ICorporateClientDetailsRepository CorporateClientDetailsRepository
         => GetRepository(_corporateClientDetailsRepository);
 
-    public ICountryRepository CountryRepository 
+    public ICountryRepository CountryRepository
         => GetRepository(_countryRepository);
 
     public ICityRepository CityRepository
@@ -90,16 +93,16 @@ public sealed class UnitOfWork : IUnitOfWork
     public IEmployeeRoleRepository EmployeeRolesRepository
         => GetRepository(_employeeRoleRepository);
 
-    public IAccountRepository AccountRepository 
+    public IAccountRepository AccountRepository
         => GetRepository(_accountRepository);
 
-    public IClientRepository ClientRepository 
+    public IClientRepository ClientRepository
         => GetRepository(_clientRepository);
 
-    public IAttributeRepository AttributeRepository 
+    public IAttributeRepository AttributeRepository
         => GetRepository(_attributeRepository);
 
-    public IProductAttributeValueRepository ProductAttributeValueRepository 
+    public IProductAttributeValueRepository ProductAttributeValueRepository
         => GetRepository(_productAttributeValueRepository);
 
     public IStockMovementRepository StockMovementRepository
@@ -107,6 +110,112 @@ public sealed class UnitOfWork : IUnitOfWork
 
     public IEmployeeRoleRepository EmployeeRoleRepository
         => GetRepository(_employeeRoleRepository);
+
+    public void BeginTransaction()
+    {
+        ThrowIfDisposed();
+        if (_transaction != null)
+            throw new InvalidOperationException("Transaction already started");
+        _transaction = _connection.BeginTransaction();
+        _transactionSavePoints.Clear();
+    }
+
+    public void BeginNestedTransaction()
+    {
+        ThrowIfDisposed();
+        EnsureTransactionExists();
+        CreateSavePoint();
+    }
+
+    public void Commit()
+    {
+        EnsureTransactionExists();
+        if (_transactionSavePoints.Count > 0)
+        {
+            _transactionSavePoints.Pop();
+        }
+        else
+        {
+            CommitRootTransaction();
+        }
+    }
+
+    public void Rollback()
+    {
+        EnsureTransactionExists();
+        if (_transactionSavePoints.Count > 0)
+        {
+            RollbackToSavePoint();
+        }
+        else
+        {
+            RollbackToRoot();
+        }
+    }
+
+    public void RollbackToLastSavePoint()
+    {
+        EnsureTransactionExists();
+        if (_transactionSavePoints.Count == 0)
+            throw new InvalidOperationException("No savepoints available");
+        RollbackToSavePoint();
+    }
+
+    public void CommitRootTransaction()
+    {
+        EnsureTransactionExists();
+        _transaction!.Commit();
+        CleanUpTransaction();
+    }
+
+    private void CreateSavePoint()
+    {
+        string savePoint = $"sp_{Guid.NewGuid()}";
+        _transaction!.Save(savePoint);
+        _transactionSavePoints.Push(savePoint);
+    }
+
+    private void RollbackToSavePoint()
+    {
+        string savePoint = _transactionSavePoints.Pop();
+        _transaction!.Rollback(savePoint);
+    }
+
+    public void RollbackToSavePoint(string savePoint)
+    {
+        EnsureTransactionExists();
+        if (!_transactionSavePoints.Contains(savePoint))
+            throw new ArgumentException("Savepoint does not exist", nameof(savePoint));
+        while (_transactionSavePoints.Count > 0)
+        {
+            string sp = _transactionSavePoints.Peek();
+            if (sp == savePoint)
+            {
+                _transaction!.Rollback(sp);
+                break;
+            }
+            _transactionSavePoints.Pop();
+        }
+    }
+
+    private void RollbackToRoot()
+    {
+        _transaction!.Rollback();
+        CleanUpTransaction();
+    }
+
+    private void CleanUpTransaction()
+    {
+        _transaction?.Dispose();
+        _transaction = null;
+        _transactionSavePoints.Clear();
+    }
+
+    private void EnsureTransactionExists()
+    {
+        if (_transaction == null)
+            throw new InvalidOperationException("No active transaction");
+    }
 
     public void Dispose()
     {
@@ -124,12 +233,14 @@ public sealed class UnitOfWork : IUnitOfWork
 
     private void Dispose(bool disposing)
     {
-        if (_disposed) 
+        if (_disposed)
             return;
 
         if (disposing)
         {
-            // Dispose managed resources here
+            _transaction?.Dispose();
+            _transaction = null;
+            _transactionSavePoints.Clear();
         }
 
         _disposed = true;
@@ -138,7 +249,7 @@ public sealed class UnitOfWork : IUnitOfWork
 
     private void ThrowIfDisposed()
     {
-        if (_disposed) 
+        if (_disposed)
             throw new ObjectDisposedException("UnitOfWork is disposed");
     }
 
