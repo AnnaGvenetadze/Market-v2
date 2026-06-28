@@ -1,4 +1,4 @@
-﻿create or alter procedure dbo.sp_InsertCategory
+﻿create procedure dbo.sp_InsertCategory
     @CategoryName nvarchar(100),
     @ParentId int = null,
     @Description nvarchar(1000) = null,

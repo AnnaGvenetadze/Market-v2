@@ -8,7 +8,7 @@ namespace Market.Tests;
 
 public class CategoryAttributeRepositoryTests
 {
-    private const string ConnectionString = "Server=localhost;Database=MarketDB_Test;Trusted_Connection=True;TrustServerCertificate=True;";
+    private const string ConnectionString = "Server=.;Database=G11_Market_Test;Trusted_Connection=True;TrustServerCertificate=True;";
     private SqlConnection _connection;
     private ICategoryRepository _categoryRepository;
     private AttributeRepository _attributeRepository;

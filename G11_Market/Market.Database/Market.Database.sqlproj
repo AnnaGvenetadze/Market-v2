@@ -156,5 +156,7 @@
     <None Include="dbo\Stored Procedures\sp_GetSaleItemById.sql" />
     <None Include="dbo\Stored Procedures\sp_InsertSaleItem.sql" />
     <None Include="dbo\Stored Procedures\sp_UpdateSaleItem.sql" />
+    <None Include="TEST.Database.publish.xml" />
+    <None Include="DEV.Database.publish.xml" />
   </ItemGroup>
 </Project>

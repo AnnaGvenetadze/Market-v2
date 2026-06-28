@@ -19,7 +19,3 @@ public class CountryDTO
     [IgnoreOnUpdate]
     public DateTime? UpdateDate { get; set; }
 }
-
-
-
-

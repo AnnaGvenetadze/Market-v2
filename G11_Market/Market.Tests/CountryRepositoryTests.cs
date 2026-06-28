@@ -64,7 +64,7 @@ public class CountryRepositoryTests : BaseRepositoryTests
     {
         // Arrange
         var existingCountry = _repository.GetById(UpdateTestId);
-        existingCountry!.Name = $"New{existingCountry.Name}";
+        existingCountry.Name = $"New{existingCountry.Name}";
 
         // Act
         _repository.Update(existingCountry);
