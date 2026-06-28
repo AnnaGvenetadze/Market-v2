@@ -2,7 +2,7 @@
 
 namespace Market.DTO;
 
-public class InventoryManagerDTO
+public class InventoryManagerDetailDTO
 {
     public int Id { get; set; }
 

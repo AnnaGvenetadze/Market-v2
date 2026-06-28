@@ -7,11 +7,11 @@ using Market.Services.Interfaces.Repositories;
 namespace Market.Repositories;
 
 public sealed class InventoryManagerDetailsRepository(DbConnection connection)
-    : BaseRepository<InventoryManagerDTO>(connection), IInventoryManagerDetailsRepository
+    : BaseRepository<InventoryManagerDetailDTO>(connection), IInventoryManagerDetailsRepository
 {
     private readonly DbConnection _connection = connection;
 
-    public new int Insert(InventoryManagerDTO entity)
+    public new int Insert(InventoryManagerDetailDTO entity)
     {
         ArgumentNullException.ThrowIfNull(entity, nameof(entity));
 
@@ -29,15 +29,15 @@ public sealed class InventoryManagerDetailsRepository(DbConnection connection)
         return entity.Id;
     }
 
-    public InventoryManagerDTO? GetByEmployeeId(int employeeId)
-        => Search(manager => manager.Id == employeeId && !manager.IsDeleted).FirstOrDefault();
+    public InventoryManagerDetailDTO? GetByEmployeeId(int employeeId)
+        => Search(manager => manager.Id == employeeId && manager.IsDeleted == false).FirstOrDefault();
 
-    public IEnumerable<InventoryManagerDTO> GetAllActive()
-        => Search(manager => !manager.IsDeleted);
+    public IEnumerable<InventoryManagerDetailDTO> GetAllActive()
+        => Search(manager => manager.IsDeleted == false);
 
-    public IEnumerable<InventoryManagerDTO> GetManagersWhoCanApproveStockCorrection()
-        => Search(manager => manager.CanApproveStockCorrection && !manager.IsDeleted);
+    public IEnumerable<InventoryManagerDetailDTO> GetManagersWhoCanApproveStockCorrection()
+        => Search(manager => manager.CanApproveStockCorrection == true && manager.IsDeleted == false);
 
-    public IEnumerable<InventoryManagerDTO> GetManagersWhoCanApproveNegativeStock()
-        => Search(manager => manager.CanApproveNegativeStock && !manager.IsDeleted);
+    public IEnumerable<InventoryManagerDetailDTO> GetManagersWhoCanApproveNegativeStock()
+        => Search(manager => manager.CanApproveNegativeStock == true && manager.IsDeleted == false);
 }

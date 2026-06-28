@@ -12,5 +12,5 @@ public sealed class EmployeeRepository(DbConnection connection) : BaseRepository
 
     public IEnumerable<EmployeeDTO> GetSubordinates(int managerEmployeeId) => Search(e => e.ManagerEmployeeId == managerEmployeeId);
 
-    public IEnumerable<EmployeeDTO> GetAllActive() => Search(e => !e.IsDeleted);
+    public IEnumerable<EmployeeDTO> GetAllActive() => Search(e => e.IsDeleted == false);
 }

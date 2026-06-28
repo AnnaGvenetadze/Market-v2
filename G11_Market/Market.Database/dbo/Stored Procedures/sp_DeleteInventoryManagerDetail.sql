@@ -1,4 +1,4 @@
-﻿create procedure dbo.sp_DeleteInventoryManager
+﻿create procedure dbo.sp_DeleteInventoryManagerDetail
     @Id int
 as
 begin

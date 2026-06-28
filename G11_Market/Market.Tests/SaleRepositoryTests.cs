@@ -125,9 +125,11 @@ public class SaleRepositoryTests : BaseRepositoryTests
 
         // Act
         _saleRepository.Delete(insertedId);
+        var deletedSale = _saleRepository.Search(s => s.Id == insertedId).FirstOrDefault();
 
         // Assert
-        Assert.That(_saleRepository.Search(s => s.Id == insertedId).Any(), Is.False);
+        Assert.That(deletedSale, Is.Not.Null);
+        Assert.That(deletedSale.Status, Is.EqualTo(2));
     }
 
     [Test]

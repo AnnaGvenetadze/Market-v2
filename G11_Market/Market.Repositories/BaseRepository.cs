@@ -92,11 +92,8 @@ public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
     {
         ExpressionTranslator<T> translator = new();
         var (sql, parameters) = translator.Translate(expression);
-
-        return _connection.Query<T>(
-            $"sp_Search{_entityPluralName}",
-            parameters,
-            commandType: CommandType.StoredProcedure);
+        string sqlQuery = $"SELECT * FROM {_entityPluralName} WHERE {sql}";
+        return _connection.Query<T>(sqlQuery, parameters);
     }
 
     #region IDisposable Support

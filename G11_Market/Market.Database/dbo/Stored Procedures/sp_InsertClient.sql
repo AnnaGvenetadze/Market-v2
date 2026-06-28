@@ -20,7 +20,7 @@ begin
     if @AccountId is null throw 50013, 'AccountId is required.', 1;
     if @ContactEmail is null throw 50014, 'Email cannot be empty.', 1;
     if @ContactEmail not like '%_@_%._%' throw 50015, 'Invalid email format.', 1;
-    if @PhoneNumber is not null and @PhoneNumber like '%[^0-9+ -]%' throw 50020, 'PhoneNumber contains invalid characters.', 1;    
+    if @PhoneNumber is not null and @PhoneNumber like '%[^0-9+ -.()]%' throw 50020, 'PhoneNumber contains invalid characters.', 1;  
     if exists (select 1 from Clients where ContactEmail = @ContactEmail) throw 50021, 'Email already exists.', 1;
     if exists (select 1 from Clients where AccountId = @AccountId) throw 50006, 'Client for this AccountId already exists.', 1;
     if not exists (select 1 from Accounts where Id = @AccountId) throw 50016, 'Invalid AccountId.', 1;

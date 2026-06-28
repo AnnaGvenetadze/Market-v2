@@ -4,11 +4,11 @@ namespace Market.Services.Interfaces.Repositories;
 
 public interface IInventoryManagerDetailsRepository
 {
-    InventoryManagerDTO? GetByEmployeeId(int employeeId);
+    InventoryManagerDetailDTO? GetByEmployeeId(int employeeId);
 
-    IEnumerable<InventoryManagerDTO> GetAllActive();
+    IEnumerable<InventoryManagerDetailDTO> GetAllActive();
 
-    IEnumerable<InventoryManagerDTO> GetManagersWhoCanApproveStockCorrection();
+    IEnumerable<InventoryManagerDetailDTO> GetManagersWhoCanApproveStockCorrection();
 
-    IEnumerable<InventoryManagerDTO> GetManagersWhoCanApproveNegativeStock();
+    IEnumerable<InventoryManagerDetailDTO> GetManagersWhoCanApproveNegativeStock();
 }

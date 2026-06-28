@@ -32,102 +32,21 @@ public class ClientRepositoryTests : BaseRepositoryTests
     ";
 
     private const string SeedClientDatabaseScript = @"
-            INSERT INTO Accounts
-    (
-        Username,
-        PasswordHash,
-        Email,
-        FirstName,
-        LastName,
-        AccountType,
-        IsDeleted,
-        CreateDate
-    )
-    VALUES
-    (
-        'testuser1',
-        'test123',
-        'test@gmail.com',
-        'test',
-        'test',
-        2,
-        0,
-        GETDATE()
-    ),
-    (
-        'testuser2',
-        'test456',
-        'test2@gmail.com',
-        'test',
-        'test',
-        2,
-        0,
-        GETDATE()
-    ),
-    (
-        'testuser3',
-        'test789',
-        'test3@gmail.com',
-        'test',
-        'test',
-        2,
-        0,
-        GETDATE()
-    );
+    INSERT INTO Accounts (Username, PasswordHash, Email, FirstName, LastName, AccountType, IsDeleted, CreateDate)
+    VALUES 
+        ('testuser1', 'test123', 'test@gmail.com', 'test', 'test', 2, 0, GETDATE()),
+        ('testuser2', 'test456', 'test2@gmail.com', 'test', 'test', 2, 0, GETDATE()),
+        ('testuser3', 'test789', 'test3@gmail.com', 'test', 'test', 2, 0, GETDATE());
 
-    INSERT INTO ClientTypes
-    (
-        Name,
-        Description,
-        IsDeleted,
-        CreateDate
-    )
-    VALUES
-    (
-        'Individual',
-        'Individual client type',
-        0,
-        GETDATE()
-    ),
-    (
-        'Corporate',
-        'Corporate client type',
-        0,
-        GETDATE()
-    );
+    INSERT INTO ClientTypes (Name, Description, IsDeleted, CreateDate)
+    VALUES 
+        ('Individual', 'Individual client type', 0, GETDATE()),
+        ('Corporate', 'Corporate client type', 0, GETDATE());
 
-    INSERT INTO Clients
-    (
-        AccountId,
-        ClientTypeId,
-        FirstName,
-        LastName,
-        PhoneNumber,
-        ContactEmail,
-        IsDeleted,
-        CreateDate
-    )
-    VALUES
-    (
-        1,
-        1,
-        'Giorgi',
-        'Client',
-        '555111222',
-        'client1@test.com',
-        0,
-        GETDATE()
-    ),
-    (
-        2,
-        2,
-        'Nika',
-        'Client',
-        '555333444',
-        'client2@test.com',
-        0,
-        GETDATE()
-    );
+    INSERT INTO Clients (AccountId, ClientTypeId, FirstName, LastName, PhoneNumber, ContactEmail, IsDeleted, CreateDate)
+    VALUES 
+        (1, 1, 'Giorgi', 'Client', '555111222', 'client1@test.com', 0, GETDATE()),
+        (2, 2, 'Nika', 'Client', '555333444', 'client2@test.com', 0, GETDATE());
 ";
 
     public static void ClearClientDatabase()
