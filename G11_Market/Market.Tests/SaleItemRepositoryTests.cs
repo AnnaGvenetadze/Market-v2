@@ -6,8 +6,6 @@ namespace Market.Tests;
 
 public class SaleItemRepositoryTests : BaseRepositoryTests
 {
-    private const string ConnectionString // = "Server=localhost;Database=Market.Database;Trusted_Connection=True;TrustServerCertificate=True;";
-    = "Server=localhost;Database=MarketDB_Test;Trusted_Connection=True;TrustServerCertificate=True;";
     private SqlConnection _connection;
     private SaleItemRepository _repository;
 

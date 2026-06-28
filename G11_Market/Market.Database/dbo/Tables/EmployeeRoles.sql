@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[EmployeesRoles]
+﻿CREATE TABLE [dbo].[EmployeeRoles]
 (
 	EmployeeId int not null,
     RoleId int not null,

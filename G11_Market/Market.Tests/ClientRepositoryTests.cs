@@ -8,7 +8,6 @@ namespace Market.Tests;
 
 public class ClientRepositoryTests : BaseRepositoryTests
 {
-    private const string ConnectionString = "Server=localhost;Database=Market.Database;Trusted_Connection=True;TrustServerCertificate=True;";
     private SqlConnection _connection;
     private ClientRepository _repository;
 

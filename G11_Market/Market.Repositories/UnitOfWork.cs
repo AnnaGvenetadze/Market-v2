@@ -4,7 +4,6 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 // todo: Make sure that all units are passing.
-// todo: We need to add transaction support to the UnitOfWork class.
 // todo: We need to develop factory class for UnitOfWork (not for now).
 public sealed class UnitOfWork : IUnitOfWork
 {
@@ -61,31 +60,31 @@ public sealed class UnitOfWork : IUnitOfWork
     public ICategoryRepository CategoryRepository
         => GetRepository(_categoryRepository);
 
-    public IEmployeeRepository EmployeeRepository 
+    public IEmployeeRepository EmployeeRepository
         => GetRepository(_employeeRepository);
 
-    public IProductRepository ProductRepository 
+    public IProductRepository ProductRepository
         => GetRepository(_productRepository);
 
     public IStockMovementRepository StockMovementsRepository
         => GetRepository(_stockMovementRepository);
 
-    public ISaleRepository SaleRepository 
+    public ISaleRepository SaleRepository
         => GetRepository(_saleRepository);
 
     public ISaleItemRepository SaleItemRepository
         => GetRepository(_saleItemRepository);
 
-    public IRoleRepository RoleRepository 
+    public IRoleRepository RoleRepository
         => GetRepository(_roleRepository);
 
-    public IInventoryManagerDetailsRepository InventoryManagerDetailsRepository 
+    public IInventoryManagerDetailsRepository InventoryManagerDetailsRepository
         => GetRepository(_inventoryManagerDetailsRepository);
 
     public ICorporateClientDetailsRepository CorporateClientDetailsRepository
         => GetRepository(_corporateClientDetailsRepository);
 
-    public ICountryRepository CountryRepository 
+    public ICountryRepository CountryRepository
         => GetRepository(_countryRepository);
 
     public ICityRepository CityRepository
@@ -94,16 +93,16 @@ public sealed class UnitOfWork : IUnitOfWork
     public IEmployeeRoleRepository EmployeeRolesRepository
         => GetRepository(_employeeRoleRepository);
 
-    public IAccountRepository AccountRepository 
+    public IAccountRepository AccountRepository
         => GetRepository(_accountRepository);
 
-    public IClientRepository ClientRepository 
+    public IClientRepository ClientRepository
         => GetRepository(_clientRepository);
 
-    public IAttributeRepository AttributeRepository 
+    public IAttributeRepository AttributeRepository
         => GetRepository(_attributeRepository);
 
-    public IProductAttributeValueRepository ProductAttributeValueRepository 
+    public IProductAttributeValueRepository ProductAttributeValueRepository
         => GetRepository(_productAttributeValueRepository);
 
     public IStockMovementRepository StockMovementRepository
@@ -234,7 +233,7 @@ public sealed class UnitOfWork : IUnitOfWork
 
     private void Dispose(bool disposing)
     {
-        if (_disposed) 
+        if (_disposed)
             return;
 
         if (disposing)
@@ -250,7 +249,7 @@ public sealed class UnitOfWork : IUnitOfWork
 
     private void ThrowIfDisposed()
     {
-        if (_disposed) 
+        if (_disposed)
             throw new ObjectDisposedException("UnitOfWork is disposed");
     }
 
