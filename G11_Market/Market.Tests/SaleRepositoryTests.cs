@@ -119,7 +119,7 @@ public class SaleRepositoryTests : BaseRepositoryTests
         var sale = new SaleDTO
         {
             CreatedEmployeeId = _employeeId,
-            Status = 0
+            Status = 0,
         };
         var insertedId = _saleRepository.Insert(sale);
 
@@ -127,7 +127,7 @@ public class SaleRepositoryTests : BaseRepositoryTests
         _saleRepository.Delete(insertedId);
 
         // Assert
-        Assert.Throws<InvalidOperationException>(() => _saleRepository.GetById(insertedId));
+        Assert.That(_saleRepository.Search(s => s.Id == insertedId).Any(), Is.False);
     }
 
     [Test]
