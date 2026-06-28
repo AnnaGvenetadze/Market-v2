@@ -7,6 +7,7 @@ namespace Market.Repositories;
 // todo: We need to develop factory class for UnitOfWork (not for now).
 public sealed class UnitOfWork : IUnitOfWork
 {
+    private bool _disposed;
     private readonly DbConnection _connection;
     private DbTransaction? _transaction;
     private readonly Stack<string> _transactionSavePoints = new();
@@ -27,10 +28,6 @@ public sealed class UnitOfWork : IUnitOfWork
     private readonly Lazy<ClientRepository> _clientRepository;
     private readonly Lazy<AttributeRepository> _attributeRepository;
     private readonly Lazy<ProductAttributeValueRepository> _productAttributeValueRepository;
-
-
-
-    private bool _disposed;
 
     public UnitOfWork(DbConnection connection)
     {
@@ -55,7 +52,6 @@ public sealed class UnitOfWork : IUnitOfWork
 
         _disposed = false;
     }
-
 
     public ICategoryRepository CategoryRepository
         => GetRepository(_categoryRepository);
