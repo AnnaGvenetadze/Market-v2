@@ -5,7 +5,8 @@ using Market.Services.Interfaces.Repositories;
 namespace Market.Repositories;
 // todo: Make sure that all units are passing.
 // todo: We need to develop factory class for UnitOfWork (not for now).
-public sealed class UnitOfWork : IUnitOfWork
+
+internal sealed class UnitOfWork : IUnitOfWork, IDisposable
 {
     private bool _disposed;
     private readonly DbConnection _connection;
@@ -219,13 +220,11 @@ public sealed class UnitOfWork : IUnitOfWork
         GC.SuppressFinalize(this);
     }
 
-
     private T GetRepository<T>(Lazy<T> repository) where T : class
     {
         ThrowIfDisposed();
         return repository.Value;
     }
-
 
     private void Dispose(bool disposing)
     {
@@ -242,13 +241,11 @@ public sealed class UnitOfWork : IUnitOfWork
         _disposed = true;
     }
 
-
     private void ThrowIfDisposed()
     {
         if (_disposed)
             throw new ObjectDisposedException("UnitOfWork is disposed");
     }
-
 
     ~UnitOfWork()
     {

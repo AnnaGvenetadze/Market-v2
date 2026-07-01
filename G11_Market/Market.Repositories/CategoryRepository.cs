@@ -1,4 +1,6 @@
-﻿using System.Data.Common;
+﻿using System.Data;
+using System.Data.Common;
+using Dapper;
 using Market.DTO;
 using Market.Services.Interfaces.Repositories;
 
@@ -32,5 +34,29 @@ public sealed class CategoryRepository(DbConnection connection)
         return Search(category =>
             category.ParentId == parentId &&
             category.IsDeleted == false);
+    }
+
+    public void AssignAttribute(CategoryAttributeDTO categoryAttribute)
+    {
+        _connection.Execute(
+            "sp_AssignCategoryAttribute",
+            new
+            {
+                CategoryId = categoryAttribute.CategoryId, 
+                AttributeId = categoryAttribute.AttributeId
+            },
+            commandType: CommandType.StoredProcedure);
+    }
+
+    public void UnassignAttribute(CategoryAttributeDTO categoryAttribute)
+    {
+        _connection.Execute(
+            "sp_UnassignCategoryAttribute",
+            new
+            {
+                CategoryId = categoryAttribute.CategoryId, 
+                AttributeId = categoryAttribute.AttributeId
+            },
+            commandType: CommandType.StoredProcedure);
     }
 }

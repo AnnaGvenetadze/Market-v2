@@ -10,7 +10,7 @@ namespace Market.Repositories;
 
 public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
 {
-    private readonly DbConnection _connection;
+    protected readonly DbConnection _connection;
     private bool _disposed = false;
     private readonly string _entityName;
     private readonly string _entityPluralName;
@@ -92,7 +92,7 @@ public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
     {
         ExpressionTranslator<T> translator = new();
         var (sql, parameters) = translator.Translate(expression);
-        string sqlQuery = $"SELECT * FROM {_entityPluralName} WHERE {sql}";
+        string sqlQuery = $"SELECT * FROM {_entityPluralName} WHERE IsDeleted = 0 AND {sql}";
         return _connection.Query<T>(sqlQuery, parameters);
     }
 

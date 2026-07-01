@@ -2,7 +2,7 @@
 
 namespace Market.Services.Interfaces;
 
-public interface IUnitOfWork : IDisposable
+public interface IUnitOfWork 
 {
     ICategoryRepository CategoryRepository { get; }
     IEmployeeRepository EmployeeRepository { get; }

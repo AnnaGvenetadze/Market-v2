@@ -1,5 +1,6 @@
 ﻿using Market.DTO;
 using Market.Repositories;
+using Market.Services.Interfaces.Repositories;
 using Microsoft.Data.SqlClient;
 
 namespace Market.Tests;
@@ -7,13 +8,13 @@ namespace Market.Tests;
 public class CountryRepositoryTests : BaseRepositoryTests
 {
     private SqlConnection _connection;
-    private CountryRepository _repository;
+    private ICountryRepository _repository;
 
     [SetUp]
     public void Setup()
     {
         _connection = new SqlConnection(ConnectionString);
-        _repository = new CountryRepository(_connection);
+        _repository = UnitOfWorkFactory.Create(_connection).CountryRepository;
     }
 
     [TearDown]
