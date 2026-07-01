@@ -5,7 +5,6 @@ namespace Market.DTO
     public class ProductDTO
     {
         [IgnoreOnInsert]
-        [IgnoreOnUpdate]
         public int Id { get; set; }
 
         public int CategoryId { get; set; }

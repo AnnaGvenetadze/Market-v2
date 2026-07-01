@@ -1,4 +1,4 @@
-﻿create or alter procedure dbo.sp_GetCategoryById
+﻿create procedure dbo.sp_GetCategoryById
     @Id int
 as
 begin

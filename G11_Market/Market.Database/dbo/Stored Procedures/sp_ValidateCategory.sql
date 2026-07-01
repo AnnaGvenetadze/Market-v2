@@ -1,4 +1,4 @@
-﻿create or alter procedure dbo.sp_ValidateCategory
+﻿create procedure dbo.sp_ValidateCategory
     @CategoryId int,
     @IsValid bit output,
     @Message nvarchar(500) output

@@ -1,6 +1,5 @@
 ﻿using Market.DTO;
 using Market.Repositories;
-using Market.Tests.Helpers;
 using Microsoft.Data.SqlClient;
 
 namespace Market.Tests;
@@ -30,8 +29,8 @@ public class CountryRepositoryTests : BaseRepositoryTests
         // Arrange
         var country = new CountryDTO
         {
-            Name = "TestLand".AddGuid(),
-            CountryCode = TestDataHelper.GenerateCode()
+            Name = "TestLand",
+            CountryCode = "TST"
         };
 
         // Act
@@ -46,17 +45,68 @@ public class CountryRepositoryTests : BaseRepositoryTests
     }
 
     [Test]
-    public void InsertTest_ShouldNotInsertInvalidData()
+    public void InsertTest_ShouldNotInsertNameWithTrailingSpaces()
     {
         // Arrange
         var country = new CountryDTO
         {
-            Name = "InvalidCountry".AddGuid(),
-            CountryCode = " "
+            Name = " TestCountry ",
+            CountryCode = "NSA"
         };
 
         // Act and Assert
         Assert.Throws<SqlException>(() => _repository.Insert(country));
+    }
+
+    [Test]
+    public void InsertTest_ShouldNotInsertCountryCodeWithTrailingSpaces()
+    {
+        // Arrange
+        var country = new CountryDTO
+        {
+            Name = "SpacedCodeCountry",
+            CountryCode = " AB"
+        };
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => _repository.Insert(country));
+    }
+
+    [Test]
+    public void InsertTest_ShouldNotInsertCountryCodeShorterThanTwoCharacters()
+    {
+        // Arrange
+        var country = new CountryDTO
+        {
+            Name = "ShortCodeCountry",
+            CountryCode = "A"
+        };
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => _repository.Insert(country));
+    }
+
+    [Test]
+    public void InsertTest_ShouldNotInsertDuplicateCountryCode()
+    {
+        // Arrange
+        var first = new CountryDTO
+        {
+            Name = "FirstCountry",
+            CountryCode = "DUP"
+        };
+
+        var second = new CountryDTO
+        {
+            Name = "SecondCountry",
+            CountryCode = "DUP"
+        };
+
+        // Act
+        _repository.Insert(first);
+
+        // Assert
+        Assert.Throws<SqlException>(() => _repository.Insert(second));
     }
 
     [Test]
@@ -76,9 +126,91 @@ public class CountryRepositoryTests : BaseRepositoryTests
     }
 
     [Test]
-    public void UpdateTest_ShouldNotUpdateInvalidData()
+    public void UpdateTest_ShouldNotUpdateBlankName()
     {
-        Assert.Pass("This test is not implemented yet. Implementing validation logic in the repository is required to make this test meaningful.");
+        // Arrange
+        var existingCountry = _repository.GetById(UpdateTestId);
+        existingCountry.Name = " ";
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => _repository.Update(existingCountry));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldNotUpdateNameTrailingSpaces()
+    {
+        // Arrange
+        var existingCountry = _repository.GetById(UpdateTestId);
+        existingCountry.Name = " UpdatedCountry ";
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => _repository.Update(existingCountry));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldNotUpdateBlankCountryCode()
+    {
+        // Arrange
+        var existingCountry = _repository.GetById(UpdateTestId);
+        existingCountry.CountryCode = " ";
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => _repository.Update(existingCountry));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldNotUpdateCountryCodeShorterThanTwoCharacters()
+    {
+        // Arrange
+        var existingCountry = _repository.GetById(UpdateTestId);
+        existingCountry.CountryCode = "A";
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => _repository.Update(existingCountry));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldNotUpdateCountryCodeWithTrailingSpaces()
+    {
+        // Arrange
+        var existingCountry = _repository.GetById(UpdateTestId);
+        existingCountry.CountryCode = " AB";
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => _repository.Update(existingCountry));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldNotUpdateDuplicateCountryCode()
+    {
+        // Arrange
+        var first = new CountryDTO
+        {
+            Name = "FirstUpdateCountry",
+            CountryCode = "UPA"
+        };
+
+        var second = new CountryDTO
+        {
+            Name = "SecondUpdateCountry",
+            CountryCode = "UPB"
+        };
+
+        _repository.Insert(first);
+        var secondId = _repository.Insert(second);
+
+        var countryToUpdate = _repository.GetById(secondId);
+        countryToUpdate.CountryCode = first.CountryCode;
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => _repository.Update(countryToUpdate));
+    }
+
+    [Test]
+    public void Update_WhenEntityIsNull_ShouldThrowException()
+    {
+        // Act and Assert
+        Assert.Throws<ArgumentNullException>(() => _repository.Update(null!));
     }
 
     [Test]
@@ -87,5 +219,41 @@ public class CountryRepositoryTests : BaseRepositoryTests
         // Arrange, Act and Assert
         _repository.Delete(DeleteTestId);
         Assert.Throws<SqlException>(() => _repository.GetById(DeleteTestId));
+    }
+
+    [Test]
+    public void Delete_WhenIdIsNull_ShouldThrowException()
+    {
+        // Act and Assert
+        Assert.Throws<ArgumentNullException>(() => _repository.Delete(null!));
+    }
+
+    [Test]
+    public void GetByCodeTest_ShouldReturnCountryByCode()
+    {
+        // Act
+        var country = _repository.GetByCode("GEO");
+
+        // Assert
+        Assert.That(country, Is.Not.Null);
+        Assert.That(country!.CountryCode, Is.EqualTo("GEO"));
+        Assert.That(country.Name, Is.EqualTo("Georgia"));
+    }
+
+    [Test]
+    public void GetByCodeTest_ShouldReturnNullWhenCodeDoesNotExist()
+    {
+        // Act
+        var country = _repository.GetByCode("ZZZ");
+
+        // Assert
+        Assert.That(country, Is.Null);
+    }
+
+    [Test]
+    public void GetByCodeTest_WhenCodeIsBlank_ShouldThrowException()
+    {
+        // Act and Assert
+        Assert.Throws<ArgumentException>(() => _repository.GetByCode(" "));
     }
 }

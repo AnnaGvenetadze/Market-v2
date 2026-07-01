@@ -1,4 +1,4 @@
-﻿create or alter procedure dbo.sp_ActivateCategory
+﻿create procedure dbo.sp_ActivateCategory
     @CategoryID int
 as
 begin
@@ -10,7 +10,7 @@ begin
         inner join dbo.Categories p
             on c.ParentID = p.ID
         where c.ID = @CategoryID
-          and p.IsActive = 0
+          and p.IsDeleted = 0
     )
     begin
         raiserror('parent category is inactive.', 16, 1);
@@ -19,7 +19,7 @@ begin
 
     update dbo.Categories
     set
-        IsActive = 1,
+        IsDeleted = 1,
         UpdatedDate = getdate()
     where ID = @CategoryID;
 

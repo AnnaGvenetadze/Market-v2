@@ -6,9 +6,8 @@ using Microsoft.Data.SqlClient;
 
 namespace Market.Tests;
 
-public class CategoryAttributeRepositoryTests
+public class CategoryAttributeRepositoryTests : BaseRepositoryTests
 {
-    private const string ConnectionString = "Server=.;Database=G11_Market_Test;Trusted_Connection=True;TrustServerCertificate=True;";
     private SqlConnection _connection;
     private ICategoryRepository _categoryRepository;
     private AttributeRepository _attributeRepository;

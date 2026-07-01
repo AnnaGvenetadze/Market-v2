@@ -4,4 +4,5 @@ namespace Market.Services.Interfaces.Repositories;
 
 public interface ICountryRepository : IBaseRepository<CountryDTO>
 {
+    CountryDTO? GetByCode(string countryCode);
 }

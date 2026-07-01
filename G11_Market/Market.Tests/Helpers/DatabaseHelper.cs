@@ -4,9 +4,8 @@ namespace Market.Tests.Helpers;
 
 internal class DatabaseHelper
 {
-    private const string ConnectionString
-        //= "Server=.;Database=G11_Market_TEST;Integrated Security=True;TrustServerCertificate=True;";
-        = "Server=.;Database=G11_Market_Test;Trusted_Connection=True;TrustServerCertificate=True;";
+    private const string ConnectionString = "Server=localhost;Database=MarketDB_Test;Trusted_Connection=True;TrustServerCertificate=True;";
+        //= "Server=.;Database=G11_Market_Test;Trusted_Connection=True;TrustServerCertificate=True;";
 
     private const string ClearDatabaseScript = @"
         -- Self-referencing tables: break self FK links first

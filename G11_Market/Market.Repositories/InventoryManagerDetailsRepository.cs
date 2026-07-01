@@ -19,7 +19,7 @@ public sealed class InventoryManagerDetailsRepository(DbConnection connection)
             "sp_InsertInventoryManager",
             new
             {
-                entity.Id,
+                entity.Id, // of exsisting account id
                 entity.StockAdjustmentLimit,
                 entity.CanApproveStockCorrection,
                 entity.CanApproveNegativeStock

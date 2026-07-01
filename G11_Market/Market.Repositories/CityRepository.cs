@@ -7,4 +7,14 @@ namespace Market.Repositories;
 public class CityRepository(DbConnection connection)
     : BaseRepository<CityDTO>(connection), ICityRepository
 {
+    public CityDTO? GetByName(string name)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+
+        return Search(city => city.Name == name && city.IsDeleted == false)
+            .FirstOrDefault();
+    }
+
+    public IEnumerable<CityDTO> GetAllActive()
+        => Search(city => city.IsDeleted == false);
 }

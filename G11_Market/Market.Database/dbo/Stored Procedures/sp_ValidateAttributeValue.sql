@@ -13,7 +13,7 @@ BEGIN
 
     SELECT @AttributeType = AttributeType
     FROM Attributes
-    WHERE AttributeId = @AttributeId;
+    WHERE Id = @AttributeId;
 
     IF @AttributeType IS NULL
     BEGIN

@@ -1,6 +1,6 @@
 ﻿create procedure sp_InsertProductAttributeValue
-    @productId INT NOT NULL,
-    @AttributeId INT NOT NULL,
+    @productId INT,
+    @AttributeId INT,
     @TextValue NVARCHAR(500) = NULL,
     @NumberValue DECIMAL(18,2) = NULL,
     @DateValue DATETIME = NULL,
@@ -12,7 +12,7 @@ begin
     declare @AttributeType TinyInt;
     select @AttributeType = AttributeType
     from 
-    Attributes Where AttributeId = Attributes.AttributeId;
+    Attributes Where Id = @AttributeId;
 
     if @AttributeType is null
     begin

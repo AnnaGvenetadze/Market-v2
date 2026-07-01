@@ -1,4 +1,4 @@
-﻿create or alter procedure dbo.sp_DeleteCategory
+﻿create procedure dbo.sp_DeleteCategory
     @CategoryId int
 as
 begin
@@ -27,7 +27,7 @@ begin
         select 1
         from dbo.Categories
         where ParentId = @CategoryId
-          and IsActive = 1
+          and IsDeleted = 0
     )
     begin
         ;throw 50022, 'Category has active subcategories. Deactivate or remove subcategories first.', 1;
@@ -38,7 +38,7 @@ begin
         select 1
         from dbo.Products
         where CategoryId = @CategoryId
-          and IsActive = 1
+          and IsDeleted = 0
     )
     begin
         ;throw 50023, 'Category has active products. Deactivate, delete, or move products to another category first.', 1;
@@ -47,7 +47,7 @@ begin
     begin try
         update dbo.Categories
         set
-            IsActive = 0,
+            IsDeleted = 1,
             UpdatedDate = getdate()
         where Id = @CategoryId;
 

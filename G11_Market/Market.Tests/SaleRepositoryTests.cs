@@ -113,7 +113,7 @@ public class SaleRepositoryTests : BaseRepositoryTests
     }
 
     [Test]
-    public void DeleteTest_ShouldDeleteValidData()
+    public void CancelTest_ShouldCancelValidSale()
     {
         // Arrange
         var sale = new SaleDTO
@@ -121,15 +121,19 @@ public class SaleRepositoryTests : BaseRepositoryTests
             CreatedEmployeeId = _employeeId,
             Status = 0,
         };
+
         var insertedId = _saleRepository.Insert(sale);
 
         // Act
-        _saleRepository.Delete(insertedId);
-        var deletedSale = _saleRepository.Search(s => s.Id == insertedId).FirstOrDefault();
+        _saleRepository.Cancel(insertedId, _secondEmployeeId, "Cancelled in test");
+
+        var cancelledSale = _saleRepository.Search(s => s.Id == insertedId).FirstOrDefault();
 
         // Assert
-        Assert.That(deletedSale, Is.Not.Null);
-        Assert.That(deletedSale.Status, Is.EqualTo(2));
+        Assert.That(cancelledSale, Is.Not.Null);
+        Assert.That(cancelledSale!.Status, Is.EqualTo(2));
+        Assert.That(cancelledSale.CancelledByEmployeeId, Is.EqualTo(_secondEmployeeId));
+        Assert.That(cancelledSale.CancelReason, Is.EqualTo("Cancelled in test"));
     }
 
     [Test]

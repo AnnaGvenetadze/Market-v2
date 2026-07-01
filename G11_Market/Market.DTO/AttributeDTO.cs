@@ -5,7 +5,6 @@ namespace Market.DTO;
 public sealed class AttributeDTO
 {
     [IgnoreOnInsert]
-    [IgnoreOnUpdate]
     public int Id { get; set; }
 
     public string AttributeName { get; set; } = string.Empty;

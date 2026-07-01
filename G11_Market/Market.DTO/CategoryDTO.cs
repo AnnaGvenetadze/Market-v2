@@ -5,7 +5,6 @@ namespace Market.DTO;
 public sealed class CategoryDTO
 {
     [IgnoreOnInsert]
-    [IgnoreOnUpdate]
     public int Id { get; set; }
 
     public int? ParentId { get; set; }

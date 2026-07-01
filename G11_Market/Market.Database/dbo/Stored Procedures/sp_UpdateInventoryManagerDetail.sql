@@ -1,4 +1,4 @@
-﻿create procedure dbo.sp_UpdateInventoryManager
+﻿create procedure dbo.sp_UpdateInventoryManagerDetail
     @Id int,
     @StockAdjustmentLimit decimal(18,2),
     @CanApproveStockCorrection bit,
