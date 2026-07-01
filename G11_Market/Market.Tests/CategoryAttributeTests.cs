@@ -19,8 +19,8 @@ public class CategoryAttributeRepositoryTests : BaseRepositoryTests
     public void Setup()
     {
         _connection = new SqlConnection(ConnectionString);
-        UnitOfWork unitOfWork = new UnitOfWork(_connection);
-        _categoryRepository = unitOfWork.CategoryRepository;
+        //UnitOfWork unitOfWork = new UnitOfWork(_connection);
+        //_categoryRepository = unitOfWork.CategoryRepository;
         _attributeRepository = new AttributeRepository(_connection);
         _categoryAttributeRepository = new CategoryAttributeRepository(_connection);
 

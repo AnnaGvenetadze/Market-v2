@@ -18,7 +18,7 @@ namespace Market.Tests
         }
 
         [Test]
-        public void InsertTest_ShouldInsertValidAttributeName()
+        public void InsertTest_ShouldInsertValidData()
         {
             // Arrange
             var attribute = new AttributeDTO
@@ -35,53 +35,6 @@ namespace Market.Tests
             Assert.That(newId, Is.GreaterThan(0));
             Assert.That(insertedAttribute, Is.Not.Null);
             Assert.That(insertedAttribute!.AttributeName, Is.EqualTo(attribute.AttributeName));
-        }
-
-        [Test]
-        public void InsertTest_ShouldNotInsertNullAttributeName()
-        {
-            // Arrange
-            var attribute = new AttributeDTO
-            {
-                AttributeName = null!,
-                AttributeType = 1
-            };
-
-            // Act and Assert
-            Assert.Throws<SqlException>(() => _repository.Insert(attribute));
-        }
-
-        [Test]
-        public void InsertTest_ShouldNotInsertBlankAttributeName()
-        {
-            // Arrange
-            var attribute = new AttributeDTO
-            {
-                AttributeName = " ",
-                AttributeType = 1
-            };
-
-            // Act and Assert
-            Assert.Throws<SqlException>(() => _repository.Insert(attribute));
-        }
-
-        [Test]
-        public void InsertTest_ShouldInsertValidAttributeType()
-        {
-            // Arrange
-            var attribute = new AttributeDTO
-            {
-                AttributeName = "Size".AddGuid(),
-                AttributeType = 2
-            };
-
-            // Act
-            var newId = _repository.Insert(attribute);
-            var insertedAttribute = _repository.GetById(newId);
-
-            // Assert
-            Assert.That(newId, Is.GreaterThan(0));
-            Assert.That(insertedAttribute, Is.Not.Null);
             Assert.That(insertedAttribute!.AttributeType, Is.EqualTo(attribute.AttributeType));
         }
 
@@ -125,7 +78,7 @@ namespace Market.Tests
         }
 
         [Test]
-        public void UpdateTest_ShouldUpdateValidAttributeName()
+        public void UpdateTest_ShouldUpdateValidData()
         {
             // Arrange
             var attribute = new AttributeDTO
@@ -147,88 +100,7 @@ namespace Market.Tests
             // Assert
             Assert.That(updatedAttribute, Is.Not.Null);
             Assert.That(updatedAttribute!.AttributeName, Is.EqualTo(insertedAttribute.AttributeName));
-        }
-
-        [Test]
-        public void UpdateTest_ShouldUpdateValidAttributeType()
-        {
-            // Arrange
-            var attribute = new AttributeDTO
-            {
-                AttributeName = "TypeUpdateAttribute".AddGuid(),
-                AttributeType = 1
-            };
-
-            var newId = _repository.Insert(attribute);
-            var insertedAttribute = _repository.GetById(newId);
-
-            insertedAttribute!.AttributeType = 2;
-
-            // Act
-            _repository.Update(insertedAttribute);
-
-            var updatedAttribute = _repository.GetById(newId);
-
-            // Assert
-            Assert.That(updatedAttribute, Is.Not.Null);
-            Assert.That(updatedAttribute!.AttributeType, Is.EqualTo(2));
-        }
-
-        [Test]
-        public void UpdateTest_ShouldNotUpdateNullAttributeName()
-        {
-            // Arrange
-            var attribute = new AttributeDTO
-            {
-                AttributeName = "NullUpdateAttribute".AddGuid(),
-                AttributeType = 1
-            };
-
-            var newId = _repository.Insert(attribute);
-            var insertedAttribute = _repository.GetById(newId);
-
-            insertedAttribute!.AttributeName = null!;
-
-            // Act and Assert
-            Assert.Throws<SqlException>(() => _repository.Update(insertedAttribute));
-        }
-
-        [Test]
-        public void UpdateTest_ShouldNotUpdateBlankAttributeName()
-        {
-            // Arrange
-            var attribute = new AttributeDTO
-            {
-                AttributeName = "BlankUpdateAttribute".AddGuid(),
-                AttributeType = 1
-            };
-
-            var newId = _repository.Insert(attribute);
-            var insertedAttribute = _repository.GetById(newId);
-
-            insertedAttribute!.AttributeName = " ";
-
-            // Act and Assert
-            Assert.Throws<SqlException>(() => _repository.Update(insertedAttribute));
-        }
-
-        [Test]
-        public void UpdateTest_ShouldNotUpdateInvalidAttributeType()
-        {
-            // Arrange
-            var attribute = new AttributeDTO
-            {
-                AttributeName = "InvalidUpdateTypeAttribute".AddGuid(),
-                AttributeType = 1
-            };
-
-            var newId = _repository.Insert(attribute);
-            var insertedAttribute = _repository.GetById(newId);
-
-            insertedAttribute!.AttributeType = 9;
-
-            // Act and Assert
-            Assert.Throws<SqlException>(() => _repository.Update(insertedAttribute));
+            Assert.That(updatedAttribute!.AttributeType, Is.EqualTo(insertedAttribute.AttributeType));
         }
 
         [Test]

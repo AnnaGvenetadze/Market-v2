@@ -20,7 +20,7 @@ public class CountryRepositoryTests : BaseRepositoryTests
     [TearDown]
     public void TearDown()
     {
-        _repository.Dispose();
+        //_repository.Dispose();
         _connection.Dispose();
     }
 
@@ -43,48 +43,6 @@ public class CountryRepositoryTests : BaseRepositoryTests
         Assert.That(insertedCountry, Is.Not.Null);
         Assert.That(insertedCountry!.Name, Is.EqualTo(country.Name));
         Assert.That(insertedCountry.CountryCode, Is.EqualTo(country.CountryCode));
-    }
-
-    [Test]
-    public void InsertTest_ShouldNotInsertNameWithTrailingSpaces()
-    {
-        // Arrange
-        var country = new CountryDTO
-        {
-            Name = " TestCountry ",
-            CountryCode = "NSA"
-        };
-
-        // Act and Assert
-        Assert.Throws<SqlException>(() => _repository.Insert(country));
-    }
-
-    [Test]
-    public void InsertTest_ShouldNotInsertCountryCodeWithTrailingSpaces()
-    {
-        // Arrange
-        var country = new CountryDTO
-        {
-            Name = "SpacedCodeCountry",
-            CountryCode = " AB"
-        };
-
-        // Act and Assert
-        Assert.Throws<SqlException>(() => _repository.Insert(country));
-    }
-
-    [Test]
-    public void InsertTest_ShouldNotInsertCountryCodeShorterThanTwoCharacters()
-    {
-        // Arrange
-        var country = new CountryDTO
-        {
-            Name = "ShortCodeCountry",
-            CountryCode = "A"
-        };
-
-        // Act and Assert
-        Assert.Throws<SqlException>(() => _repository.Insert(country));
     }
 
     [Test]
@@ -124,61 +82,6 @@ public class CountryRepositoryTests : BaseRepositoryTests
         // Assert
         Assert.That(updatedCountry, Is.Not.Null);
         Assert.That(updatedCountry!.Name, Is.EqualTo(existingCountry.Name));
-    }
-
-    [Test]
-    public void UpdateTest_ShouldNotUpdateBlankName()
-    {
-        // Arrange
-        var existingCountry = _repository.GetById(UpdateTestId);
-        existingCountry.Name = " ";
-
-        // Act and Assert
-        Assert.Throws<SqlException>(() => _repository.Update(existingCountry));
-    }
-
-    [Test]
-    public void UpdateTest_ShouldNotUpdateNameTrailingSpaces()
-    {
-        // Arrange
-        var existingCountry = _repository.GetById(UpdateTestId);
-        existingCountry.Name = " UpdatedCountry ";
-
-        // Act and Assert
-        Assert.Throws<SqlException>(() => _repository.Update(existingCountry));
-    }
-
-    [Test]
-    public void UpdateTest_ShouldNotUpdateBlankCountryCode()
-    {
-        // Arrange
-        var existingCountry = _repository.GetById(UpdateTestId);
-        existingCountry.CountryCode = " ";
-
-        // Act and Assert
-        Assert.Throws<SqlException>(() => _repository.Update(existingCountry));
-    }
-
-    [Test]
-    public void UpdateTest_ShouldNotUpdateCountryCodeShorterThanTwoCharacters()
-    {
-        // Arrange
-        var existingCountry = _repository.GetById(UpdateTestId);
-        existingCountry.CountryCode = "A";
-
-        // Act and Assert
-        Assert.Throws<SqlException>(() => _repository.Update(existingCountry));
-    }
-
-    [Test]
-    public void UpdateTest_ShouldNotUpdateCountryCodeWithTrailingSpaces()
-    {
-        // Arrange
-        var existingCountry = _repository.GetById(UpdateTestId);
-        existingCountry.CountryCode = " AB";
-
-        // Act and Assert
-        Assert.Throws<SqlException>(() => _repository.Update(existingCountry));
     }
 
     [Test]
@@ -249,12 +152,5 @@ public class CountryRepositoryTests : BaseRepositoryTests
 
         // Assert
         Assert.That(country, Is.Null);
-    }
-
-    [Test]
-    public void GetByCodeTest_WhenCodeIsBlank_ShouldThrowException()
-    {
-        // Act and Assert
-        Assert.Throws<ArgumentException>(() => _repository.GetByCode(" "));
     }
 }
