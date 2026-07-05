@@ -134,6 +134,10 @@
     <Build Include="dbo\Stored Procedures\sp_DeleteAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateInventoryManagerDetail.sql" />
+    <Build Include="dbo\Stored Procedures\sp_AssignCattegoryAttribute.sql" />
+    <Build Include="dbo\Stored Procedures\sp_AssignEmployeeRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UnassignCategoryAttribute.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UnassignEmployeeRole.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Stored Procedures\sp_ValidateCategory.sql" />
