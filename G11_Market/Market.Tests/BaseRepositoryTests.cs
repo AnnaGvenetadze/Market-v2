@@ -9,32 +9,24 @@ public abstract class BaseRepositoryTests
 {
     protected const int UpdateTestId = 1;
     protected const int DeleteTestId = 2;
-    protected static string ConnectionString => ConfigurationManager.ConnectionString;
+    protected static string ConnectionString 
+        => ConfigurationManager.ConnectionString;
+
     protected SqlConnection Connection;
     protected IUnitOfWork UnitOfWork;
 
-    [OneTimeSetUp]
-    public void OneTimeSetup()
+    [SetUp]
+    public void BaseSetup()
     {
         DatabaseHelper.ClearDatabase();
         DatabaseHelper.SeedDatabase();
-    }
 
-    [SetUp]
-    public void Setup()
-    {
         Connection = new SqlConnection(ConnectionString);
         UnitOfWork = UnitOfWorkFactory.Create(Connection);
     }
 
-    [OneTimeTearDown]
-    public void OneTimeTearDown()
-    {
-        DatabaseHelper.ClearDatabase();
-    }
-
     [TearDown]
-    public void TearDown()
+    public void BaseTearDown()
     {
         UnitOfWork.Dispose();
         Connection.Dispose();
