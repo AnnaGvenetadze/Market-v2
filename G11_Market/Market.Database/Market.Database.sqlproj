@@ -166,4 +166,7 @@
     <None Include="TEST.Database.publish.xml" />
     <None Include="DEV.Database.publish.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Views\vw_ProductDetails.sql" />
+  </ItemGroup>
 </Project>
