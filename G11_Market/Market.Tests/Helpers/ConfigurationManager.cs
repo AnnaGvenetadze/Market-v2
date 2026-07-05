@@ -2,7 +2,7 @@
 
 namespace Market.Tests.Helpers;
 
-public static class TestConfigurationHelper
+public static class ConfigurationManager
 {
     private static readonly IConfigurationRoot Configuration = new ConfigurationBuilder()
         .SetBasePath(AppContext.BaseDirectory)
@@ -10,6 +10,6 @@ public static class TestConfigurationHelper
         .Build();
 
     public static string ConnectionString =>
-        Configuration.GetConnectionString("MarketTestDb")
-        ?? throw new InvalidOperationException("Connection string 'MarketTestDb' was not found.");
+        Configuration.GetConnectionString("MarketDb")
+        ?? throw new InvalidOperationException("Connection string 'MarketDb' was not found.");
 }

@@ -11,7 +11,7 @@ public abstract class BaseRepositoryTests
     protected const int DeleteTestId = 2;
     //protected const string ConnectionString = "Server=localhost;Database=MarketDB_Test;Trusted_Connection=True;TrustServerCertificate=True;";
     // = "Server=.;Database=G11_Market_Test;Trusted_Connection=True;TrustServerCertificate=True;";
-    protected static string ConnectionString => TestConfigurationHelper.ConnectionString;
+    protected static string ConnectionString => ConfigurationManager.ConnectionString;
     protected SqlConnection Connection;
     protected IUnitOfWork UnitOfWork;
 
