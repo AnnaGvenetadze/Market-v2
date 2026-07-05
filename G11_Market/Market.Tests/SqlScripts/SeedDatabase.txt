@@ -1,0 +1,5 @@
+﻿INSERT INTO Countries (Name, CountryCode)
+VALUES 
+    ('Georgia', 'GEO'),
+    ('Armenia', 'ARM'),
+    ('Chad', 'CHA');
