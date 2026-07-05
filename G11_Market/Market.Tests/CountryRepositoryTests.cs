@@ -30,23 +30,14 @@ public class CountryRepositoryTests : BaseRepositoryTests
     public void InsertTest_ShouldNotInsertDuplicateCountryCode()
     {
         // Arrange
-        var first = new CountryDTO
+        var country = new CountryDTO
         {
-            Name = "FirstCountry",
-            CountryCode = "DUP"
+            Name = "DuplicateGeorgia",
+            CountryCode = "GEO"
         };
 
-        var second = new CountryDTO
-        {
-            Name = "SecondCountry",
-            CountryCode = "DUP"
-        };
-
-        // Act
-        UnitOfWork.CountryRepository.Insert(first);
-
-        // Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.CountryRepository.Insert(second));
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.CountryRepository.Insert(country));
     }
 
     [Test]
@@ -69,23 +60,8 @@ public class CountryRepositoryTests : BaseRepositoryTests
     public void UpdateTest_ShouldNotUpdateDuplicateCountryCode()
     {
         // Arrange
-        var first = new CountryDTO
-        {
-            Name = "FirstUpdateCountry",
-            CountryCode = "UPA"
-        };
-
-        var second = new CountryDTO
-        {
-            Name = "SecondUpdateCountry",
-            CountryCode = "UPB"
-        };
-
-        UnitOfWork.CountryRepository.Insert(first);
-        var secondId = UnitOfWork.CountryRepository.Insert(second);
-
-        var countryToUpdate = UnitOfWork.CountryRepository.GetById(secondId);
-        countryToUpdate!.CountryCode = first.CountryCode;
+        var countryToUpdate = UnitOfWork.CountryRepository.GetById(DeleteTestId);
+        countryToUpdate!.CountryCode = "GEO";
 
         // Act and Assert
         Assert.Throws<SqlException>(() => UnitOfWork.CountryRepository.Update(countryToUpdate));
