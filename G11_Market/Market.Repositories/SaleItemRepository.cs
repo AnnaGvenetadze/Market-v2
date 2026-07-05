@@ -4,7 +4,7 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-public sealed class SaleItemRepository(DbConnection connection)
+internal sealed class SaleItemRepository(DbConnection connection)
     : BaseRepository<SaleItemDTO>(connection), ISaleItemRepository
 {
     public IEnumerable<SaleItemDTO> GetBySaleId(int saleId)

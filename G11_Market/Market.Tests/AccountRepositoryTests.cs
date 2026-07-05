@@ -1,5 +1,4 @@
 ﻿using Market.DTO;
-using Market.Repositories;
 using Market.Tests.Helpers;
 using Microsoft.Data.SqlClient;
 
@@ -7,17 +6,6 @@ namespace Market.Tests;
 
 public class AccountRepositoryTests : BaseRepositoryTests
 {
-    private SqlConnection _connection;
-    private AccountRepository _accountRepository;
-
-    [SetUp]
-    public void Setup()
-    {
-        _connection = new SqlConnection(ConnectionString);
-        _accountRepository = new AccountRepository(_connection);
-    }
-
-
     [Test]
     public void InsertTest_ShouldInsertValidData()
     {
@@ -35,8 +23,8 @@ public class AccountRepositoryTests : BaseRepositoryTests
         };
 
         // Act
-        var insertedId = _accountRepository.Insert(account);
-        var insertedAccount = _accountRepository.GetById(insertedId);
+        var insertedId = UnitOfWork.AccountRepository.Insert(account);
+        var insertedAccount = UnitOfWork.AccountRepository.GetById(insertedId);
 
         // Assert
         Assert.That(insertedAccount, Is.Not.Null);
@@ -60,16 +48,16 @@ public class AccountRepositoryTests : BaseRepositoryTests
             FirstName = "Luka",
             LastName = "Mania"
         };
-        var insertedId = _accountRepository.Insert(account);
+        var insertedId = UnitOfWork.AccountRepository.Insert(account);
 
-        var accountToUpdate = _accountRepository.GetById(insertedId);
-        accountToUpdate.PasswordHash = "NewPassword";
+        var accountToUpdate = UnitOfWork.AccountRepository.GetById(insertedId);
+        accountToUpdate!.PasswordHash = "NewPassword";
         accountToUpdate.LastName = "NotMania";
         accountToUpdate.UpdateDate = DateTime.Now;
 
         // Act
-        _accountRepository.Update(accountToUpdate);
-        var updatedAccount = _accountRepository.GetById(insertedId);
+        UnitOfWork.AccountRepository.Update(accountToUpdate);
+        var updatedAccount = UnitOfWork.AccountRepository.GetById(insertedId);
 
         // Assert
         Assert.That(updatedAccount, Is.Not.Null);
@@ -91,13 +79,13 @@ public class AccountRepositoryTests : BaseRepositoryTests
             FirstName = "Luka",
             LastName = "Mania"
         };
-        var insertedId = _accountRepository.Insert(account);
+        var insertedId = UnitOfWork.AccountRepository.Insert(account);
 
         // Act
-        _accountRepository.Delete(insertedId);
+        UnitOfWork.AccountRepository.Delete(insertedId);
 
         // Assert
-        Assert.Throws<SqlException>(() => _accountRepository.GetById(insertedId));
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.GetById(insertedId));
     }
 
 
@@ -115,7 +103,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
             FirstName = "User",
             LastName = "One"
         };
-        _accountRepository.Insert(account1);
+        UnitOfWork.AccountRepository.Insert(account1);
 
         var account2 = new AccountDTO
         {
@@ -128,7 +116,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
         };
 
         // Act & Assert
-        Assert.Throws<SqlException>(() => _accountRepository.Insert(account2));
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(account2));
     }
 
 
@@ -146,7 +134,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
             FirstName = "User",
             LastName = "One"
         };
-        _accountRepository.Insert(account1);
+        UnitOfWork.AccountRepository.Insert(account1);
 
         var account2 = new AccountDTO
         {
@@ -159,7 +147,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
         };
 
         // Act & Assert
-        Assert.Throws<SqlException>(() => _accountRepository.Insert(account2));
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(account2));
     }
 
 
@@ -177,10 +165,10 @@ public class AccountRepositoryTests : BaseRepositoryTests
             FirstName = "Luka",
             LastName = "Mania"
         };
-        _accountRepository.Insert(account);
+        UnitOfWork.AccountRepository.Insert(account);
 
         // Act
-        var result = _accountRepository.GetByUsername(wantedUsername);
+        var result = UnitOfWork.AccountRepository.GetByUsername(wantedUsername);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -192,7 +180,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
     public void GetByUsername_WhenNotFound_ShouldReturnNull()
     {
         // Act
-        var result = _accountRepository.GetByUsername("NonExistentUser");
+        var result = UnitOfWork.AccountRepository.GetByUsername("NonExistentUser");
 
         // Assert
         Assert.That(result, Is.Null);
@@ -213,10 +201,10 @@ public class AccountRepositoryTests : BaseRepositoryTests
             FirstName = "Target",
             LastName = "Email"
         };
-        _accountRepository.Insert(account);
+        UnitOfWork.AccountRepository.Insert(account);
 
         // Act
-        var result = _accountRepository.GetByEmail(targetEmail);
+        var result = UnitOfWork.AccountRepository.GetByEmail(targetEmail);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -228,7 +216,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
     public void GetByEmail_WhenNotFound_ShouldReturnNull()
     {
         // Act
-        var result = _accountRepository.GetByEmail("notfound@gmail.com");
+        var result = UnitOfWork.AccountRepository.GetByEmail("notfound@gmail.com");
 
         // Assert
         Assert.That(result, Is.Null);
@@ -244,12 +232,12 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var account2 = new AccountDTO { Username = "U2".AddGuid(), PasswordHash = "H", Email = "E2".AddGuid() + "@gmail.com", AccountType = targetType, FirstName = "C", LastName = "D" };
         var account3 = new AccountDTO { Username = "U3".AddGuid(), PasswordHash = "H", Email = "E3".AddGuid() + "@gmail.com", AccountType = 3, FirstName = "E", LastName = "F" }; 
 
-        var id1 = _accountRepository.Insert(account1);
-        var id2 = _accountRepository.Insert(account2);
-        _accountRepository.Insert(account3); 
+        var id1 = UnitOfWork.AccountRepository.Insert(account1);
+        var id2 = UnitOfWork.AccountRepository.Insert(account2);
+        UnitOfWork.AccountRepository.Insert(account3); 
 
         // Act
-        var results = _accountRepository.GetByAccountType(targetType).ToList();
+        var results = UnitOfWork.AccountRepository.GetByAccountType(targetType).ToList();
 
         // Assert
         Assert.That(results.Count, Is.AtLeast(2));
@@ -262,21 +250,21 @@ public class AccountRepositoryTests : BaseRepositoryTests
     [Test]
     public void GetById_WhenIdIsNull_ShouldThrowException()
     {
-        Assert.Throws<ArgumentNullException>(() => _accountRepository.GetById(null!));
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.GetById(null!));
     }
 
 
     [Test]
     public void Update_WhenEntityIsNull_ShouldThrowException()
     {
-        Assert.Throws<ArgumentNullException>(() => _accountRepository.Update(null!));
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.Update(null!));
     }
 
 
     [Test]
     public void Delete_WhenIdIsNull_ShouldThrowException()
     {
-        Assert.Throws<ArgumentNullException>(() => _accountRepository.Delete(null!));
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.Delete(null!));
     }
 
 
@@ -287,21 +275,13 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var account1 = new AccountDTO { Username = "All1".AddGuid(), PasswordHash = "H", Email = "All1".AddGuid() + "@m.com", AccountType = 1, FirstName = "A", LastName = "B" };
         var account2 = new AccountDTO { Username = "All2".AddGuid(), PasswordHash = "H", Email = "All2".AddGuid() + "@m.com", AccountType = 1, FirstName = "C", LastName = "D" };
 
-        _accountRepository.Insert(account1);
-        _accountRepository.Insert(account2);
+        UnitOfWork.AccountRepository.Insert(account1);
+        UnitOfWork.AccountRepository.Insert(account2);
 
         // Act
-        var allAccounts = _accountRepository.GetAll().ToList();
+        var allAccounts = UnitOfWork.AccountRepository.GetAll().ToList();
 
         // Assert
         Assert.That(allAccounts.Count, Is.AtLeast(2));
-    }
-
-
-    [TearDown]
-    public void TearDown()
-    {
-        _accountRepository.Dispose();
-        _connection.Dispose();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Market.Services.Interfaces.Repositories;
 
-public interface IEmployeeRepository
+public interface IEmployeeRepository : IBaseRepository<EmployeeDTO>
 {
     EmployeeDTO? GetByEmployeeCode(string employeeCode);
     EmployeeDTO? GetByAccountId(int accountId);

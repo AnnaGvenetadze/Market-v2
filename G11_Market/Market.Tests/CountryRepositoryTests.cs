@@ -1,29 +1,10 @@
 ﻿using Market.DTO;
-using Market.Repositories;
-using Market.Services.Interfaces.Repositories;
 using Microsoft.Data.SqlClient;
 
 namespace Market.Tests;
 
 public class CountryRepositoryTests : BaseRepositoryTests
 {
-    private SqlConnection _connection;
-    private ICountryRepository _repository;
-
-    [SetUp]
-    public void Setup()
-    {
-        _connection = new SqlConnection(ConnectionString);
-        _repository = UnitOfWorkFactory.Create(_connection).CountryRepository;
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        //_repository.Dispose();
-        _connection.Dispose();
-    }
-
     [Test]
     public void InsertTest_ShouldInsertValidData()
     {
@@ -35,8 +16,8 @@ public class CountryRepositoryTests : BaseRepositoryTests
         };
 
         // Act
-        var newId = _repository.Insert(country);
-        var insertedCountry = _repository.GetById(newId);
+        var newId = UnitOfWork.CountryRepository.Insert(country);
+        var insertedCountry = UnitOfWork.CountryRepository.GetById(newId);
 
         // Assert
         Assert.That(newId, Is.GreaterThan(0));
@@ -62,22 +43,22 @@ public class CountryRepositoryTests : BaseRepositoryTests
         };
 
         // Act
-        _repository.Insert(first);
+        UnitOfWork.CountryRepository.Insert(first);
 
         // Assert
-        Assert.Throws<SqlException>(() => _repository.Insert(second));
+        Assert.Throws<SqlException>(() => UnitOfWork.CountryRepository.Insert(second));
     }
 
     [Test]
     public void UpdateTest_ShouldUpdateValidData()
     {
         // Arrange
-        var existingCountry = _repository.GetById(UpdateTestId);
-        existingCountry.Name = $"New{existingCountry.Name}";
+        var existingCountry = UnitOfWork.CountryRepository.GetById(UpdateTestId);
+        existingCountry!.Name = $"New{existingCountry.Name}";
 
         // Act
-        _repository.Update(existingCountry);
-        var updatedCountry = _repository.GetById(UpdateTestId);
+        UnitOfWork.CountryRepository.Update(existingCountry);
+        var updatedCountry = UnitOfWork.CountryRepository.GetById(UpdateTestId);
 
         // Assert
         Assert.That(updatedCountry, Is.Not.Null);
@@ -100,43 +81,43 @@ public class CountryRepositoryTests : BaseRepositoryTests
             CountryCode = "UPB"
         };
 
-        _repository.Insert(first);
-        var secondId = _repository.Insert(second);
+        UnitOfWork.CountryRepository.Insert(first);
+        var secondId = UnitOfWork.CountryRepository.Insert(second);
 
-        var countryToUpdate = _repository.GetById(secondId);
-        countryToUpdate.CountryCode = first.CountryCode;
+        var countryToUpdate = UnitOfWork.CountryRepository.GetById(secondId);
+        countryToUpdate!.CountryCode = first.CountryCode;
 
         // Act and Assert
-        Assert.Throws<SqlException>(() => _repository.Update(countryToUpdate));
+        Assert.Throws<SqlException>(() => UnitOfWork.CountryRepository.Update(countryToUpdate));
     }
 
     [Test]
     public void Update_WhenEntityIsNull_ShouldThrowException()
     {
         // Act and Assert
-        Assert.Throws<ArgumentNullException>(() => _repository.Update(null!));
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.CountryRepository.Update(null!));
     }
 
     [Test]
     public void DeleteTest_ShouldDeleteValidData()
     {
         // Arrange, Act and Assert
-        _repository.Delete(DeleteTestId);
-        Assert.Throws<SqlException>(() => _repository.GetById(DeleteTestId));
+        UnitOfWork.CountryRepository.Delete(DeleteTestId);
+        Assert.Throws<SqlException>(() => UnitOfWork.CountryRepository.GetById(DeleteTestId));
     }
 
     [Test]
     public void Delete_WhenIdIsNull_ShouldThrowException()
     {
         // Act and Assert
-        Assert.Throws<ArgumentNullException>(() => _repository.Delete(null!));
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.CountryRepository.Delete(null!));
     }
 
     [Test]
     public void GetByCodeTest_ShouldReturnCountryByCode()
     {
         // Act
-        var country = _repository.GetByCode("GEO");
+        var country = UnitOfWork.CountryRepository.GetByCode("GEO");
 
         // Assert
         Assert.That(country, Is.Not.Null);
@@ -148,7 +129,7 @@ public class CountryRepositoryTests : BaseRepositoryTests
     public void GetByCodeTest_ShouldReturnNullWhenCodeDoesNotExist()
     {
         // Act
-        var country = _repository.GetByCode("ZZZ");
+        var country = UnitOfWork.CountryRepository.GetByCode("ZZZ");
 
         // Assert
         Assert.That(country, Is.Null);

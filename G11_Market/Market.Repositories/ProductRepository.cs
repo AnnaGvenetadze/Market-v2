@@ -4,7 +4,7 @@ using System.Data.Common;
 
 namespace Market.Repositories;
 
-public sealed class ProductRepository(DbConnection connection)
+internal sealed class ProductRepository(DbConnection connection)
     : BaseRepository<ProductDTO>(connection), IProductRepository
 {
     public ProductDTO? GetByName(string productName)

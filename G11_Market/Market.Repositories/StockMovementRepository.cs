@@ -4,7 +4,7 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-public sealed class StockMovementRepository(DbConnection connection)
+internal sealed class StockMovementRepository(DbConnection connection)
     : BaseRepository<StockMovementDTO>(connection), IStockMovementRepository
 {
     public IEnumerable<StockMovementDTO> GetByProductId(int productId)

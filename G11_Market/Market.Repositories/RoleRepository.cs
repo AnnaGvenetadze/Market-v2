@@ -4,7 +4,7 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-public sealed class RoleRepository(DbConnection connection)
+internal sealed class RoleRepository(DbConnection connection)
     : BaseRepository<RoleDTO>(connection), IRoleRepository
 {
     public RoleDTO GetByName(string name)

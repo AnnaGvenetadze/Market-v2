@@ -4,7 +4,7 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-public sealed class ClientRepository(DbConnection connection)
+internal sealed class ClientRepository(DbConnection connection)
     : BaseRepository<ClientDTO>(connection), IClientRepository
 {
     public ClientDTO? GetByAccountId(int accountId)

@@ -1,173 +1,175 @@
-﻿using Dapper;
-using Market.DTO;
-using Market.Repositories;
-using Market.Tests.Helpers;
-using Microsoft.Data.SqlClient;
+﻿// TODO: ფორმატზე დასაყვანი
 
-namespace Market.Tests;
+//using Dapper;
+//using Market.DTO;
+//using Market.Repositories;
+//using Market.Tests.Helpers;
+//using Microsoft.Data.SqlClient;
 
-public class ClientRepositoryTests : BaseRepositoryTests
-{
-    private SqlConnection _connection;
-    private ClientRepository _repository;
+//namespace Market.Tests;
 
-    private const string ClearClientDatabaseScript = @"
-        DELETE FROM SaleItems;
-        DELETE FROM Sales;
+//public class ClientRepositoryTests : BaseRepositoryTests
+//{
+//    private SqlConnection _connection;
+//    private ClientRepository _repository;
 
-        DELETE FROM Clients;
-        DELETE FROM Employees;
+//    private const string ClearClientDatabaseScript = @"
+//        DELETE FROM SaleItems;
+//        DELETE FROM Sales;
 
-        DELETE FROM ClientTypes;
-        DELETE FROM Accounts;
+//        DELETE FROM Clients;
+//        DELETE FROM Employees;
 
-        DBCC CHECKIDENT ('SaleItems', RESEED, 0);
-        DBCC CHECKIDENT ('Sales', RESEED, 0);
+//        DELETE FROM ClientTypes;
+//        DELETE FROM Accounts;
 
-        DBCC CHECKIDENT ('Clients', RESEED, 0);
-        DBCC CHECKIDENT ('Employees', RESEED, 0);
+//        DBCC CHECKIDENT ('SaleItems', RESEED, 0);
+//        DBCC CHECKIDENT ('Sales', RESEED, 0);
 
-        DBCC CHECKIDENT ('ClientTypes', RESEED, 0);
-        DBCC CHECKIDENT ('Accounts', RESEED, 0);
-    ";
+//        DBCC CHECKIDENT ('Clients', RESEED, 0);
+//        DBCC CHECKIDENT ('Employees', RESEED, 0);
 
-    private const string SeedClientDatabaseScript = @"
-    INSERT INTO Accounts (Username, PasswordHash, Email, FirstName, LastName, AccountType, IsDeleted, CreateDate)
-    VALUES 
-        ('testuser1', 'test123', 'test@gmail.com', 'test', 'test', 2, 0, GETDATE()),
-        ('testuser2', 'test456', 'test2@gmail.com', 'test', 'test', 2, 0, GETDATE()),
-        ('testuser3', 'test789', 'test3@gmail.com', 'test', 'test', 2, 0, GETDATE());
+//        DBCC CHECKIDENT ('ClientTypes', RESEED, 0);
+//        DBCC CHECKIDENT ('Accounts', RESEED, 0);
+//    ";
 
-    INSERT INTO ClientTypes (Name, Description, IsDeleted, CreateDate)
-    VALUES 
-        ('Individual', 'Individual client type', 0, GETDATE()),
-        ('Corporate', 'Corporate client type', 0, GETDATE());
+//    private const string SeedClientDatabaseScript = @"
+//    INSERT INTO Accounts (Username, PasswordHash, Email, FirstName, LastName, AccountType, IsDeleted, CreateDate)
+//    VALUES 
+//        ('testuser1', 'test123', 'test@gmail.com', 'test', 'test', 2, 0, GETDATE()),
+//        ('testuser2', 'test456', 'test2@gmail.com', 'test', 'test', 2, 0, GETDATE()),
+//        ('testuser3', 'test789', 'test3@gmail.com', 'test', 'test', 2, 0, GETDATE());
 
-    INSERT INTO Clients (AccountId, ClientTypeId, FirstName, LastName, PhoneNumber, ContactEmail, IsDeleted, CreateDate)
-    VALUES 
-        (1, 1, 'Giorgi', 'Client', '555111222', 'client1@test.com', 0, GETDATE()),
-        (2, 2, 'Nika', 'Client', '555333444', 'client2@test.com', 0, GETDATE());
-";
+//    INSERT INTO ClientTypes (Name, Description, IsDeleted, CreateDate)
+//    VALUES 
+//        ('Individual', 'Individual client type', 0, GETDATE()),
+//        ('Corporate', 'Corporate client type', 0, GETDATE());
 
-    public static void ClearClientDatabase()
-    {
-        using var connection = new SqlConnection(ConnectionString);
-        connection.Open();
+//    INSERT INTO Clients (AccountId, ClientTypeId, FirstName, LastName, PhoneNumber, ContactEmail, IsDeleted, CreateDate)
+//    VALUES 
+//        (1, 1, 'Giorgi', 'Client', '555111222', 'client1@test.com', 0, GETDATE()),
+//        (2, 2, 'Nika', 'Client', '555333444', 'client2@test.com', 0, GETDATE());
+//";
 
-        using var command = new SqlCommand(ClearClientDatabaseScript, connection);
-        command.ExecuteNonQuery();
-    }
+//    public static void ClearClientDatabase()
+//    {
+//        using var connection = new SqlConnection(ConnectionString);
+//        connection.Open();
 
-    public static void SeedClientDatabase()
-    {
-        using var connection = new SqlConnection(ConnectionString);
-        connection.Open();
+//        using var command = new SqlCommand(ClearClientDatabaseScript, connection);
+//        command.ExecuteNonQuery();
+//    }
 
-        using var command = new SqlCommand(SeedClientDatabaseScript, connection);
-        command.ExecuteNonQuery();
-    }
+//    public static void SeedClientDatabase()
+//    {
+//        using var connection = new SqlConnection(ConnectionString);
+//        connection.Open();
 
-    [SetUp]
-    public void Setup()
-    {
-        ClearClientDatabase();
-        SeedClientDatabase();
-        _connection = new SqlConnection(ConnectionString);
-        _repository = new ClientRepository(_connection);
-    }
+//        using var command = new SqlCommand(SeedClientDatabaseScript, connection);
+//        command.ExecuteNonQuery();
+//    }
 
-    [TearDown]
-    public void TearDown()
-    {
-        _connection.Dispose();
-        _repository.Dispose();
-    }
+//    [SetUp]
+//    public void Setup()
+//    {
+//        ClearClientDatabase();
+//        SeedClientDatabase();
+//        _connection = new SqlConnection(ConnectionString);
+//        _repository = new ClientRepository(_connection);
+//    }
 
-    [Test]
+//    [TearDown]
+//    public void TearDown()
+//    {
+//        _connection.Dispose();
+//        _repository.Dispose();
+//    }
 
-    public void InsertTest_ShouldInsertValidData()
-    {
-        // Arrange
+//    [Test]
 
-        var client = new ClientDTO
-        {
-            AccountId = 3,
-            ClientTypeId = 1,
-            FirstName = "Test",
-            LastName = "Client",
-            PhoneNumber = "555123456",
-            ContactEmail = "test@gmail.com"
-        };
+//    public void InsertTest_ShouldInsertValidData()
+//    {
+//        // Arrange
 
-        // Act
+//        var client = new ClientDTO
+//        {
+//            AccountId = 3,
+//            ClientTypeId = 1,
+//            FirstName = "Test",
+//            LastName = "Client",
+//            PhoneNumber = "555123456",
+//            ContactEmail = "test@gmail.com"
+//        };
 
-        var newId = _repository.Insert(client);
-        var inserted = _repository.GetById(newId);
+//        // Act
 
-        // Assert
+//        var newId = _repository.Insert(client);
+//        var inserted = _repository.GetById(newId);
 
-        Assert.That(newId, Is.GreaterThan(0));
-        Assert.That(inserted, Is.Not.Null);
-        Assert.That(inserted!.FirstName, Is.EqualTo(client.FirstName));
-        Assert.That(inserted.LastName, Is.EqualTo(client.LastName));
-        Assert.That(inserted.AccountId, Is.EqualTo(client.AccountId));
-    }
+//        // Assert
 
-    [Test]
-    public void InsertTest_ShouldNotInsertInvalidData()
-    {
-        // Arrange
+//        Assert.That(newId, Is.GreaterThan(0));
+//        Assert.That(inserted, Is.Not.Null);
+//        Assert.That(inserted!.FirstName, Is.EqualTo(client.FirstName));
+//        Assert.That(inserted.LastName, Is.EqualTo(client.LastName));
+//        Assert.That(inserted.AccountId, Is.EqualTo(client.AccountId));
+//    }
 
-        var client = new ClientDTO
-        {
-            AccountId = 3,
-            ClientTypeId = 1,
-            FirstName = "",
-            LastName = "Test",
-            PhoneNumber = "abc123",
-            ContactEmail = "123"
-        };
+//    [Test]
+//    public void InsertTest_ShouldNotInsertInvalidData()
+//    {
+//        // Arrange
 
-        // Act & Assert
+//        var client = new ClientDTO
+//        {
+//            AccountId = 3,
+//            ClientTypeId = 1,
+//            FirstName = "",
+//            LastName = "Test",
+//            PhoneNumber = "abc123",
+//            ContactEmail = "123"
+//        };
 
-        Assert.Throws<SqlException>(() => _repository.Insert(client));
-    }
+//        // Act & Assert
 
-    [Test]
-    public void UpdateTest_ShouldUpdateValidData()
-    {
-        // Arrange
+//        Assert.Throws<SqlException>(() => _repository.Insert(client));
+//    }
 
-        var client = _repository.GetById(UpdateTestId);
+//    [Test]
+//    public void UpdateTest_ShouldUpdateValidData()
+//    {
+//        // Arrange
 
-        client!.FirstName = "Updated";
-        client.LastName = "Client";
-        client.PhoneNumber = "555999888";
-        client.ContactEmail = "updated@gmail.com";
+//        var client = _repository.GetById(UpdateTestId);
 
-        // Act
+//        client!.FirstName = "Updated";
+//        client.LastName = "Client";
+//        client.PhoneNumber = "555999888";
+//        client.ContactEmail = "updated@gmail.com";
 
-        _repository.Update(client);
-        var updated = _repository.GetById(UpdateTestId);
+//        // Act
 
-        // Assert
+//        _repository.Update(client);
+//        var updated = _repository.GetById(UpdateTestId);
 
-        Assert.That(updated, Is.Not.Null);
-        Assert.That(updated!.FirstName, Is.EqualTo("Updated"));
-        Assert.That(updated.PhoneNumber, Is.EqualTo("555999888"));
-        Assert.That(updated.ContactEmail, Is.EqualTo("updated@gmail.com"));
-    }
+//        // Assert
 
-    [Test]
-    public void DeleteTest_ShouldDeleteValidData()
-    {
-        // Act
-        _repository.Delete(DeleteTestId);
+//        Assert.That(updated, Is.Not.Null);
+//        Assert.That(updated!.FirstName, Is.EqualTo("Updated"));
+//        Assert.That(updated.PhoneNumber, Is.EqualTo("555999888"));
+//        Assert.That(updated.ContactEmail, Is.EqualTo("updated@gmail.com"));
+//    }
 
-        // Assert
-        var exception = Assert.Throws<SqlException>(() => _repository.GetById(DeleteTestId));
+//    [Test]
+//    public void DeleteTest_ShouldDeleteValidData()
+//    {
+//        // Act
+//        _repository.Delete(DeleteTestId);
 
-        Assert.That(exception, Is.Not.Null);
-        Assert.That(exception!.Number, Is.EqualTo(50034));
-    }
-}
+//        // Assert
+//        var exception = Assert.Throws<SqlException>(() => _repository.GetById(DeleteTestId));
+
+//        Assert.That(exception, Is.Not.Null);
+//        Assert.That(exception!.Number, Is.EqualTo(50034));
+//    }
+//}

@@ -4,7 +4,7 @@ using System.Data.Common;
 
 namespace Market.Repositories;
 
-public class AttributeRepository(DbConnection connection)
+internal class AttributeRepository(DbConnection connection)
     : BaseRepository<AttributeDTO>(connection), IAttributeRepository
 {
 }

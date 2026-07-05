@@ -1,5 +1,5 @@
 ﻿using Market.DTO;
-using Market.Repositories;
+using Market.Services.Interfaces.Repositories;
 using Market.Tests.Helpers;
 using Microsoft.Data.SqlClient;
 
@@ -8,17 +8,17 @@ namespace Market.Tests;
 public class InventoryManagerDetailsRepositoryTests : BaseRepositoryTests
 {
     private SqlConnection _connection;
-    private AccountRepository _accountRepository;
-    private EmployeeRepository _employeeRepository;
-    private InventoryManagerDetailsRepository _inventoryManagerDetailsRepository;
+    private IAccountRepository _accountRepository;
+    private IEmployeeRepository _employeeRepository;
+    private IInventoryManagerDetailsRepository _inventoryManagerDetailsRepository;
 
     [SetUp]
     public void Setup()
     {
         _connection = new SqlConnection(ConnectionString);
-        _accountRepository = new AccountRepository(_connection);
-        _employeeRepository = new EmployeeRepository(_connection);
-        _inventoryManagerDetailsRepository = new InventoryManagerDetailsRepository(_connection);
+        _accountRepository = UnitOfWork.AccountRepository;
+        _employeeRepository = UnitOfWork.EmployeeRepository;
+        _inventoryManagerDetailsRepository = UnitOfWork.InventoryManagerDetailsRepository;
     }
 
 
@@ -65,7 +65,7 @@ public class InventoryManagerDetailsRepositoryTests : BaseRepositoryTests
 
         var inventoryManagerToUpdate = _inventoryManagerDetailsRepository
             .GetById(insertedId);
-        inventoryManagerToUpdate.StockAdjustmentLimit = 1500;
+        inventoryManagerToUpdate!.StockAdjustmentLimit = 1500;
         inventoryManagerToUpdate.CanApproveStockCorrection = true;
         inventoryManagerToUpdate.CanApproveNegativeStock = true;
 
@@ -276,7 +276,7 @@ public class InventoryManagerDetailsRepositoryTests : BaseRepositoryTests
 
         var inventoryManagerToUpdate = _inventoryManagerDetailsRepository
             .GetById(insertedId);
-        inventoryManagerToUpdate.StockAdjustmentLimit = -1;
+        inventoryManagerToUpdate!.StockAdjustmentLimit = -1;
 
         // Act & Assert
         Assert.Throws<SqlException>(
@@ -314,9 +314,6 @@ public class InventoryManagerDetailsRepositoryTests : BaseRepositoryTests
     [TearDown]
     public void TearDown()
     {
-        _inventoryManagerDetailsRepository.Dispose();
-        _employeeRepository.Dispose();
-        _accountRepository.Dispose();
         _connection.Dispose();
     }
 

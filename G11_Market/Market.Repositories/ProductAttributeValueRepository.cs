@@ -4,7 +4,8 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-public sealed class ProductAttributeValueRepository(DbConnection connection)
+// TODO: ამის ესაინ ანესაინი როგორ? სუფთად კაშირის თეიბლი არაა
+internal sealed class ProductAttributeValueRepository(DbConnection connection)
     : CompositeKeyBaseRepository<ProductAttributeValueDTO>(connection), IProductAttributeValueRepository
 {
     protected override string FirstKeyName => "ProductId";

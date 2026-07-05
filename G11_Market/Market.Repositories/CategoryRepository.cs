@@ -6,7 +6,7 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-public sealed class CategoryRepository(DbConnection connection)
+internal sealed class CategoryRepository(DbConnection connection)
     : BaseRepository<CategoryDTO>(connection), ICategoryRepository
 {
     public CategoryDTO? GetByName(string categoryName)
@@ -43,7 +43,8 @@ public sealed class CategoryRepository(DbConnection connection)
             new
             {
                 CategoryId = categoryAttribute.CategoryId, 
-                AttributeId = categoryAttribute.AttributeId
+                AttributeId = categoryAttribute.AttributeId,
+                OrderPosition = categoryAttribute.OrderPosition
             },
             commandType: CommandType.StoredProcedure);
     }

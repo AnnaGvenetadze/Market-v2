@@ -4,7 +4,7 @@ using System.Data.Common;
 
 namespace Market.Repositories;
 
-public class CityRepository(DbConnection connection)
+internal class CityRepository(DbConnection connection)
     : BaseRepository<CityDTO>(connection), ICityRepository
 {
     public CityDTO? GetByName(string name)

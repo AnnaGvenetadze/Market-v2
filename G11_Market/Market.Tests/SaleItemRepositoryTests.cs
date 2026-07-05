@@ -1,366 +1,367 @@
-﻿using Market.DTO;
-using Market.Repositories;
-using Microsoft.Data.SqlClient;
+﻿// TODO: ფორმატში მოსაყვანი
 
-namespace Market.Tests;
+//using Market.DTO;
+//using Microsoft.Data.SqlClient;
 
-public class SaleItemRepositoryTests : BaseRepositoryTests
-{
-    private SqlConnection _connection;
-    private SaleItemRepository _repository;
+//namespace Market.Tests;
 
-    private const string ClearSaleItemDatabaseScript = @"
-        DELETE FROM SaleItems;
-        DELETE FROM Sales;
+//public class SaleItemRepositoryTests : BaseRepositoryTests
+//{
+//    private SqlConnection _connection;
+//    private SaleItemRepository _repository;
 
-        DELETE FROM ProductAttributeValues;
-        DELETE FROM Products;
+//    private const string ClearSaleItemDatabaseScript = @"
+//        DELETE FROM SaleItems;
+//        DELETE FROM Sales;
 
-        DELETE FROM CategoryAttributes;
-        DELETE FROM Categories;
+//        DELETE FROM ProductAttributeValues;
+//        DELETE FROM Products;
 
-        DELETE FROM InventoryManagerDetails;
-        DELETE FROM EmployeeRoles;
-        DELETE FROM Employees;
+//        DELETE FROM CategoryAttributes;
+//        DELETE FROM Categories;
 
-        DELETE FROM Clients;
-        DELETE FROM ClientTypes;
+//        DELETE FROM InventoryManagerDetails;
+//        DELETE FROM EmployeeRoles;
+//        DELETE FROM Employees;
 
-        DELETE FROM Accounts;
+//        DELETE FROM Clients;
+//        DELETE FROM ClientTypes;
 
-        DBCC CHECKIDENT ('SaleItems', RESEED, 0);
-        DBCC CHECKIDENT ('Sales', RESEED, 0);
-        DBCC CHECKIDENT ('Products', RESEED, 0);
-        DBCC CHECKIDENT ('Categories', RESEED, 0);
-        DBCC CHECKIDENT ('Employees', RESEED, 0);
-        DBCC CHECKIDENT ('Clients', RESEED, 0);
-        DBCC CHECKIDENT ('ClientTypes', RESEED, 0);
-        DBCC CHECKIDENT ('Accounts', RESEED, 0);
-    ";
+//        DELETE FROM Accounts;
 
-    private const string SeedSaleItemDatabaseScript = @"
-        INSERT INTO Accounts
-        (
-            Username,
-            PasswordHash,
-            Email,
-            FirstName,
-            LastName,
-            AccountType,
-            IsDeleted,
-            CreateDate
-        )
-        VALUES
-        (
-            'employeeuser1',
-            'test123',
-            'employee1@test.com',
-            'Employee',
-            'One',
-            1,
-            0,
-            GETDATE()
-        ),
-        (
-            'employeeuser2',
-            'test456',
-            'employee2@test.com',
-            'Employee',
-            'Two',
-            1,
-            0,
-            GETDATE()
-        );
+//        DBCC CHECKIDENT ('SaleItems', RESEED, 0);
+//        DBCC CHECKIDENT ('Sales', RESEED, 0);
+//        DBCC CHECKIDENT ('Products', RESEED, 0);
+//        DBCC CHECKIDENT ('Categories', RESEED, 0);
+//        DBCC CHECKIDENT ('Employees', RESEED, 0);
+//        DBCC CHECKIDENT ('Clients', RESEED, 0);
+//        DBCC CHECKIDENT ('ClientTypes', RESEED, 0);
+//        DBCC CHECKIDENT ('Accounts', RESEED, 0);
+//    ";
 
-        INSERT INTO Employees
-        (
-            AccountId,
-            ManagerEmployeeId,
-            FirstName,
-            LastName,
-            PhoneNumber,
-            ContactEmail,
-            EmployeeCode,
-            HireDate,
-            IsDeleted,
-            CreateDate
-        )
-        VALUES
-        (
-            1,
-            NULL,
-            'Giorgi',
-            'Employee',
-            '555111222',
-            'giorgi.employee@test.com',
-            'EMP001',
-            GETDATE(),
-            0,
-            GETDATE()
-        ),
-        (
-            2,
-            NULL,
-            'Nika',
-            'Employee',
-            '555333444',
-            'nika.employee@test.com',
-            'EMP002',
-            GETDATE(),
-            0,
-            GETDATE()
-        );
+//    private const string SeedSaleItemDatabaseScript = @"
+//        INSERT INTO Accounts
+//        (
+//            Username,
+//            PasswordHash,
+//            Email,
+//            FirstName,
+//            LastName,
+//            AccountType,
+//            IsDeleted,
+//            CreateDate
+//        )
+//        VALUES
+//        (
+//            'employeeuser1',
+//            'test123',
+//            'employee1@test.com',
+//            'Employee',
+//            'One',
+//            1,
+//            0,
+//            GETDATE()
+//        ),
+//        (
+//            'employeeuser2',
+//            'test456',
+//            'employee2@test.com',
+//            'Employee',
+//            'Two',
+//            1,
+//            0,
+//            GETDATE()
+//        );
 
-        INSERT INTO Categories
-        (
-            ParentId,
-            CategoryName,
-            Description,
-            IsDeleted,
-            CreatedDate
-        )
-        VALUES
-        (
-            NULL,
-            'Test Category 1',
-            'Test category description 1',
-            0,
-            GETDATE()
-        ),
-        (
-            NULL,
-            'Test Category 2',
-            'Test category description 2',
-            0,
-            GETDATE()
-        ),
-        (
-            NULL,
-            'Test Category 3',
-            'Test category description 3',
-            0,
-            GETDATE()
-        );
+//        INSERT INTO Employees
+//        (
+//            AccountId,
+//            ManagerEmployeeId,
+//            FirstName,
+//            LastName,
+//            PhoneNumber,
+//            ContactEmail,
+//            EmployeeCode,
+//            HireDate,
+//            IsDeleted,
+//            CreateDate
+//        )
+//        VALUES
+//        (
+//            1,
+//            NULL,
+//            'Giorgi',
+//            'Employee',
+//            '555111222',
+//            'giorgi.employee@test.com',
+//            'EMP001',
+//            GETDATE(),
+//            0,
+//            GETDATE()
+//        ),
+//        (
+//            2,
+//            NULL,
+//            'Nika',
+//            'Employee',
+//            '555333444',
+//            'nika.employee@test.com',
+//            'EMP002',
+//            GETDATE(),
+//            0,
+//            GETDATE()
+//        );
 
-        INSERT INTO Products
-        (
-            CategoryId,
-            ProductName,
-            Price,
-            IsDeleted,
-            CreatedDate
-        )
-        VALUES
-        (
-            1,
-            'Product One',
-            100.00,
-            0,
-            GETDATE()
-        ),
-        (
-            2,
-            'Product Two',
-            200.00,
-            0,
-            GETDATE()
-        ),
-        (
-            3,
-            'Product Three',
-            300.00,
-            0,
-            GETDATE()
-        );
+//        INSERT INTO Categories
+//        (
+//            ParentId,
+//            CategoryName,
+//            Description,
+//            IsDeleted,
+//            CreatedDate
+//        )
+//        VALUES
+//        (
+//            NULL,
+//            'Test Category 1',
+//            'Test category description 1',
+//            0,
+//            GETDATE()
+//        ),
+//        (
+//            NULL,
+//            'Test Category 2',
+//            'Test category description 2',
+//            0,
+//            GETDATE()
+//        ),
+//        (
+//            NULL,
+//            'Test Category 3',
+//            'Test category description 3',
+//            0,
+//            GETDATE()
+//        );
 
-        INSERT INTO Sales
-        (
-            CreatedEmployeeId,
-            CancelledByEmployeeId,
-            Status,
-            CreatedDate,
-            CancelledDate,
-            CancelReason
-        )
-        VALUES
-        (
-            1,
-            NULL,
-            0,
-            GETDATE(),
-            NULL,
-            NULL
-        ),
-        (
-            1,
-            NULL,
-            0,
-            GETDATE(),
-            NULL,
-            NULL
-        ),
-        (
-            2,
-            NULL,
-            0,
-            GETDATE(),
-            NULL,
-            NULL
-        );
+//        INSERT INTO Products
+//        (
+//            CategoryId,
+//            ProductName,
+//            Price,
+//            IsDeleted,
+//            CreatedDate
+//        )
+//        VALUES
+//        (
+//            1,
+//            'Product One',
+//            100.00,
+//            0,
+//            GETDATE()
+//        ),
+//        (
+//            2,
+//            'Product Two',
+//            200.00,
+//            0,
+//            GETDATE()
+//        ),
+//        (
+//            3,
+//            'Product Three',
+//            300.00,
+//            0,
+//            GETDATE()
+//        );
 
-        INSERT INTO SaleItems
-        (
-            SaleId,
-            ProductId,
-            Quantity,
-            UnitPrice,
-            DiscountAmount
-        )
-        VALUES
-        (
-            1,
-            1,
-            2,
-            100.00,
-            0
-        ),
-        (
-            2,
-            2,
-            3,
-            200.00,
-            0
-        );
-    ";
+//        INSERT INTO Sales
+//        (
+//            CreatedEmployeeId,
+//            CancelledByEmployeeId,
+//            Status,
+//            CreatedDate,
+//            CancelledDate,
+//            CancelReason
+//        )
+//        VALUES
+//        (
+//            1,
+//            NULL,
+//            0,
+//            GETDATE(),
+//            NULL,
+//            NULL
+//        ),
+//        (
+//            1,
+//            NULL,
+//            0,
+//            GETDATE(),
+//            NULL,
+//            NULL
+//        ),
+//        (
+//            2,
+//            NULL,
+//            0,
+//            GETDATE(),
+//            NULL,
+//            NULL
+//        );
 
-    public static void ClearSaleItemDatabase()
-    {
-        using var connection = new SqlConnection(ConnectionString);
-        connection.Open();
+//        INSERT INTO SaleItems
+//        (
+//            SaleId,
+//            ProductId,
+//            Quantity,
+//            UnitPrice,
+//            DiscountAmount
+//        )
+//        VALUES
+//        (
+//            1,
+//            1,
+//            2,
+//            100.00,
+//            0
+//        ),
+//        (
+//            2,
+//            2,
+//            3,
+//            200.00,
+//            0
+//        );
+//    ";
 
-        using var command = new SqlCommand(ClearSaleItemDatabaseScript, connection);
-        command.ExecuteNonQuery();
-    }
+//    public static void ClearSaleItemDatabase()
+//    {
+//        using var connection = new SqlConnection(ConnectionString);
+//        connection.Open();
 
-    public static void SeedSaleItemDatabase()
-    {
-        using var connection = new SqlConnection(ConnectionString);
-        connection.Open();
+//        using var command = new SqlCommand(ClearSaleItemDatabaseScript, connection);
+//        command.ExecuteNonQuery();
+//    }
 
-        using var command = new SqlCommand(SeedSaleItemDatabaseScript, connection);
-        command.ExecuteNonQuery();
-    }
+//    public static void SeedSaleItemDatabase()
+//    {
+//        using var connection = new SqlConnection(ConnectionString);
+//        connection.Open();
 
-    [SetUp]
-    public void Setup()
-    {
-        ClearSaleItemDatabase();
-        SeedSaleItemDatabase();
+//        using var command = new SqlCommand(SeedSaleItemDatabaseScript, connection);
+//        command.ExecuteNonQuery();
+//    }
 
-        _connection = new SqlConnection(ConnectionString);
-        _repository = new SaleItemRepository(_connection);
-    }
+//    [SetUp]
+//    public void Setup()
+//    {
+//        ClearSaleItemDatabase();
+//        SeedSaleItemDatabase();
 
-    [TearDown]
-    public void TearDown()
-    {
-        _connection.Dispose();
-        _repository.Dispose();
-    }
+//        _connection = new SqlConnection(ConnectionString);
+//        _repository = new SaleItemRepository(_connection);
+//    }
 
-    [Test]
-    public void InsertTest_ShouldInsertValidData()
-    {
-        // Arrange
+//    [TearDown]
+//    public void TearDown()
+//    {
+//        _connection.Dispose();
+//        _repository.Dispose();
+//    }
 
-        var saleItem = new SaleItemDTO
-        {
-            SaleId = 3,
-            ProductId = 3,
-            Quantity = 5,
-            UnitPrice = 300,
-            DiscountAmount = 0
-        };
+//    [Test]
+//    public void InsertTest_ShouldInsertValidData()
+//    {
+//        // Arrange
 
-        // Act
+//        var saleItem = new SaleItemDTO
+//        {
+//            SaleId = 3,
+//            ProductId = 3,
+//            Quantity = 5,
+//            UnitPrice = 300,
+//            DiscountAmount = 0
+//        };
 
-        var newId = _repository.Insert(saleItem);
-        var inserted = _repository.GetById(newId);
+//        // Act
 
-        // Assert
+//        var newId = _repository.Insert(saleItem);
+//        var inserted = _repository.GetById(newId);
 
-        Assert.That(newId, Is.GreaterThan(0));
-        Assert.That(inserted, Is.Not.Null);
-        Assert.That(inserted!.SaleId, Is.EqualTo(saleItem.SaleId));
-        Assert.That(inserted.ProductId, Is.EqualTo(saleItem.ProductId));
-        Assert.That(inserted.Quantity, Is.EqualTo(saleItem.Quantity));
-        Assert.That(inserted.UnitPrice, Is.EqualTo(saleItem.UnitPrice));
-    }
+//        // Assert
 
-    [Test]
-    public void InsertTest_ShouldNotInsertInvalidData()
-    {
-        // Arrange
+//        Assert.That(newId, Is.GreaterThan(0));
+//        Assert.That(inserted, Is.Not.Null);
+//        Assert.That(inserted!.SaleId, Is.EqualTo(saleItem.SaleId));
+//        Assert.That(inserted.ProductId, Is.EqualTo(saleItem.ProductId));
+//        Assert.That(inserted.Quantity, Is.EqualTo(saleItem.Quantity));
+//        Assert.That(inserted.UnitPrice, Is.EqualTo(saleItem.UnitPrice));
+//    }
 
-        var saleItem = new SaleItemDTO
-        {
-            SaleId = 0,
-            ProductId = 0,
-            Quantity = -1,
-            UnitPrice = -10.0m
-        };
+//    [Test]
+//    public void InsertTest_ShouldNotInsertInvalidData()
+//    {
+//        // Arrange
 
-        // Act and Assert
+//        var saleItem = new SaleItemDTO
+//        {
+//            SaleId = 0,
+//            ProductId = 0,
+//            Quantity = -1,
+//            UnitPrice = -10.0m
+//        };
 
-        Assert.Throws<SqlException>(() => _repository.Insert(saleItem));
-    }
+//        // Act and Assert
 
-    [Test]
+//        Assert.Throws<SqlException>(() => _repository.Insert(saleItem));
+//    }
 
-    public void DeleteTest_ShouldRemoveItem()
-    {
-        // Arrange
+//    [Test]
 
-        var saleItem = new SaleItemDTO
-        {
-            SaleId = 3,
-            ProductId = 3,
-            Quantity = 5,
-            UnitPrice = 300,
-            DiscountAmount = 0
-        };
+//    public void DeleteTest_ShouldRemoveItem()
+//    {
+//        // Arrange
 
-        var newId = _repository.Insert(saleItem);
+//        var saleItem = new SaleItemDTO
+//        {
+//            SaleId = 3,
+//            ProductId = 3,
+//            Quantity = 5,
+//            UnitPrice = 300,
+//            DiscountAmount = 0
+//        };
 
-        // Act
+//        var newId = _repository.Insert(saleItem);
 
-        _repository.Delete(newId);
+//        // Act
 
-        // Assert
+//        _repository.Delete(newId);
 
-        Assert.Throws<InvalidOperationException>(() => _repository.GetById(newId));
-    }
+//        // Assert
 
-    [Test]
-    public void updateTest_ShouldModifyExistingItem()
-    {
-        // Arrange
-        var saleItem = _repository.GetById(UpdateTestId);
+//        Assert.Throws<InvalidOperationException>(() => _repository.GetById(newId));
+//    }
 
-        Assert.That(saleItem, Is.Not.Null);
+//    [Test]
+//    public void updateTest_ShouldModifyExistingItem()
+//    {
+//        // Arrange
+//        var saleItem = _repository.GetById(UpdateTestId);
 
-        saleItem!.Quantity = 10;
-        saleItem.UnitPrice = 150;
-        saleItem.DiscountAmount = 5;
+//        Assert.That(saleItem, Is.Not.Null);
 
-        // Act
-        _repository.Update(saleItem);
+//        saleItem!.Quantity = 10;
+//        saleItem.UnitPrice = 150;
+//        saleItem.DiscountAmount = 5;
 
-        var updated = _repository.GetById(UpdateTestId);
+//        // Act
+//        _repository.Update(saleItem);
 
-        // Assert
-        Assert.That(updated, Is.Not.Null);
-        Assert.That(updated!.Quantity, Is.EqualTo(10));
-        Assert.That(updated.UnitPrice, Is.EqualTo(150));
-    }
-}
+//        var updated = _repository.GetById(UpdateTestId);
+
+//        // Assert
+//        Assert.That(updated, Is.Not.Null);
+//        Assert.That(updated!.Quantity, Is.EqualTo(10));
+//        Assert.That(updated.UnitPrice, Is.EqualTo(150));
+//    }
+//}

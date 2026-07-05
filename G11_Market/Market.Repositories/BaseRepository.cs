@@ -8,7 +8,7 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
+internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
 {
     protected readonly DbConnection _connection;
     private bool _disposed = false;

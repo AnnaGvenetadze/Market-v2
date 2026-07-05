@@ -4,7 +4,7 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-public sealed class CountryRepository(DbConnection connection)
+internal sealed class CountryRepository(DbConnection connection)
     : BaseRepository<CountryDTO>(connection), ICountryRepository
 {
     public CountryDTO? GetByCode(string countryCode)

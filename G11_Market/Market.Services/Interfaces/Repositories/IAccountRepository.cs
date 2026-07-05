@@ -2,7 +2,7 @@
 
 namespace Market.Services.Interfaces.Repositories;
 
-public interface IAccountRepository
+public interface IAccountRepository : IBaseRepository<AccountDTO>
 {
     public AccountDTO GetByUsername(string username);
     public AccountDTO GetByEmail(string email);

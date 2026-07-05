@@ -1,5 +1,4 @@
 ﻿using Market.DTO;
-using Market.Repositories;
 using Market.Tests.Helpers;
 using Microsoft.Data.SqlClient;
 
@@ -7,16 +6,6 @@ namespace Market.Tests
 {
     public class AttributeRepositoryTests : BaseRepositoryTests
     {
-        private SqlConnection _connection;
-        private AttributeRepository _repository;
-
-        [SetUp]
-        public void Setup()
-        {
-            _connection = new SqlConnection(ConnectionString);
-            _repository = new AttributeRepository(_connection);
-        }
-
         [Test]
         public void InsertTest_ShouldInsertValidData()
         {
@@ -28,8 +17,8 @@ namespace Market.Tests
             };
 
             // Act
-            var newId = _repository.Insert(attribute);
-            var insertedAttribute = _repository.GetById(newId);
+            var newId = UnitOfWork.AttributeRepository.Insert(attribute);
+            var insertedAttribute = UnitOfWork.AttributeRepository.GetById(newId);
 
             // Assert
             Assert.That(newId, Is.GreaterThan(0));
@@ -49,7 +38,7 @@ namespace Market.Tests
             };
 
             // Act and Assert
-            Assert.Throws<SqlException>(() => _repository.Insert(attribute));
+            Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Insert(attribute));
         }
 
         [Test]
@@ -71,10 +60,10 @@ namespace Market.Tests
             };
 
             // Act
-            _repository.Insert(first);
+            UnitOfWork.AttributeRepository.Insert(first);
 
             // Assert
-            Assert.Throws<SqlException>(() => _repository.Insert(second));
+            Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Insert(second));
         }
 
         [Test]
@@ -87,15 +76,15 @@ namespace Market.Tests
                 AttributeType = 1
             };
 
-            var newId = _repository.Insert(attribute);
-            var insertedAttribute = _repository.GetById(newId);
+            var newId = UnitOfWork.AttributeRepository.Insert(attribute);
+            var insertedAttribute = UnitOfWork.AttributeRepository.GetById(newId);
 
             insertedAttribute!.AttributeName = "UpdatedAttribute".AddGuid();
 
             // Act
-            _repository.Update(insertedAttribute);
+            UnitOfWork.AttributeRepository.Update(insertedAttribute);
 
-            var updatedAttribute = _repository.GetById(newId);
+            var updatedAttribute = UnitOfWork.AttributeRepository.GetById(newId);
 
             // Assert
             Assert.That(updatedAttribute, Is.Not.Null);
@@ -119,23 +108,23 @@ namespace Market.Tests
                 AttributeType = 2
             };
 
-            var firstId = _repository.Insert(first);
-            var secondId = _repository.Insert(second);
+            var firstId = UnitOfWork.AttributeRepository.Insert(first);
+            var secondId = UnitOfWork.AttributeRepository.Insert(second);
 
-            var firstAttribute = _repository.GetById(firstId);
-            var secondAttribute = _repository.GetById(secondId);
+            var firstAttribute = UnitOfWork.AttributeRepository.GetById(firstId);
+            var secondAttribute = UnitOfWork.AttributeRepository.GetById(secondId);
 
             secondAttribute!.AttributeName = firstAttribute!.AttributeName;
 
             // Act and Assert
-            Assert.Throws<SqlException>(() => _repository.Update(secondAttribute));
+            Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Update(secondAttribute));
         }
 
         [Test]
         public void Update_WhenEntityIsNull_ShouldThrowException()
         {
             // Act and Assert
-            Assert.Throws<ArgumentNullException>(() => _repository.Update(null!));
+            Assert.Throws<ArgumentNullException>(() => UnitOfWork.AttributeRepository.Update(null!));
         }
 
         [Test]
@@ -148,20 +137,20 @@ namespace Market.Tests
                 AttributeType = 1
             };
 
-            var newId = _repository.Insert(attribute);
+            var newId = UnitOfWork.AttributeRepository.Insert(attribute);
 
             // Act
-            _repository.Delete(newId);
+            UnitOfWork.AttributeRepository.Delete(newId);
 
             // Assert
-            Assert.Throws<InvalidOperationException>(() => _repository.GetById(newId));
+            Assert.Throws<InvalidOperationException>(() => UnitOfWork.AttributeRepository.GetById(newId));
         }
 
         [Test]
         public void Delete_WhenIdIsNull_ShouldThrowException()
         {
             // Act and Assert
-            Assert.Throws<ArgumentNullException>(() => _repository.Delete(null!));
+            Assert.Throws<ArgumentNullException>(() => UnitOfWork.AttributeRepository.Delete(null!));
         }
 
         [Test]
@@ -171,14 +160,7 @@ namespace Market.Tests
             var invalidId = -9;
 
             // Act and Assert
-            Assert.Throws<SqlException>(() => _repository.Delete(invalidId));
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _repository.Dispose();
-            _connection.Dispose();
+            Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Delete(invalidId));
         }
     }
 }

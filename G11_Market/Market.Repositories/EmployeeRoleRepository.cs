@@ -4,7 +4,7 @@ using System.Data.Common;
 
 namespace Market.Repositories;
 
-public class EmployeeRoleRepository(DbConnection connection)
+internal class EmployeeRoleRepository(DbConnection connection)
     : BaseRepository<EmployeeRoleDTO>(connection), IEmployeeRoleRepository
 {
 }

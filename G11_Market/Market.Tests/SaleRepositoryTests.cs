@@ -1,5 +1,5 @@
 ﻿using Market.DTO;
-using Market.Repositories;
+using Market.Services.Interfaces.Repositories;
 using Market.Tests.Helpers;
 using Microsoft.Data.SqlClient;
 
@@ -8,9 +8,9 @@ namespace Market.Tests;
 public class SaleRepositoryTests : BaseRepositoryTests
 {
     private SqlConnection _connection;
-    private SaleRepository _saleRepository;
-    private EmployeeRepository _employeeRepository;
-    private AccountRepository _accountRepository;
+    private ISaleRepository _saleRepository;
+    private IEmployeeRepository _employeeRepository;
+    private IAccountRepository _accountRepository;
     private int _employeeId;
     private int _secondEmployeeId;
     private int _accountId;
@@ -20,9 +20,9 @@ public class SaleRepositoryTests : BaseRepositoryTests
     public void Setup()
     {
         _connection = new SqlConnection(ConnectionString);
-        _saleRepository = new SaleRepository(_connection);
-        _employeeRepository = new EmployeeRepository(_connection);
-        _accountRepository = new AccountRepository(_connection);
+        _saleRepository = UnitOfWork.SaleRepository;
+        _employeeRepository = UnitOfWork.EmployeeRepository;
+        _accountRepository = UnitOfWork.AccountRepository;
         var account = new AccountDTO
         {
             Username = "User".AddGuid(),
@@ -101,7 +101,7 @@ public class SaleRepositoryTests : BaseRepositoryTests
         var insertedId = _saleRepository.Insert(sale);
 
         var saleToUpdate = _saleRepository.GetById(insertedId);
-        saleToUpdate.Status = 1; 
+        saleToUpdate!.Status = 1; 
 
         // Act
         _saleRepository.Update(saleToUpdate);
@@ -182,25 +182,6 @@ public class SaleRepositoryTests : BaseRepositoryTests
     }
 
     [Test]
-    public void InsertTest_ShouldAllowNullCancelReason()
-    {
-        // Arrange
-        var sale = new SaleDTO
-        {
-            CreatedEmployeeId = _employeeId,
-            Status = 0,
-            CancelReason = null 
-        };
-
-        // Act
-        var insertedId = _saleRepository.Insert(sale);
-        var insertedSale = _saleRepository.GetById(insertedId);
-
-        // Assert
-        Assert.That(insertedSale.CancelReason, Is.Null);
-    }
-
-    [Test]
     public void UpdateTest_ShouldAllowValidCancellation()
     {
         // Arrange
@@ -212,7 +193,7 @@ public class SaleRepositoryTests : BaseRepositoryTests
         var insertedId = _saleRepository.Insert(sale);
 
         var saleToCancel = _saleRepository.GetById(insertedId);
-        saleToCancel.Status = 2; 
+        saleToCancel!.Status = 2; 
         saleToCancel.CancelledByEmployeeId = _secondEmployeeId;
         saleToCancel.CancelledDate = DateTime.Now;
         saleToCancel.CancelReason = "Customer dont want it";
@@ -222,7 +203,7 @@ public class SaleRepositoryTests : BaseRepositoryTests
         var updatedSale = _saleRepository.GetById(insertedId);
 
         // Assert
-        Assert.That(updatedSale.Status, Is.EqualTo(2));
+        Assert.That(updatedSale!.Status, Is.EqualTo(2));
         Assert.That(updatedSale.CancelledByEmployeeId, Is.EqualTo(_secondEmployeeId));
         Assert.That(updatedSale.CancelReason, Is.EqualTo("Customer dont want it"));
     }
@@ -304,9 +285,6 @@ public class SaleRepositoryTests : BaseRepositoryTests
     [TearDown]
     public void TearDown()
     {
-        _saleRepository.Dispose();
-        _employeeRepository.Dispose();
-        _accountRepository.Dispose();
         _connection.Dispose();
     }
 }

@@ -6,7 +6,7 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-public sealed class SaleRepository(DbConnection connection) : BaseRepository<SaleDTO>(connection), ISaleRepository
+internal sealed class SaleRepository(DbConnection connection) : BaseRepository<SaleDTO>(connection), ISaleRepository
 {
     private readonly DbConnection _connection = connection;
 

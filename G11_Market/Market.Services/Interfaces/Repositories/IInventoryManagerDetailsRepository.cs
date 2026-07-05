@@ -2,7 +2,7 @@
 
 namespace Market.Services.Interfaces.Repositories;
 
-public interface IInventoryManagerDetailsRepository
+public interface IInventoryManagerDetailsRepository : IBaseRepository<InventoryManagerDetailDTO>
 {
     InventoryManagerDetailDTO? GetByEmployeeId(int employeeId);
 

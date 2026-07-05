@@ -6,7 +6,7 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-public sealed class InventoryManagerDetailsRepository(DbConnection connection)
+internal sealed class InventoryManagerDetailsRepository(DbConnection connection)
     : BaseRepository<InventoryManagerDetailDTO>(connection), IInventoryManagerDetailsRepository
 {
     private readonly DbConnection _connection = connection;
