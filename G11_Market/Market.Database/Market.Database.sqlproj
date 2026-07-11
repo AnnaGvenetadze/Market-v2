@@ -138,6 +138,14 @@
     <Build Include="dbo\Stored Procedures\sp_AssignEmployeeRole.sql" />
     <Build Include="dbo\Stored Procedures\sp_UnassignCategoryAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_UnassignEmployeeRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllCities.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteCity.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetCityById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_InsertCity.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetSalesByDateRange.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetSalesByStatus.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetSaleTotal.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateCity.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Stored Procedures\sp_ValidateCategory.sql" />

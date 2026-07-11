@@ -1,11 +1,25 @@
-﻿namespace Market.DTO;
+﻿using Market.Extensions.Attributes;
 
-public sealed class CityDTO
+namespace Market.DTO;
+
+public sealed class CityDTO 
 {
+    [IgnoreOnInsert]
     public int Id { get; set; }
+
     public string Name { get; set; } = null!;
+
     public int CountryId { get; set; }
+
+    [IgnoreOnInsert]
+    [IgnoreOnUpdate]
     public bool IsDeleted { get; set; }
+
+    [IgnoreOnInsert]
+    [IgnoreOnUpdate]
     public DateTime CreateDate { get; set; }
-    public DateTime UpdateDate { get; set; }
+
+    [IgnoreOnInsert]
+    [IgnoreOnUpdate]
+    public DateTime? UpdateDate { get; set; }
 }
