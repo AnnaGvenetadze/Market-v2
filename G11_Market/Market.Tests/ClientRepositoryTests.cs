@@ -1,6 +1,4 @@
-﻿// TODO: ფორმატზე დასაყვანი
-
-//using Dapper;
+﻿//using Dapper;
 //using Market.DTO;
 //using Market.Repositories;
 //using Market.Tests.Helpers;
@@ -13,67 +11,12 @@
 //    private SqlConnection _connection;
 //    private ClientRepository _repository;
 
-//    private const string ClearClientDatabaseScript = @"
-//        DELETE FROM SaleItems;
-//        DELETE FROM Sales;
-
-//        DELETE FROM Clients;
-//        DELETE FROM Employees;
-
-//        DELETE FROM ClientTypes;
-//        DELETE FROM Accounts;
-
-//        DBCC CHECKIDENT ('SaleItems', RESEED, 0);
-//        DBCC CHECKIDENT ('Sales', RESEED, 0);
-
-//        DBCC CHECKIDENT ('Clients', RESEED, 0);
-//        DBCC CHECKIDENT ('Employees', RESEED, 0);
-
-//        DBCC CHECKIDENT ('ClientTypes', RESEED, 0);
-//        DBCC CHECKIDENT ('Accounts', RESEED, 0);
-//    ";
-
-//    private const string SeedClientDatabaseScript = @"
-//    INSERT INTO Accounts (Username, PasswordHash, Email, FirstName, LastName, AccountType, IsDeleted, CreateDate)
-//    VALUES 
-//        ('testuser1', 'test123', 'test@gmail.com', 'test', 'test', 2, 0, GETDATE()),
-//        ('testuser2', 'test456', 'test2@gmail.com', 'test', 'test', 2, 0, GETDATE()),
-//        ('testuser3', 'test789', 'test3@gmail.com', 'test', 'test', 2, 0, GETDATE());
-
-//    INSERT INTO ClientTypes (Name, Description, IsDeleted, CreateDate)
-//    VALUES 
-//        ('Individual', 'Individual client type', 0, GETDATE()),
-//        ('Corporate', 'Corporate client type', 0, GETDATE());
-
-//    INSERT INTO Clients (AccountId, ClientTypeId, FirstName, LastName, PhoneNumber, ContactEmail, IsDeleted, CreateDate)
-//    VALUES 
-//        (1, 1, 'Giorgi', 'Client', '555111222', 'client1@test.com', 0, GETDATE()),
-//        (2, 2, 'Nika', 'Client', '555333444', 'client2@test.com', 0, GETDATE());
-//";
-
-//    public static void ClearClientDatabase()
-//    {
-//        using var connection = new SqlConnection(ConnectionString);
-//        connection.Open();
-
-//        using var command = new SqlCommand(ClearClientDatabaseScript, connection);
-//        command.ExecuteNonQuery();
-//    }
-
-//    public static void SeedClientDatabase()
-//    {
-//        using var connection = new SqlConnection(ConnectionString);
-//        connection.Open();
-
-//        using var command = new SqlCommand(SeedClientDatabaseScript, connection);
-//        command.ExecuteNonQuery();
-//    }
 
 //    [SetUp]
 //    public void Setup()
 //    {
-//        ClearClientDatabase();
-//        SeedClientDatabase();
+//        DatabaseHelper.ClearDatabase();
+//        DatabaseHelper.SeedDatabase();
 //        _connection = new SqlConnection(ConnectionString);
 //        _repository = new ClientRepository(_connection);
 //    }
