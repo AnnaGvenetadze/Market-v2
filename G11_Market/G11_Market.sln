@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.37111.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Market.App", "Market.App\Market.App.csproj", "{E9551D6D-05B7-4560-B195-2811507397D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Market.App", "Market.App\Market.App.csproj", "{E9551D6D-05B7-4560-B195-2811507397D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Market.Extensions", "Market.Extensions\Market.Extensions.csproj", "{B5C61073-B891-4270-BE69-8690CFA5F50B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Market.Extensions", "Market.Extensions\Market.Extensions.csproj", "{B5C61073-B891-4270-BE69-8690CFA5F50B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Market.DTO", "Market.DTO\Market.DTO.csproj", "{9EBC39F1-8FBE-45FB-B3B5-116BA7E9A92C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Market.DTO", "Market.DTO\Market.DTO.csproj", "{9EBC39F1-8FBE-45FB-B3B5-116BA7E9A92C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Market.Repositories", "Market.Repositories\Market.Repositories.csproj", "{C882E233-9C00-424E-BAE6-038861959068}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Market.Repositories", "Market.Repositories\Market.Repositories.csproj", "{C882E233-9C00-424E-BAE6-038861959068}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Market.Services", "Market.Services\Market.Services.csproj", "{A209095B-5164-493A-AB7A-BF3EF1D6499E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Market.Services", "Market.Services\Market.Services.csproj", "{A209095B-5164-493A-AB7A-BF3EF1D6499E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Market.Tests", "Market.Tests\Market.Tests.csproj", "{D5369FBF-6A23-42EE-921E-AB7ECB2AF4DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Market.Tests", "Market.Tests\Market.Tests.csproj", "{D5369FBF-6A23-42EE-921E-AB7ECB2AF4DA}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Market.Database", "Market.Database\Market.Database.sqlproj", "{18997C36-E733-4CCC-9CB9-92AAF4167CAF}"
 EndProject
