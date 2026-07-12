@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Data.Common;
 using System.Linq.Expressions;
+using System.Reflection;
 using Dapper;
 using Market.Extensions;
 using Market.Extensions.Attributes;
@@ -14,6 +15,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
     private bool _disposed = false;
     private readonly string _entityName;
     private readonly string _entityPluralName;
+    private static readonly bool TypeHasIsDeleted = CheckIfTypeHasIsDeleted();
 
     protected BaseRepository(DbConnection connection)
     {
@@ -92,10 +94,37 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
     {
         ExpressionTranslator<T> translator = new();
         var (sql, parameters) = translator.Translate(expression);
-        string sqlQuery = $"SELECT * FROM {_entityPluralName} WHERE IsDeleted = 0 AND {sql}";
+        bool expressionHasIsDeleted =
+               translator.ContainsProperty(expression, "IsDeleted");
+
+        string sqlQuery;
+        if (TypeHasIsDeleted && !expressionHasIsDeleted)
+        {
+            sqlQuery = $"SELECT * FROM {_entityPluralName} WHERE IsDeleted = 0 AND {sql}";
+        }
+        else
+        {
+            sqlQuery = $"SELECT * FROM {_entityPluralName} WHERE {sql}";
+        }
+
+
         return _connection.Query<T>(sqlQuery, parameters);
     }
 
+    private static bool CheckIfTypeHasIsDeleted()
+    {
+        PropertyInfo? property =
+            typeof(T).GetProperty(
+                "IsDeleted",
+                BindingFlags.Public | BindingFlags.Instance);
+
+        if (property == null || property.PropertyType != typeof(bool))
+        {
+            return false;
+        }
+
+        return true;
+    }
     #region IDisposable Support
 
     public void Dispose()

@@ -14,16 +14,20 @@ internal sealed class CategoryRepository(DbConnection connection)
         ArgumentException.ThrowIfNullOrWhiteSpace(categoryName);
 
         return Search(category =>
-                category.CategoryName == categoryName &&
-                category.IsDeleted == false)
+                category.CategoryName == categoryName)
             .FirstOrDefault();
     }
 
     public IEnumerable<CategoryDTO> GetRootCategories()
     {
         return Search(category =>
-            category.ParentId == null &&
-            category.IsDeleted == false);
+            category.ParentId == null);
+    }
+
+    public IEnumerable<CategoryDTO> GetDeletedCategories()
+    {
+        return Search(category =>
+            category.IsDeleted == true);
     }
 
     public IEnumerable<CategoryDTO> GetChildren(int parentId)
@@ -32,8 +36,7 @@ internal sealed class CategoryRepository(DbConnection connection)
             throw new ArgumentOutOfRangeException(nameof(parentId));
 
         return Search(category =>
-            category.ParentId == parentId &&
-            category.IsDeleted == false);
+            category.ParentId == parentId);
     }
 
     public void AssignAttribute(CategoryAttributeDTO categoryAttribute)

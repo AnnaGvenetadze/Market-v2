@@ -3,12 +3,12 @@ using System.Text;
 
 namespace Market.Extensions;
 
-public class ExpressionTranslator<T> : ExpressionVisitor
+public partial class ExpressionTranslator<T> : ExpressionVisitor
 {
     private readonly StringBuilder _sql = new();
     private readonly Dictionary<string, object> _parameters = new();
     private int _paramCount = 0;
-
+    
     public (string Sql, Dictionary<string, object> Parameters) Translate(Expression<Func<T, bool>> expression)
     {
         _sql.Clear();
