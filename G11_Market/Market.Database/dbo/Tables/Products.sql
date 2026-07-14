@@ -3,7 +3,7 @@ CREATE TABLE Products (
     CategoryId INT NOT NULL,
     ProductName NVARCHAR(100) NOT NULL UNIQUE,
     Price DECIMAL(18,2) NOT NULL,
-    IsDeleted BIT NOT NULL DEFAULT 1,
+    IsDeleted BIT NOT NULL DEFAULT 0,
     CreatedDate DATETIME NOT NULL DEFAULT GETDATE(),
     UpdatedDate DATETIME NULL,
     FOREIGN KEY (CategoryId) REFERENCES Categories(Id)

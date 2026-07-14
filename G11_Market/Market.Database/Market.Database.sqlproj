@@ -146,6 +146,17 @@
     <Build Include="dbo\Stored Procedures\sp_GetSalesByStatus.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetSaleTotal.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateCity.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetProductById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllProducts.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetRoleById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllRoles.sql" />
+    <Build Include="dbo\Stored Procedures\sp_InsertRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetClientTypeById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllClientTypes.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateClientType.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteClientType.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Stored Procedures\sp_ValidateCategory.sql" />

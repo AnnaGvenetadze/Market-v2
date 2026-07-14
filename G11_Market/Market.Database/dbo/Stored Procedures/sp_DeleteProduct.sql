@@ -1,19 +1,19 @@
-﻿create procedure dbo.sp_DeleteProduct
-    @ProductId int
-as
-begin
-    set nocount on;
+﻿CREATE PROCEDURE dbo.sp_DeleteProduct
+    @Id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    update dbo.Products
-    set
-        IsDeleted = 0,
-        UpdatedDate = getdate()
-    where Id = @ProductId;
+    UPDATE dbo.Products
+    SET
+        IsDeleted = 1,
+        UpdatedDate = GETDATE()
+    WHERE Id = @Id
+      AND IsDeleted = 0;
 
-    if @@rowcount = 0
-    begin
-        raiserror('product not found.', 16, 1);
-        return;
-    end;
-end;
-go
+    IF @@ROWCOUNT = 0
+    BEGIN
+        RAISERROR('Product with Id %d was not found or has already been deleted.', 16, 1, @Id);
+    END;
+END;
+GO

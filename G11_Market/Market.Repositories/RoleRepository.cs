@@ -7,7 +7,7 @@ namespace Market.Repositories;
 internal sealed class RoleRepository(DbConnection connection)
     : BaseRepository<RoleDTO>(connection), IRoleRepository
 {
-    public RoleDTO GetByName(string name)
+    public RoleDTO? GetByName(string name)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 

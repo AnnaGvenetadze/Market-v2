@@ -14,6 +14,7 @@ public interface IUnitOfWork
     ICountryRepository CountryRepository { get; }
     IAccountRepository AccountRepository { get; }
     IClientRepository ClientRepository { get; }
+    IClientTypeRepository ClientTypeRepository { get; }
     IAttributeRepository AttributeRepository { get; }
     IProductAttributeValueRepository ProductAttributeValueRepository { get; }
     IStockMovementRepository StockMovementRepository { get; }

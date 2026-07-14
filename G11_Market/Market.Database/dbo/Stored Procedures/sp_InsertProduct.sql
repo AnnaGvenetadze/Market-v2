@@ -1,22 +1,27 @@
-create procedure dbo.sp_InsertProduct
-    @CategoryId int,
-    @ProductName nvarchar(100),
-    @Price decimal(18, 2)
-as
-begin
-    set nocount on;
+CREATE PROCEDURE dbo.sp_InsertProduct
+    @CategoryId INT,
+    @ProductName NVARCHAR(100),
+    @Price DECIMAL(18, 2),
+    @Id INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    insert into dbo.Products (
+    INSERT INTO dbo.Products
+    (
         CategoryId,
         ProductName,
-        Price
+        Price,
+        IsDeleted
     )
-    values (
+    VALUES
+    (
         @CategoryId,
         @ProductName,
-        @Price
+        @Price,
+        0
     );
 
-    select scope_identity() as ProductId;
-end;
-go
+    SET @Id = CONVERT(INT, SCOPE_IDENTITY());
+END;
+GO
