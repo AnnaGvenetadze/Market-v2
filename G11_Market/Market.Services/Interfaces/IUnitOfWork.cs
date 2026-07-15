@@ -1,4 +1,5 @@
-﻿using Market.Services.Interfaces.Repositories;
+﻿using System.Data.Common;
+using Market.Services.Interfaces.Repositories;
 
 namespace Market.Services.Interfaces;
 
@@ -21,5 +22,28 @@ public interface IUnitOfWork
     IEmployeeRoleRepository EmployeeRoleRepository { get; }
     ICityRepository CityRepository { get; }
 
-    void Dispose();
+    void BeginTransaction();
+
+    void BeginNestedTransaction();
+
+    void Commit();
+
+    void Rollback();
+
+    void RollbackToLastSavePoint();
+
+    void CommitRootTransaction();
+
+    void CreateSavePoint();
+
+    void RollbackToSavePoint();
+
+    void RollbackToSavePoint(string savePoint);
+
+    void RollbackToRoot();
+
+    void CleanUpTransaction();
+
+    void EnsureTransactionExists();
+
 }
