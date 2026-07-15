@@ -167,35 +167,35 @@ internal sealed class UnitOfWork : IUnitOfWork, IDisposable
 
     private void CreateSavePoint()
     {
-        string savePoint = $"sp_{Guid.NewGuid()}";
+        string savePoint = $"sp_{Random.Shared.Next(0, 1000)}";
         _transaction!.Save(savePoint);
         _transactionSavePoints.Push(savePoint);
     }
 
-    private void RollbackToSavePoint()
+    public void RollbackToSavePoint()
     {
         string savePoint = _transactionSavePoints.Pop();
         _transaction!.Rollback(savePoint);
     }
 
-    public void RollbackToSavePoint(string savePoint)
-    {
-        EnsureTransactionExists();
-        if (!_transactionSavePoints.Contains(savePoint))
-            throw new ArgumentException("Savepoint does not exist", nameof(savePoint));
-        while (_transactionSavePoints.Count > 0)
-        {
-            string sp = _transactionSavePoints.Peek();
-            if (sp == savePoint)
-            {
-                _transaction!.Rollback(sp);
-                break;
-            }
-            _transactionSavePoints.Pop();
-        }
-    }
+    //public void RollbackToSavePoint(string savePoint)
+    //{
+    //    EnsureTransactionExists();
+    //    if (!_transactionSavePoints.Contains(savePoint))
+    //        throw new ArgumentException("Savepoint does not exist", nameof(savePoint));
+    //    while (_transactionSavePoints.Count > 0)
+    //    {
+    //        string sp = _transactionSavePoints.Peek();
+    //        if (sp == savePoint)
+    //        {
+    //            _transaction!.Rollback(sp);
+    //            break;
+    //        }
+    //        _transactionSavePoints.Pop();
+    //    }
+    //}
 
-    private void RollbackToRoot()
+    public void RollbackToRoot()
     {
         _transaction!.Rollback();
         CleanUpTransaction();

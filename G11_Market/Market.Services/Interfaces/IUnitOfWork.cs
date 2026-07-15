@@ -34,16 +34,10 @@ public interface IUnitOfWork
 
     void CommitRootTransaction();
 
-    void CreateSavePoint();
-
     void RollbackToSavePoint();
 
-    void RollbackToSavePoint(string savePoint);
+    //void RollbackToSavePoint(string savePoint);
 
     void RollbackToRoot();
-
-    void CleanUpTransaction();
-
-    void EnsureTransactionExists();
 
 }

@@ -28,7 +28,6 @@ public abstract class BaseRepositoryTests
     [TearDown]
     public void BaseTearDown()
     {
-        UnitOfWork.Dispose();
         Connection.Dispose();
     }
 }
