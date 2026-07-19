@@ -178,22 +178,22 @@ internal sealed class UnitOfWork : IUnitOfWork, IDisposable
         _transaction!.Rollback(savePoint);
     }
 
-    //public void RollbackToSavePoint(string savePoint)
-    //{
-    //    EnsureTransactionExists();
-    //    if (!_transactionSavePoints.Contains(savePoint))
-    //        throw new ArgumentException("Savepoint does not exist", nameof(savePoint));
-    //    while (_transactionSavePoints.Count > 0)
-    //    {
-    //        string sp = _transactionSavePoints.Peek();
-    //        if (sp == savePoint)
-    //        {
-    //            _transaction!.Rollback(sp);
-    //            break;
-    //        }
-    //        _transactionSavePoints.Pop();
-    //    }
-    //}
+    public void RollbackToSavePoint(string savePoint)
+    {
+        EnsureTransactionExists();
+        if (!_transactionSavePoints.Contains(savePoint))
+            throw new ArgumentException("Savepoint does not exist", nameof(savePoint));
+        while (_transactionSavePoints.Count > 0)
+        {
+            string sp = _transactionSavePoints.Peek();
+            if (sp == savePoint)
+            {
+                _transaction!.Rollback(sp);
+                break;
+            }
+            _transactionSavePoints.Pop();
+        }
+    }
 
     public void RollbackToRoot()
     {

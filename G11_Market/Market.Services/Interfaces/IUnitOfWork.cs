@@ -36,7 +36,7 @@ public interface IUnitOfWork
 
     void RollbackToSavePoint();
 
-    //void RollbackToSavePoint(string savePoint);
+    void RollbackToSavePoint(string savePoint);
 
     void RollbackToRoot();
 
