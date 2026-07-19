@@ -112,7 +112,6 @@ public class TransactionTests
     [Test]
     public void Repositories_WhenAccessed_AreSuccessfullyLazyLoaded()
     {
-        // Assert that the Lazy instances resolve correctly without throwing exceptions
         Assert.That(_unitOfWork.CategoryRepository, Is.Not.Null);
         Assert.That(_unitOfWork.ProductRepository, Is.Not.Null);
         Assert.That(_unitOfWork.EmployeeRepository, Is.Not.Null);
@@ -128,13 +127,10 @@ public class TransactionTests
         // Act
         TransactionTestHelper.InsertTestRecord(_connection, transaction, 2, "Database Engine B");
 
-        // Assert: Record is visible inside the transaction before rollback
+        // Assert
         Assert.That(TransactionTestHelper.CheckIfRecordExists(_connection, transaction, 2), Is.True,
             "Record should be visible inside the active transaction.");
-
         _unitOfWork.Rollback();
-
-        // Assert: Record is completely gone after rollback
         Assert.That(TransactionTestHelper.CheckIfRecordExists(_connection, null, 2), Is.False,
             "Record should not exist in the database after rollback.");
     }
