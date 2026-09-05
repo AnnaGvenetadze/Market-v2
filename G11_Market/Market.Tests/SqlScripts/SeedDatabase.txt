@@ -10,11 +10,15 @@
 -- Countries
 -- Expected Ids: 1, 2, 3
 -- =========================================================
-INSERT INTO Countries (Name, CountryCode)
+SET IDENTITY_INSERT Countries ON;
+
+INSERT INTO Countries (Id, Name, CountryCode)
 VALUES
-    ('Georgia', 'GEO'),
-    ('Armenia', 'ARM'),
-    ('Chad', 'CHD');
+    (1, 'Georgia', 'GEO'),
+    (2, 'Armenia', 'ARM'),
+    (3, 'Chad', 'CHD');
+
+SET IDENTITY_INSERT Countries OFF;
 
 
 -- =========================================================
@@ -22,11 +26,15 @@ VALUES
 -- Expected Ids: 1, 2, 3
 -- CountryId: 1 = Georgia, 2 = Armenia, 3 = Chad
 -- =========================================================
-INSERT INTO Cities (Name, CountryId)
+SET IDENTITY_INSERT Cities ON;
+
+INSERT INTO Cities (Id, Name, CountryId)
 VALUES
-    ('Tbilisi', 1),
-    ('Yerevan', 2),
-    ('NDjamena', 3);
+    (1, 'Tbilisi', 1),
+    (2, 'Yerevan', 2),
+    (3, 'NDjamena', 3);
+
+SET IDENTITY_INSERT Cities OFF;
 
 
 -- =========================================================
@@ -36,8 +44,11 @@ VALUES
 -- 4, 5, 6 = employee accounts
 -- 7, 8, 9 = corporate client accounts
 -- =========================================================
+SET IDENTITY_INSERT Accounts ON;
+
 INSERT INTO Accounts
 (
+    Id,
     Username,
     PasswordHash,
     Email,
@@ -46,28 +57,34 @@ INSERT INTO Accounts
     LastName
 )
 VALUES
-    ('client_one', 'hash_client_1', 'client.one@test.com', 1, 'Client', 'One'),
-    ('client_two', 'hash_client_2', 'client.two@test.com', 1, 'Client', 'Two'),
-    ('client_three', 'hash_client_3', 'client.three@test.com', 1, 'Client', 'Three'),
+    (1, 'client_one', 'hash_client_1', 'client.one@test.com', 1, 'Client', 'One'),
+    (2, 'client_two', 'hash_client_2', 'client.two@test.com', 1, 'Client', 'Two'),
+    (3, 'client_three', 'hash_client_3', 'client.three@test.com', 1, 'Client', 'Three'),
 
-    ('employee_one', 'hash_employee_1', 'employee.one@test.com', 2, 'Employee', 'One'),
-    ('employee_two', 'hash_employee_2', 'employee.two@test.com', 2, 'Employee', 'Two'),
-    ('employee_three', 'hash_employee_3', 'employee.three@test.com', 2, 'Employee', 'Three'),
+    (4, 'employee_one', 'hash_employee_1', 'employee.one@test.com', 2, 'Employee', 'One'),
+    (5, 'employee_two', 'hash_employee_2', 'employee.two@test.com', 2, 'Employee', 'Two'),
+    (6, 'employee_three', 'hash_employee_3', 'employee.three@test.com', 2, 'Employee', 'Three'),
 
-    ('corporate_one', 'hash_corporate_1', 'corporate.one@test.com', 3, 'Corporate', 'One'),
-    ('corporate_two', 'hash_corporate_2', 'corporate.two@test.com', 3, 'Corporate', 'Two'),
-    ('corporate_three', 'hash_corporate_3', 'corporate.three@test.com', 3, 'Corporate', 'Three');
+    (7, 'corporate_one', 'hash_corporate_1', 'corporate.one@test.com', 3, 'Corporate', 'One'),
+    (8, 'corporate_two', 'hash_corporate_2', 'corporate.two@test.com', 3, 'Corporate', 'Two'),
+    (9, 'corporate_three', 'hash_corporate_3', 'corporate.three@test.com', 3, 'Corporate', 'Three');
+
+SET IDENTITY_INSERT Accounts OFF;
 
 
 -- =========================================================
 -- ClientTypes
 -- Expected Ids: 1, 2, 3
 -- =========================================================
-INSERT INTO ClientTypes (Name, Description)
+SET IDENTITY_INSERT ClientTypes ON;
+
+INSERT INTO ClientTypes (Id, Name, Description)
 VALUES
-    ('Retail', 'Retail customer type'),
-    ('Wholesale', 'Wholesale customer type'),
-    ('VIP', 'VIP customer type');
+    (1, 'Retail', 'Retail customer type'),
+    (2, 'Wholesale', 'Wholesale customer type'),
+    (3, 'VIP', 'VIP customer type');
+
+SET IDENTITY_INSERT ClientTypes OFF;
 
 
 -- =========================================================
@@ -76,8 +93,11 @@ VALUES
 -- AccountId: 1, 2, 3
 -- ClientTypeId: 1, 2, 3
 -- =========================================================
+SET IDENTITY_INSERT Clients ON;
+
 INSERT INTO Clients
 (
+    Id,
     AccountId,
     ClientTypeId,
     FirstName,
@@ -86,9 +106,11 @@ INSERT INTO Clients
     ContactEmail
 )
 VALUES
-    (1, 1, 'Client', 'One', '555000001', 'client.contact.one@test.com'),
-    (2, 2, 'Client', 'Two', '555000002', 'client.contact.two@test.com'),
-    (3, 3, 'Client', 'Three', '555000003', 'client.contact.three@test.com');
+    (1, 1, 1, 'Client', 'One', '555000001', 'client.contact.one@test.com'),
+    (2, 2, 2, 'Client', 'Two', '555000002', 'client.contact.two@test.com'),
+    (3, 3, 3, 'Client', 'Three', '555000003', 'client.contact.three@test.com');
+
+SET IDENTITY_INSERT Clients OFF;
 
 
 -- =========================================================
@@ -114,11 +136,15 @@ VALUES
 -- Roles
 -- Expected Ids: 1, 2, 3
 -- =========================================================
-INSERT INTO Roles (Name, Description)
+SET IDENTITY_INSERT Roles ON;
+
+INSERT INTO Roles (Id, Name, Description)
 VALUES
-    ('Cashier', 'Handles sales and payments'),
-    ('Inventory Manager', 'Manages stock and product quantities'),
-    ('Administrator', 'Manages system configuration');
+    (1, 'Cashier', 'Handles sales and payments'),
+    (2, 'Inventory Manager', 'Manages stock and product quantities'),
+    (3, 'Administrator', 'Manages system configuration');
+
+SET IDENTITY_INSERT Roles OFF;
 
 
 -- =========================================================
@@ -126,22 +152,11 @@ VALUES
 -- Expected Ids: 1, 2, 3
 -- AccountId: 4, 5, 6
 -- =========================================================
-INSERT INTO Employees
-(
-    AccountId,
-    ManagerEmployeeId,
-    FirstName,
-    LastName,
-    PhoneNumber,
-    ContactEmail,
-    EmployeeCode,
-    HireDate
-)
-VALUES
-    (4, NULL, 'Employee', 'One', '555100001', 'employee.contact.one@test.com', 'EMP001', '2024-01-10');
+SET IDENTITY_INSERT Employees ON;
 
 INSERT INTO Employees
 (
+    Id,
     AccountId,
     ManagerEmployeeId,
     FirstName,
@@ -152,8 +167,25 @@ INSERT INTO Employees
     HireDate
 )
 VALUES
-    (5, 1, 'Employee', 'Two', '555100002', 'employee.contact.two@test.com', 'EMP002', '2024-02-15'),
-    (6, 1, 'Employee', 'Three', '555100003', 'employee.contact.three@test.com', 'EMP003', '2024-03-20');
+    (1, 4, NULL, 'Employee', 'One', '555100001', 'employee.contact.one@test.com', 'EMP001', '2024-01-10');
+
+INSERT INTO Employees
+(
+    Id,
+    AccountId,
+    ManagerEmployeeId,
+    FirstName,
+    LastName,
+    PhoneNumber,
+    ContactEmail,
+    EmployeeCode,
+    HireDate
+)
+VALUES
+    (2, 5, 1, 'Employee', 'Two', '555100002', 'employee.contact.two@test.com', 'EMP002', '2024-02-15'),
+    (3, 6, 1, 'Employee', 'Three', '555100003', 'employee.contact.three@test.com', 'EMP003', '2024-03-20');
+
+SET IDENTITY_INSERT Employees OFF;
 
 
 -- =========================================================
@@ -188,24 +220,30 @@ VALUES
 -- Categories
 -- Expected Ids: 1, 2, 3
 -- =========================================================
-INSERT INTO Categories
-(
-    ParentId,
-    CategoryName,
-    Description
-)
-VALUES
-    (NULL, 'Electronics', 'Electronic devices and accessories');
+SET IDENTITY_INSERT Categories ON;
 
 INSERT INTO Categories
 (
+    Id,
     ParentId,
     CategoryName,
     Description
 )
 VALUES
-    (1, 'Computers', 'Computers and related products'),
-    (1, 'Mobile Phones', 'Mobile phones and accessories');
+    (1, NULL, 'Electronics', 'Electronic devices and accessories');
+
+INSERT INTO Categories
+(
+    Id,
+    ParentId,
+    CategoryName,
+    Description
+)
+VALUES
+    (2, 1, 'Computers', 'Computers and related products'),
+    (3, 1, 'Mobile Phones', 'Mobile phones and accessories');
+
+SET IDENTITY_INSERT Categories OFF;
 
 
 -- =========================================================
@@ -217,15 +255,20 @@ VALUES
 -- 3 = Date
 -- 4 = Boolean
 -- =========================================================
+SET IDENTITY_INSERT Attributes ON;
+
 INSERT INTO Attributes
 (
+    Id,
     AttributeName,
     AttributeType
 )
 VALUES
-    ('Brand', 1),
-    ('Weight', 2),
-    ('WarrantyEndDate', 3);
+    (1, 'Brand', 1),
+    (2, 'Weight', 2),
+    (3, 'WarrantyEndDate', 3);
+
+SET IDENTITY_INSERT Attributes OFF;
 
 
 -- =========================================================
@@ -248,19 +291,24 @@ VALUES
 -- Products
 -- Expected Ids: 1, 2, 3
 -- Important:
--- Products table has IsDeleted default 1, so we explicitly set IsDeleted = 0.
+-- Products default to IsDeleted = 0; the explicit value keeps fixture intent visible.
 -- =========================================================
+SET IDENTITY_INSERT Products ON;
+
 INSERT INTO Products
 (
+    Id,
     CategoryId,
     ProductName,
     Price,
     IsDeleted
 )
 VALUES
-    (1, 'Samsung Monitor', 1200.00, 0),
-    (2, 'Lenovo Laptop', 2500.00, 0),
-    (3, 'iPhone 15', 3000.00, 0);
+    (1, 1, 'Samsung Monitor', 1200.00, 0),
+    (2, 2, 'Lenovo Laptop', 2500.00, 0),
+    (3, 3, 'iPhone 15', 3000.00, 0);
+
+SET IDENTITY_INSERT Products OFF;
 
 
 -- =========================================================
@@ -290,8 +338,11 @@ VALUES
 -- 1 = Completed
 -- 2 = Cancelled
 -- =========================================================
+SET IDENTITY_INSERT Sales ON;
+
 INSERT INTO Sales
 (
+    Id,
     CreatedEmployeeId,
     CancelledByEmployeeId,
     Status,
@@ -299,9 +350,11 @@ INSERT INTO Sales
     CancelReason
 )
 VALUES
-    (1, NULL, 1, NULL, NULL),
-    (2, NULL, 0, NULL, NULL),
-    (3, 1, 2, GETDATE(), 'Cancelled during seed data setup');
+    (1, 1, NULL, 1, NULL, NULL),
+    (2, 2, NULL, 0, NULL, NULL),
+    (3, 3, 1, 2, GETDATE(), 'Cancelled during seed data setup');
+
+SET IDENTITY_INSERT Sales OFF;
 
 
 -- =========================================================
@@ -309,8 +362,11 @@ VALUES
 -- Expected Ids: 1, 2, 3
 -- Unique constraint: SaleId + ProductId
 -- =========================================================
+SET IDENTITY_INSERT SaleItems ON;
+
 INSERT INTO SaleItems
 (
+    Id,
     SaleId,
     ProductId,
     Quantity,
@@ -318,9 +374,11 @@ INSERT INTO SaleItems
     DiscountAmount
 )
 VALUES
-    (1, 1, 2, 1200.00, 0.00),
-    (1, 2, 1, 2500.00, 100.00),
-    (2, 3, 3, 3000.00, 0.00);
+    (1, 1, 1, 2, 1200.00, 0.00),
+    (2, 1, 2, 1, 2500.00, 100.00),
+    (3, 2, 3, 3, 3000.00, 0.00);
+
+SET IDENTITY_INSERT SaleItems OFF;
 
 
 -- =========================================================
@@ -331,8 +389,11 @@ VALUES
 -- 1 = Refill
 -- 2 = Adjustment
 -- =========================================================
+SET IDENTITY_INSERT StockMovements ON;
+
 INSERT INTO StockMovements
 (
+    Id,
     ProductId,
     MovementType,
     QuantityChange,
@@ -342,6 +403,8 @@ INSERT INTO StockMovements
     Reason
 )
 VALUES
-    (1, 0, -2, 10, 1, 1, 'Seed sale movement for product 1'),
-    (2, 1, 20, 5, NULL, 2, 'Seed refill movement for product 2'),
-    (3, 2, -1, 15, NULL, 3, 'Seed adjustment movement for product 3');
+    (1, 1, 0, -2, 10, 1, 1, 'Seed sale movement for product 1'),
+    (2, 2, 1, 20, 5, NULL, 2, 'Seed refill movement for product 2'),
+    (3, 3, 2, -1, 15, NULL, 3, 'Seed adjustment movement for product 3');
+
+SET IDENTITY_INSERT StockMovements OFF;

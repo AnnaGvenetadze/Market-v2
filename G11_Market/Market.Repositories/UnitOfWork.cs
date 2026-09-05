@@ -27,6 +27,7 @@ internal sealed class UnitOfWork : IUnitOfWork, IDisposable
     private readonly Lazy<CityRepository> _cityRepository;
     private readonly Lazy<AccountRepository> _accountRepository;
     private readonly Lazy<ClientRepository> _clientRepository;
+    private readonly Lazy<ClientTypeRepository> _clientTypeRepository;
     private readonly Lazy<AttributeRepository> _attributeRepository;
     private readonly Lazy<ProductAttributeValueRepository> _productAttributeValueRepository;
 
@@ -44,6 +45,7 @@ internal sealed class UnitOfWork : IUnitOfWork, IDisposable
         _countryRepository = new Lazy<CountryRepository>(() => new CountryRepository(_connection));
         _accountRepository = new Lazy<AccountRepository>(() => new AccountRepository(_connection));
         _clientRepository = new Lazy<ClientRepository>(() => new ClientRepository(_connection));
+        _clientTypeRepository = new Lazy<ClientTypeRepository>(() => new ClientTypeRepository(_connection));
         _attributeRepository = new Lazy<AttributeRepository>(() => new AttributeRepository(_connection));
         _productAttributeValueRepository = new Lazy<ProductAttributeValueRepository>(() => new ProductAttributeValueRepository(_connection));
         _stockMovementRepository = new Lazy<StockMovementRepository>(() => new StockMovementRepository(_connection));
@@ -95,6 +97,9 @@ internal sealed class UnitOfWork : IUnitOfWork, IDisposable
 
     public IClientRepository ClientRepository
         => GetRepository(_clientRepository);
+
+    public IClientTypeRepository ClientTypeRepository
+        => GetRepository(_clientTypeRepository);
 
     public IAttributeRepository AttributeRepository
         => GetRepository(_attributeRepository);

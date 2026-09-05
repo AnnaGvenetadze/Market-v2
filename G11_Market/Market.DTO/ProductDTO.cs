@@ -14,6 +14,7 @@ namespace Market.DTO
         public decimal Price { get; set; }
 
         [IgnoreOnInsert]
+        [IgnoreOnUpdate]
         public bool IsDeleted { get; set; }
 
         [IgnoreOnInsert]
@@ -21,6 +22,7 @@ namespace Market.DTO
         public DateTime CreatedDate { get; set; }
 
         [IgnoreOnInsert]
+        [IgnoreOnUpdate]
         public DateTime? UpdatedDate { get; set; }
     }
 }

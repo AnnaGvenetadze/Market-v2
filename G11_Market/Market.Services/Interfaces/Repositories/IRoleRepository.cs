@@ -4,5 +4,5 @@ namespace Market.Services.Interfaces.Repositories;
 
 public interface IRoleRepository : IBaseRepository<RoleDTO>
 {
-    RoleDTO GetByName(string name);
+    RoleDTO? GetByName(string name);
 }
