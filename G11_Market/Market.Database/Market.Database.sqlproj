@@ -156,15 +156,16 @@
     <Build Include="dbo\Stored Procedures\sp_UpdateClientType.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteClientType.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAllAttributes.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateCategory.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Stored Procedures\sp_InsertCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteCategory.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetCategories.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllCategories.sql" />
     <None Include="dbo\Views\vw_CategoriesWithParent.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetCategoryById.sql" />
     <Build Include="dbo\Stored Procedures\sp_ActivateCategory.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetCategoryAttributes.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllCategoryAttributes.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteCategoryAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetClients.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateClient.sql" />

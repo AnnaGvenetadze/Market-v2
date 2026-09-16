@@ -30,6 +30,7 @@ internal sealed class UnitOfWork : IUnitOfWork, IDisposable
     private readonly Lazy<ClientTypeRepository> _clientTypeRepository;
     private readonly Lazy<AttributeRepository> _attributeRepository;
     private readonly Lazy<ProductAttributeValueRepository> _productAttributeValueRepository;
+    private readonly Lazy<CategoryAttributeRepository> _categoryAttributeRepository;
 
     public UnitOfWork(DbConnection connection)
     {
@@ -52,13 +53,15 @@ internal sealed class UnitOfWork : IUnitOfWork, IDisposable
         _employeeRoleRepository = new Lazy<EmployeeRoleRepository>(() => new EmployeeRoleRepository(_connection));
         _corporateClientDetailsRepository = new Lazy<CorporateClientDetailsRepository>(() => new CorporateClientDetailsRepository(_connection));
         _cityRepository = new Lazy<CityRepository>(() => new CityRepository(_connection));
+        _categoryAttributeRepository = new Lazy<CategoryAttributeRepository>(() => new CategoryAttributeRepository(_connection));
 
         _disposed = false;
     }
 
     public ICategoryRepository CategoryRepository
         => GetRepository(_categoryRepository);
-
+    public ICategoryAttributeRepository CategoryAttributeRepository
+        => GetRepository(_categoryAttributeRepository);
     public IEmployeeRepository EmployeeRepository
         => GetRepository(_employeeRepository);
 

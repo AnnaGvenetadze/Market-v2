@@ -19,6 +19,24 @@ public partial class ExpressionTranslator<T> : ExpressionVisitor
 
     protected override Expression VisitBinary(BinaryExpression node)
     {
+        if (IsNullConstant(node.Right) || IsNullConstant(node.Left))
+        {
+            var memberExpr = IsNullConstant(node.Right) ? node.Left : node.Right;
+
+            _sql.Append("(");
+            Visit(memberExpr);
+
+            if (node.NodeType == ExpressionType.Equal)
+            {
+                _sql.Append(" IS NULL)");
+            }
+            else if (node.NodeType == ExpressionType.NotEqual)
+            {
+                _sql.Append(" IS NOT NULL)");
+            }
+
+            return node;
+        }
         _sql.Append("(");
 
         Visit(node.Left);
@@ -66,5 +84,15 @@ public partial class ExpressionTranslator<T> : ExpressionVisitor
         var paramName = $"@p{_paramCount++}";
         _parameters[paramName] = value ?? DBNull.Value;
         _sql.Append(paramName);
+    }
+
+    private static bool IsNullConstant(Expression expr)
+    {
+        if (expr is ConstantExpression constExpr)
+        {
+            return constExpr.Value == null;
+        }
+
+        return false;
     }
 }

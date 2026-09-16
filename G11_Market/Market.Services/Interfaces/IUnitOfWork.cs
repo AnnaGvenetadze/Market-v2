@@ -22,6 +22,7 @@ public interface IUnitOfWork
     ICorporateClientDetailsRepository CorporateClientDetailsRepository { get; }
     IEmployeeRoleRepository EmployeeRoleRepository { get; }
     ICityRepository CityRepository { get; }
+    ICategoryAttributeRepository CategoryAttributeRepository { get; }
 
     void BeginTransaction();
 

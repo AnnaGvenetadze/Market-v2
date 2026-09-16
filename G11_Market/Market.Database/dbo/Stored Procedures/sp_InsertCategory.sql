@@ -1,58 +1,36 @@
-﻿create procedure dbo.sp_InsertCategory
-    @CategoryName nvarchar(100),
-    @ParentId int = null,
-    @Description nvarchar(1000) = null,
-    @Id int output
-as
-begin
-    set nocount on;
+﻿CREATE Procedure dbo.sp_InsertCategory
+    @ParentId INT = NULL,
+    @CategoryName NVARCHAR(100),
+    @Description NVARCHAR(1000) = NULL,
+    @Id INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    set @Id = null;
+    IF @ParentId <= 0 SET @ParentId = NULL;
 
-    if @ParentId is not null
-    begin
-        declare @IsParentValid bit;
-        declare @ParentValidationMessage nvarchar(300);
+    IF @CategoryName IS NULL OR LTRIM(RTRIM(@CategoryName)) = ''
+    BEGIN
+        RAISERROR('Category name cannot be empty or whitespace.', 16, 1);
+        RETURN;
+    END
 
-        exec dbo.sp_ValidateCategory
-            @CategoryId = @ParentId,
-            @IsValid = @IsParentValid output,
-            @Message = @ParentValidationMessage output;
+    IF @ParentId IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.Categories WHERE Id = @ParentId AND IsDeleted = 0)
+    BEGIN
+        RAISERROR('Specified ParentId does not exist or is deleted.', 16, 1);
+        RETURN;
+    END
 
-        if isnull(@IsParentValid, 0) = 0
-        begin
-            ;throw 50001, 'Parent category is invalid or does not exist.', 1;
-        end;
-    end;
+    IF EXISTS (SELECT 1 FROM dbo.Categories WHERE CategoryName = @CategoryName AND IsDeleted = 0)
+    BEGIN
+        RAISERROR('Category name already exists.', 16, 1);
+        RETURN;
+    END
 
-    begin try
-        insert into dbo.Categories
-        (
-            ParentId,
-            CategoryName,
-            Description
-        )
-        values
-        (
-            @ParentId,
-            @CategoryName,
-            @Description
-        );
+    INSERT INTO dbo.Categories (ParentId, CategoryName, Description)
+    VALUES (@ParentId, @CategoryName, @Description);
 
-        set @Id = convert(int, scope_identity());
-    end try
-    begin catch
-        if error_number() in (2601, 2627)
-        begin
-            ;throw 50003, 'Category with the same name already exists.', 1;
-        end;
+    SET @Id = SCOPE_IDENTITY();
 
-        if error_number() = 547
-        begin
-            ;throw 50004, 'Category data violates table constraints.', 1;
-        end;
-
-        ;throw 50005, 'Category insert failed.', 1;
-    end catch;
-end;
-go 
+    SELECT @Id AS Id;
+END;

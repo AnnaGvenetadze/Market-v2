@@ -1,183 +1,118 @@
-﻿// TODO: Delete. No need of separate tests for junction table
+﻿using Market.DTO;
+using Market.Tests.Helpers;
+using Microsoft.Data.SqlClient;
+using NUnit.Framework;
 
-//using Market.DTO;
-//using Market.Services.Interfaces.Repositories;
-//using Market.Tests.Helpers;
-//using Microsoft.Data.SqlClient;
+namespace Market.Tests;
 
-//namespace Market.Tests;
+[TestFixture]
+public class CategoryAttributeRepositoryTests : BaseRepositoryTests
+{
+    private int _testCategoryId;
+    private int _testAttributeId;
 
-//public class CategoryAttributeRepositoryTests : BaseRepositoryTests
-//{
-//    private SqlConnection _connection;
-//    private ICategoryRepository _categoryRepository;
-//    private AttributeRepository _attributeRepository;
-//    private CategoryAttributeRepository _categoryAttributeRepository;
-//    private int _categoryId;
-//    private int _attributeId;
+    [SetUp]
+    public void SetUp()
+    {
+        // Setup valid parent records for foreign key requirements
+        var category = new CategoryDTO
+        {
+            CategoryName = "Category_".AddGuid(),
+            Description = "Test Category"
+        };
+        _testCategoryId = UnitOfWork.CategoryRepository.Insert(category);
 
-//    [SetUp]
-//    public void Setup()
-//    {
-//        _connection = new SqlConnection(ConnectionString);
-//        //UnitOfWork unitOfWork = new UnitOfWork(_connection);
-//        //_categoryRepository = unitOfWork.CategoryRepository;
-//        _attributeRepository = new AttributeRepository(_connection);
-//        _categoryAttributeRepository = new CategoryAttributeRepository(_connection);
+        var attribute = new AttributeDTO
+        {
+            AttributeName = "Attribute_".AddGuid()
+        };
+        _testAttributeId = UnitOfWork.AttributeRepository.Insert(attribute);
+    }
 
-//        var category = new CategoryDTO
-//        {
-//            CategoryName = TestDataHelper.AddGuid("TestCategory"),
-//            Description = "Test category description"
-//        };
-//        var attribute = new AttributeDTO
-//        {
-//            AttributeName = TestDataHelper.AddGuid("TestAttributeName"),
-//            AttributeType = 1
-//        };
+    [Test]
+    public void Insert_ValidCompositeMapping_ShouldSucceed()
+    {
+        var mapping = new CategoryAttributeDTO
+        {
+            CategoryId = _testCategoryId,
+            AttributeId = _testAttributeId,
+            OrderPosition = 1
+        };
 
-//        _categoryId = _categoryRepository.Insert(category);
-//        _attributeId = _attributeRepository.Insert(attribute);
-//    }
+        Assert.DoesNotThrow(() => UnitOfWork.CategoryAttributeRepository.Insert(mapping));
 
+        var results = UnitOfWork.CategoryAttributeRepository.GetById(_testCategoryId).ToList();
+        Assert.That(results.Any(x => x.AttributeId == _testAttributeId), Is.True);
+    }
 
-//    [TearDown]
-//    public void TearDown()
-//    {
-//        //_categoryRepository.Dispose();
-//        _attributeRepository.Dispose();
-//        _connection.Dispose();
-//    }
+    [Test]
+    public void Insert_NullEntity_ShouldThrowArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            UnitOfWork.CategoryAttributeRepository.Insert(null!));
+    }
 
+    [Test]
+    public void Insert_DuplicateCompositeKey_ShouldThrowSqlException()
+    {
+        var mapping = new CategoryAttributeDTO
+        {
+            CategoryId = _testCategoryId,
+            AttributeId = _testAttributeId,
+            OrderPosition = 1
+        };
 
-//    [Test]
-//    public void InsertTest_ShouldInsertValidData()
-//    {
-//        // Arrange
-//        var categoryAttribute = new CategoryAttributeDTO
-//        {
-//            CategoryId = _categoryId,
-//            AttributeId = _attributeId,
-//            OrderPosition = 1
-//        };
+        UnitOfWork.CategoryAttributeRepository.Insert(mapping);
 
-//        // Act
-//        _categoryAttributeRepository.Insert(categoryAttribute);
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.CategoryAttributeRepository.Insert(mapping));
+    }
 
-//        var insertedCategoryAttributes = _categoryAttributeRepository
-//            .GetById(_categoryId)
-//            .ToList();
+    [Test]
+    public void GetById_ByFirstKey_ShouldReturnAllAttributesForCategory()
+    {
+        var secondAttributeId = UnitOfWork.AttributeRepository.Insert(new AttributeDTO { AttributeName = "Attr2_".AddGuid() });
 
-//        // Assert
-//        Assert.That(insertedCategoryAttributes.Any(x =>
-//            x.CategoryId == _categoryId &&
-//            x.AttributeId == _attributeId &&
-//            x.OrderPosition == 1), Is.True);
-//    }
+        UnitOfWork.CategoryAttributeRepository.Insert(new CategoryAttributeDTO { CategoryId = _testCategoryId, AttributeId = _testAttributeId, OrderPosition = 1 });
+        UnitOfWork.CategoryAttributeRepository.Insert(new CategoryAttributeDTO { CategoryId = _testCategoryId, AttributeId = secondAttributeId, OrderPosition = 2 });
 
+        var results = UnitOfWork.CategoryAttributeRepository.GetById(_testCategoryId).ToList();
 
-//    [Test]
-//    public void InsertTest_ShouldNotInsertInvalidData()
-//    {
-//        // Arrange
-//        var categoryAttribute = new CategoryAttributeDTO
-//        {
-//            CategoryId = -9,
-//            AttributeId = _attributeId,
-//            OrderPosition = 1
-//        };
+        Assert.That(results.Count, Is.EqualTo(2));
+        Assert.That(results.All(x => x.CategoryId == _testCategoryId), Is.True);
+    }
 
-//        // Act and Assert
-//        Assert.Throws<SqlException>(() =>
-//            _categoryAttributeRepository.Insert(categoryAttribute));
-//    }
+    [Test]
+    public void GetById_NullFirstKey_ShouldThrowArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            UnitOfWork.CategoryAttributeRepository.GetById(null!));
+    }
 
+    [Test]
+    public void Delete_ValidCompositeKeys_ShouldRemoveMapping()
+    {
+        var mapping = new CategoryAttributeDTO
+        {
+            CategoryId = _testCategoryId,
+            AttributeId = _testAttributeId,
+            OrderPosition = 1
+        };
+        UnitOfWork.CategoryAttributeRepository.Insert(mapping);
 
-//    [Test]
-//    public void UpdateTest_ShouldUpdateValidData()
-//    {
-//        // Arrange
-//        var categoryAttribute = new CategoryAttributeDTO
-//        {
-//            CategoryId = _categoryId,
-//            AttributeId = _attributeId,
-//            OrderPosition = 1
-//        };
+        UnitOfWork.CategoryAttributeRepository.Delete(_testCategoryId, _testAttributeId);
 
-//        _categoryAttributeRepository.Insert(categoryAttribute);
+        var results = UnitOfWork.CategoryAttributeRepository.GetById(_testCategoryId);
+        Assert.That(results.Any(x => x.AttributeId == _testAttributeId), Is.False);
+    }
 
-//        categoryAttribute.OrderPosition = 5;
+    [Test]
+    public void Delete_NullKeys_ShouldThrowArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            UnitOfWork.CategoryAttributeRepository.Delete(null!, _testAttributeId));
 
-//        // Act
-//        _categoryAttributeRepository.Update(categoryAttribute);
-
-//        var updatedCategoryAttributes = _categoryAttributeRepository
-//            .GetById(_categoryId)
-//            .ToList();
-
-//        // Assert
-//        Assert.That(updatedCategoryAttributes.Any(x =>
-//            x.CategoryId == _categoryId &&
-//            x.AttributeId == _attributeId &&
-//            x.OrderPosition == 5), Is.True);
-//    }
-
-
-//    [Test]
-//    public void UpdateTest_ShouldNotUpdateInvalidData()
-//    {
-//        // Arrange
-//        var categoryAttribute = new CategoryAttributeDTO
-//        {
-//            CategoryId = -9,
-//            AttributeId = -9,
-//            OrderPosition = 10
-//        };
-
-//        // Act and Assert
-//        Assert.Throws<SqlException>(() =>
-//            _categoryAttributeRepository.Update(categoryAttribute));
-//    }
-
-
-//    [Test]
-//    public void DeleteTest_ShouldDeleteValidData()
-//    {
-//        // Arrange
-//        var categoryAttribute = new CategoryAttributeDTO
-//        {
-//            CategoryId = _categoryId,
-//            AttributeId = _attributeId,
-//            OrderPosition = 1
-//        };
-
-//        _categoryAttributeRepository.Insert(categoryAttribute);
-
-//        // Act
-//        _categoryAttributeRepository.Delete(_categoryId, _attributeId);
-
-//        var deletedCategoryAttributes = _categoryAttributeRepository
-//            .GetById(_categoryId)
-//            .ToList();
-
-//        // Assert
-//        Assert.That(deletedCategoryAttributes.Any(x =>
-//            x.CategoryId == _categoryId &&
-//            x.AttributeId == _attributeId), Is.False);
-//    }
-
-
-//    [Test]
-//    public void DeleteTest_ShouldNotDeleteInvalidData()
-//    {
-//        // Act and Assert
-//        Assert.Throws<SqlException>(() =>
-//            _categoryAttributeRepository.Delete(-9, -9));
-//    }
-
-//    public override bool Equals(object? obj)
-//    {
-//        return obj is CategoryAttributeRepositoryTests tests &&
-//               EqualityComparer<ICategoryRepository>.Default.Equals(_categoryRepository, tests._categoryRepository);
-//    }
-//}
+        Assert.Throws<ArgumentNullException>(() =>
+            UnitOfWork.CategoryAttributeRepository.Delete(_testCategoryId, null!));
+    }
+}
