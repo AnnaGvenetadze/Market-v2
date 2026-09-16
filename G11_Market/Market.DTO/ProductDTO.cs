@@ -2,7 +2,7 @@
 
 namespace Market.DTO
 {
-    public class ProductDTO
+    public sealed class ProductDTO
     {
         [IgnoreOnInsert]
         public int Id { get; set; }

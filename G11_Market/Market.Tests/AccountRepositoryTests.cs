@@ -6,282 +6,375 @@ namespace Market.Tests;
 
 public class AccountRepositoryTests : BaseRepositoryTests
 {
+    private static AccountDTO CreateValidAccount() => new()
+    {
+        Username = "User_".AddGuid(),
+        PasswordHash = "HashedPassword123!",
+        Email = $"user_{Guid.NewGuid()}@test.com",
+        AccountType = 1, // 1: Employee, 2: Individual Client, 3: Corporate Client
+        FirstName = "John",
+        LastName = "Doe"
+    };
+
     [Test]
     public void InsertTest_ShouldInsertValidData()
     {
         // Arrange
-        var account = new AccountDTO
-        {
-            Username = "User123".AddGuid(),
-            PasswordHash = "HashedPassword123",
-            Email = "Email123".AddGuid() + "@gmail.com",
-            AccountType = 1, 
-            FirstName = "Luka",
-            LastName = "Mania",
-            IsDeleted = false,
-            CreateDate = DateTime.Now
-        };
+        var account = CreateValidAccount();
 
         // Act
-        var insertedId = UnitOfWork.AccountRepository.Insert(account);
-        var insertedAccount = UnitOfWork.AccountRepository.GetById(insertedId);
+        var newId = UnitOfWork.AccountRepository.Insert(account);
+        var insertedAccount = UnitOfWork.AccountRepository.GetById(newId);
 
         // Assert
+        Assert.That(newId, Is.GreaterThan(0));
         Assert.That(insertedAccount, Is.Not.Null);
-        Assert.That(insertedAccount.Id, Is.EqualTo(insertedId));
+        Assert.That(insertedAccount!.Id, Is.EqualTo(newId));
         Assert.That(insertedAccount.Username, Is.EqualTo(account.Username));
         Assert.That(insertedAccount.Email, Is.EqualTo(account.Email));
-        Assert.That(insertedAccount.AccountType, Is.EqualTo(1));
+        Assert.That(insertedAccount.AccountType, Is.EqualTo(account.AccountType));
     }
-
-
-    [Test]
-    public void UpdateTest_ShouldUpdateValidData()
-    {
-        // Arrange
-        var account = new AccountDTO
-        {
-            Username = "User123".AddGuid(),
-            PasswordHash = "OldPass",
-            Email = "Email123".AddGuid() + "@gmail.com",
-            AccountType = 1,
-            FirstName = "Luka",
-            LastName = "Mania"
-        };
-        var insertedId = UnitOfWork.AccountRepository.Insert(account);
-
-        var accountToUpdate = UnitOfWork.AccountRepository.GetById(insertedId);
-        accountToUpdate!.PasswordHash = "NewPassword";
-        accountToUpdate.LastName = "NotMania";
-        accountToUpdate.UpdateDate = DateTime.Now;
-
-        // Act
-        UnitOfWork.AccountRepository.Update(accountToUpdate);
-        var updatedAccount = UnitOfWork.AccountRepository.GetById(insertedId);
-
-        // Assert
-        Assert.That(updatedAccount, Is.Not.Null);
-        Assert.That(updatedAccount.PasswordHash, Is.EqualTo("NewPassword"));
-        Assert.That(updatedAccount.LastName, Is.EqualTo("NotMania"));
-    }
-
-
-    [Test]
-    public void DeleteTest_ShouldDeleteValidData()
-    {
-        // Arrange
-        var account = new AccountDTO
-        {
-            Username = "User123".AddGuid(),
-            PasswordHash = "OldPass",
-            Email = "Email123".AddGuid() + "@gmail.com",
-            AccountType = 1,
-            FirstName = "Luka",
-            LastName = "Mania"
-        };
-        var insertedId = UnitOfWork.AccountRepository.Insert(account);
-
-        // Act
-        UnitOfWork.AccountRepository.Delete(insertedId);
-
-        // Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.GetById(insertedId));
-    }
-
 
     [Test]
     public void InsertTest_ShouldNotInsertDuplicateUsername()
     {
         // Arrange
-        var identicalUsername = "User123".AddGuid();
-        var account1 = new AccountDTO
-        {
-            Username = identicalUsername,
-            PasswordHash = "Pass11",
-            Email = "Email1".AddGuid() + "@gmail.com",
-            AccountType = 1,
-            FirstName = "User",
-            LastName = "One"
-        };
-        UnitOfWork.AccountRepository.Insert(account1);
+        var first = CreateValidAccount();
+        var second = CreateValidAccount();
+        second.Username = first.Username;
 
-        var account2 = new AccountDTO
-        {
-            Username = identicalUsername,
-            PasswordHash = "Hash2",
-            Email = "Email2".AddGuid() + "@gmail.com",
-            AccountType = 1,
-            FirstName = "User",
-            LastName = "Two"
-        };
+        UnitOfWork.AccountRepository.Insert(first);
 
-        // Act & Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(account2));
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(second));
     }
-
 
     [Test]
     public void InsertTest_ShouldNotInsertDuplicateEmail()
     {
         // Arrange
-        var sharedEmail = "Email123".AddGuid() + "@gmail.com";
-        var account1 = new AccountDTO
-        {
-            Username = "User1".AddGuid(),
-            PasswordHash = "Hash1",
-            Email = sharedEmail,
-            AccountType = 1,
-            FirstName = "User",
-            LastName = "One"
-        };
-        UnitOfWork.AccountRepository.Insert(account1);
+        var first = CreateValidAccount();
+        var second = CreateValidAccount();
+        second.Email = first.Email;
 
-        var account2 = new AccountDTO
-        {
-            Username = "User2".AddGuid(),
-            PasswordHash = "Hash2",
-            Email = sharedEmail,
-            AccountType = 1,
-            FirstName = "User",
-            LastName = "Two"
-        };
+        UnitOfWork.AccountRepository.Insert(first);
 
-        // Act & Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(account2));
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(second));
     }
 
+    [Test]
+    public void InsertTest_ShouldNotInsertInvalidAccountType()
+    {
+        // Arrange
+        var account = CreateValidAccount();
+        account.AccountType = 99;
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(account));
+    }
+
+    [Test]
+    public void InsertTest_ShouldNotInsertEmptyUsername()
+    {
+        // Arrange
+        var account = CreateValidAccount();
+        account.Username = "   ";
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(account));
+    }
+
+    [Test]
+    public void InsertTest_ShouldNotInsertEmptyEmail()
+    {
+        // Arrange
+        var account = CreateValidAccount();
+        account.Email = "";
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(account));
+    }
+
+    [Test]
+    public void Insert_WhenEntityIsNull_ShouldThrowException()
+    {
+        // Act and Assert
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.Insert(null!));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldUpdateValidData()
+    {
+        // Arrange
+        var account = CreateValidAccount();
+        var newId = UnitOfWork.AccountRepository.Insert(account);
+        var insertedAccount = UnitOfWork.AccountRepository.GetById(newId)!;
+
+        insertedAccount.FirstName = "Jane";
+        insertedAccount.LastName = "Smith";
+        insertedAccount.AccountType = 2;
+
+        // Act
+        UnitOfWork.AccountRepository.Update(insertedAccount);
+        var updatedAccount = UnitOfWork.AccountRepository.GetById(newId);
+
+        // Assert
+        Assert.That(updatedAccount, Is.Not.Null);
+        Assert.That(updatedAccount!.FirstName, Is.EqualTo("Jane"));
+        Assert.That(updatedAccount.LastName, Is.EqualTo("Smith"));
+        Assert.That(updatedAccount.AccountType, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldNotUpdateDuplicateUsername()
+    {
+        // Arrange
+        var first = CreateValidAccount();
+        var second = CreateValidAccount();
+
+        var firstId = UnitOfWork.AccountRepository.Insert(first);
+        var secondId = UnitOfWork.AccountRepository.Insert(second);
+
+        var firstAccount = UnitOfWork.AccountRepository.GetById(firstId)!;
+        var secondAccount = UnitOfWork.AccountRepository.GetById(secondId)!;
+
+        secondAccount.Username = firstAccount.Username;
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Update(secondAccount));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldNotUpdateDuplicateEmail()
+    {
+        // Arrange
+        var first = CreateValidAccount();
+        var second = CreateValidAccount();
+
+        var firstId = UnitOfWork.AccountRepository.Insert(first);
+        var secondId = UnitOfWork.AccountRepository.Insert(second);
+
+        var firstAccount = UnitOfWork.AccountRepository.GetById(firstId)!;
+        var secondAccount = UnitOfWork.AccountRepository.GetById(secondId)!;
+
+        secondAccount.Email = firstAccount.Email;
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Update(secondAccount));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldNotUpdateInvalidAccountType()
+    {
+        // Arrange
+        var account = CreateValidAccount();
+        var id = UnitOfWork.AccountRepository.Insert(account);
+        var inserted = UnitOfWork.AccountRepository.GetById(id)!;
+
+        inserted.AccountType = 0;
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Update(inserted));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldNotUpdateEmptyUsername()
+    {
+        // Arrange
+        var account = CreateValidAccount();
+        var id = UnitOfWork.AccountRepository.Insert(account);
+        var inserted = UnitOfWork.AccountRepository.GetById(id)!;
+
+        inserted.Username = "   ";
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Update(inserted));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldNotUpdateNonExistentId()
+    {
+        // Arrange
+        var nonExistent = CreateValidAccount();
+        nonExistent.Id = -999;
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Update(nonExistent));
+    }
+
+    [Test]
+    public void Update_WhenEntityIsNull_ShouldThrowException()
+    {
+        // Act and Assert
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.Update(null!));
+    }
+
+    [Test]
+    public void DeleteTest_ShouldDeleteValidData() 
+    {
+        // Arrange
+        var account = CreateValidAccount();
+        var newId = UnitOfWork.AccountRepository.Insert(account);
+
+        // Act
+        UnitOfWork.AccountRepository.Delete(newId);
+        var deletedAccount = UnitOfWork.AccountRepository.GetById(newId);
+
+        // Assert
+        Assert.That(deletedAccount, Is.Null);
+    }
+
+    [Test]
+    public void DeleteTest_ShouldNotDeleteInvalidId()
+    {
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Delete(-999));
+    }
+
+    [Test]
+    public void Delete_WhenIdIsNull_ShouldThrowException()
+    {
+        // Act and Assert
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.Delete(null!));
+    }
+
+    [Test]
+    public void GetById_ShouldReturnCorrectAccount()
+    {
+        // Arrange
+        var account = CreateValidAccount();
+        var id = UnitOfWork.AccountRepository.Insert(account);
+
+        // Act
+        var result = UnitOfWork.AccountRepository.GetById(id);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Id, Is.EqualTo(id));
+    }
+
+    [Test]
+    public void GetById_WhenNotFound_ShouldReturnNull()
+    {
+        // Act
+        var result = UnitOfWork.AccountRepository.GetById(-1);
+
+        // Assert
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void GetById_WhenDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        var account = CreateValidAccount();
+        var id = UnitOfWork.AccountRepository.Insert(account);
+        UnitOfWork.AccountRepository.Delete(id);
+
+        // Act
+        var result = UnitOfWork.AccountRepository.GetById(id);
+
+        // Assert
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void GetById_WhenIdIsNull_ShouldThrowException()
+    {
+        // Act and Assert
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.GetById((object)null!));
+    }
 
     [Test]
     public void GetByUsername_ShouldReturnCorrectAccount()
     {
         // Arrange
-        var wantedUsername = "User".AddGuid();
-        var account = new AccountDTO
-        {
-            Username = wantedUsername,
-            PasswordHash = "Password",
-            Email = "Email".AddGuid() + "@gmail.com",
-            AccountType = 1,
-            FirstName = "Luka",
-            LastName = "Mania"
-        };
+        var account = CreateValidAccount();
         UnitOfWork.AccountRepository.Insert(account);
 
         // Act
-        var result = UnitOfWork.AccountRepository.GetByUsername(wantedUsername);
+        var result = UnitOfWork.AccountRepository.GetByUsername(account.Username);
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Username, Is.EqualTo(wantedUsername));
+        Assert.That(result!.Username, Is.EqualTo(account.Username));
     }
-
 
     [Test]
     public void GetByUsername_WhenNotFound_ShouldReturnNull()
     {
         // Act
-        var result = UnitOfWork.AccountRepository.GetByUsername("NonExistentUser");
+        var result = UnitOfWork.AccountRepository.GetByUsername("NonExistentUser_".AddGuid());
 
         // Assert
         Assert.That(result, Is.Null);
     }
-
 
     [Test]
     public void GetByEmail_ShouldReturnCorrectAccount()
     {
         // Arrange
-        var targetEmail = "TargetEmail".AddGuid() + "@gmail.com";
-        var account = new AccountDTO
-        {
-            Username = "User".AddGuid(),
-            PasswordHash = "Pass1",
-            Email = targetEmail,
-            AccountType = 1,
-            FirstName = "Target",
-            LastName = "Email"
-        };
+        var account = CreateValidAccount();
         UnitOfWork.AccountRepository.Insert(account);
 
         // Act
-        var result = UnitOfWork.AccountRepository.GetByEmail(targetEmail);
+        var result = UnitOfWork.AccountRepository.GetByEmail(account.Email);
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Email, Is.EqualTo(targetEmail));
+        Assert.That(result!.Email, Is.EqualTo(account.Email));
     }
-
 
     [Test]
     public void GetByEmail_WhenNotFound_ShouldReturnNull()
     {
         // Act
-        var result = UnitOfWork.AccountRepository.GetByEmail("notfound@gmail.com");
+        var result = UnitOfWork.AccountRepository.GetByEmail($"nonexistent_{Guid.NewGuid()}@test.com");
 
         // Assert
         Assert.That(result, Is.Null);
     }
 
-
     [Test]
-    public void GetByAccountType_ShouldReturnMatchingAccounts()
+    public void GetByType_ShouldReturnMatchingAccounts()
     {
         // Arrange
-        byte targetType = 2;
-        var account1 = new AccountDTO { Username = "U1".AddGuid(), PasswordHash = "H", Email = "E1".AddGuid() + "@gmail.com", AccountType = targetType, FirstName = "A", LastName = "B" };
-        var account2 = new AccountDTO { Username = "U2".AddGuid(), PasswordHash = "H", Email = "E2".AddGuid() + "@gmail.com", AccountType = targetType, FirstName = "C", LastName = "D" };
-        var account3 = new AccountDTO { Username = "U3".AddGuid(), PasswordHash = "H", Email = "E3".AddGuid() + "@gmail.com", AccountType = 3, FirstName = "E", LastName = "F" }; 
+        byte targetType = 3;
+        var first = CreateValidAccount();
+        first.AccountType = targetType;
+        var second = CreateValidAccount();
+        second.AccountType = targetType;
 
-        var id1 = UnitOfWork.AccountRepository.Insert(account1);
-        var id2 = UnitOfWork.AccountRepository.Insert(account2);
-        UnitOfWork.AccountRepository.Insert(account3); 
+        var id1 = UnitOfWork.AccountRepository.Insert(first);
+        var id2 = UnitOfWork.AccountRepository.Insert(second);
 
         // Act
         var results = UnitOfWork.AccountRepository.GetByAccountType(targetType).ToList();
 
         // Assert
-        Assert.That(results.Count, Is.AtLeast(2));
-        Assert.That(results.Any(x => x.Id == id1), Is.True);
-        Assert.That(results.Any(x => x.Id == id2), Is.True);
-        Assert.That(results.All(x => x.AccountType == targetType), Is.True);
+        Assert.That(results.Any(a => a.Id == id1), Is.True);
+        Assert.That(results.Any(a => a.Id == id2), Is.True);
+        Assert.That(results.All(a => a.AccountType == targetType), Is.True);
     }
 
-
     [Test]
-    public void GetById_WhenIdIsNull_ShouldThrowException()
-    {
-        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.GetById(null!));
-    }
-
-
-    [Test]
-    public void Update_WhenEntityIsNull_ShouldThrowException()
-    {
-        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.Update(null!));
-    }
-
-
-    [Test]
-    public void Delete_WhenIdIsNull_ShouldThrowException()
-    {
-        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.Delete(null!));
-    }
-
-
-    [Test]
-    public void GetAll_ShouldReturnAllInsertedRecords()
+    public void GetAll_ShouldExcludeDeletedAccounts()
     {
         // Arrange
-        var account1 = new AccountDTO { Username = "All1".AddGuid(), PasswordHash = "H", Email = "All1".AddGuid() + "@m.com", AccountType = 1, FirstName = "A", LastName = "B" };
-        var account2 = new AccountDTO { Username = "All2".AddGuid(), PasswordHash = "H", Email = "All2".AddGuid() + "@m.com", AccountType = 1, FirstName = "C", LastName = "D" };
+        var active = CreateValidAccount();
+        var deleted = CreateValidAccount();
 
-        UnitOfWork.AccountRepository.Insert(account1);
-        UnitOfWork.AccountRepository.Insert(account2);
+        var activeId = UnitOfWork.AccountRepository.Insert(active);
+        var deletedId = UnitOfWork.AccountRepository.Insert(deleted);
+
+        UnitOfWork.AccountRepository.Delete(deletedId);
 
         // Act
-        var allAccounts = UnitOfWork.AccountRepository.GetAll().ToList();
+        var results = UnitOfWork.AccountRepository.GetAll().ToList();
 
         // Assert
-        Assert.That(allAccounts.Count, Is.AtLeast(2));
+        Assert.That(results.Any(a => a.Id == activeId), Is.True);
+        Assert.That(results.Any(a => a.Id == deletedId), Is.False);
     }
 }

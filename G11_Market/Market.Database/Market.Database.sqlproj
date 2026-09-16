@@ -100,7 +100,6 @@
     <Build Include="dbo\Tables\ProductAttributeValues.sql" />
     <Build Include="dbo\User-Defined Function\fn_IsCircularCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetEmployeeByAcountId.sql" />
-    <Build Include="dbo\Stored Procedures\sp_DeleteAccountById.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteEmployeesRole.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetEmployeeRolesByEmployeeId.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertClientType.sql" />
@@ -120,7 +119,6 @@
     <Build Include="dbo\Stored Procedures\sp_GetProductAttributeValuesByProductId.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetEmployeeById.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateCorporateClientDetails.sql" />
-    <Build Include="dbo\Stored Procedures\sp_ValidateAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertProduct.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateProduct.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetCategoryAttributeById.sql" />
@@ -157,9 +155,9 @@
     <Build Include="dbo\Stored Procedures\sp_GetAllClientTypes.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateClientType.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteClientType.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllAttributes.sql" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Stored Procedures\sp_ValidateCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetCategories.sql" />
@@ -172,7 +170,6 @@
     <Build Include="dbo\Stored Procedures\sp_UpdateClient.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteClient.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertProductAttributeValue.sql" />
-    <Build Include="dbo\Stored Procedures\sp_ValidateAttributeValue.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateProductAttributeValue.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertInventoryManager.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetInventoryManagerById.sql" />

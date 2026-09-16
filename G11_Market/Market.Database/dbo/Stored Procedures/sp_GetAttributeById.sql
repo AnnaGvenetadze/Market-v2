@@ -4,12 +4,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT
-        Id,
-        AttributeName,
-        AttributeType,
-        CreatedDate,
-        UpdatedDate
+    SELECT *
     FROM Attributes
     WHERE Id = @Id
       AND IsDeleted = 0;

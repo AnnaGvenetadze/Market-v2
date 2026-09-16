@@ -1,36 +1,65 @@
-﻿create procedure dbo.sp_InsertAccount
-    @Username nvarchar(50),
-    @PasswordHash nvarchar(255),
-    @Email nvarchar(255),
-    @FirstName nvarchar(50),
-    @LastName nvarchar(50),
-    @AccountType tinyint, -- 1=employee, 2=individual client, 3=corporate client
-    @Id int output
-as 
-begin 
-    set nocount on;
+﻿CREATE PROCEDURE sp_InsertAccount
+    @Username NVARCHAR(50),
+    @PasswordHash NVARCHAR(255),
+    @Email NVARCHAR(255),
+    @AccountType TINYINT,
+    @FirstName NVARCHAR(50),
+    @LastName NVARCHAR(50),
+    @Id INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    set @Username = nullif(trim(@Username), '');
-    set @PasswordHash = nullif(trim(@PasswordHash), '');
-    set @Email = nullif(trim(@Email), '');
-    set @FirstName = nullif(trim(@FirstName), '');
-    set @LastName = nullif(trim(@LastName), '');
+    IF @Username IS NULL OR LTRIM(RTRIM(@Username)) = ''
+    BEGIN
+        RAISERROR('Username cannot be empty.', 16, 1);
+        RETURN;
+    END;
 
-    if @Username is null throw 50001, 'Username cannot be empty.', 1;
-    if @PasswordHash is null throw 50002, 'PasswordHash cannot be empty.', 1;
-    if @Email is null throw 50003, 'Email cannot be empty.', 1;
-    if @Email not like '%_@_%._%' throw 50004, 'Invalid email format.', 1;
-    if @FirstName is null throw 50007, 'FirstName cannot be empty.', 1;
-    if @LastName is null throw 50008, 'LastName cannot be empty.', 1;
-    if @AccountType is null throw 50009, 'AccountType is required.', 1;
-    if @AccountType not in (1, 2, 3) throw 50000, 'Invalid account type. Use 1 for Employee, 2 for Individual Client, 3 for Corporate Client', 1;
-    if exists (select 1 from Accounts where Username = @Username) throw 50005, 'Username already exists.', 1;    
-    if exists (select 1 from Accounts where Email = @Email) throw 50006, 'Email already exists.', 1;
+    IF @PasswordHash IS NULL OR LTRIM(RTRIM(@PasswordHash)) = ''
+    BEGIN
+        RAISERROR('PasswordHash cannot be empty.', 16, 1);
+        RETURN;
+    END;
 
-    insert into Accounts (Username, PasswordHash, Email, FirstName, LastName, AccountType, IsDeleted, CreateDate)
-    values (@Username, @PasswordHash, @Email, @FirstName, @LastName, @AccountType, 0, getdate());
+    IF @Email IS NULL OR LTRIM(RTRIM(@Email)) = ''
+    BEGIN
+        RAISERROR('Email cannot be empty.', 16, 1);
+        RETURN;
+    END;
 
-    set @Id = scope_identity();
+    IF @FirstName IS NULL OR LTRIM(RTRIM(@FirstName)) = ''
+    BEGIN
+        RAISERROR('FirstName cannot be empty.', 16, 1);
+        RETURN;
+    END;
 
-    return 0;
-end
+    IF @LastName IS NULL OR LTRIM(RTRIM(@LastName)) = ''
+    BEGIN
+        RAISERROR('LastName cannot be empty.', 16, 1);
+        RETURN;
+    END;
+
+    IF @AccountType NOT IN (1, 2, 3)
+    BEGIN
+        RAISERROR('Invalid AccountType. Must be 1 (Employee), 2 (Individual Client), or 3 (Corporate Client).', 16, 1);
+        RETURN;
+    END;
+
+    IF EXISTS (SELECT 1 FROM Accounts WHERE Username = @Username AND IsDeleted = 0)
+    BEGIN
+        RAISERROR('An active account with this username already exists.', 16, 1);
+        RETURN;
+    END;
+
+    IF EXISTS (SELECT 1 FROM Accounts WHERE Email = @Email AND IsDeleted = 0)
+    BEGIN
+        RAISERROR('An active account with this email already exists.', 16, 1);
+        RETURN;
+    END;
+
+    INSERT INTO Accounts (Username, PasswordHash, Email, AccountType, FirstName, LastName)
+    VALUES (@Username, @PasswordHash, @Email, @AccountType, @FirstName, @LastName);
+
+    SET @Id = SCOPE_IDENTITY();
+END;

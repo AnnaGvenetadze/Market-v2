@@ -2,165 +2,350 @@
 using Market.Tests.Helpers;
 using Microsoft.Data.SqlClient;
 
-namespace Market.Tests
+namespace Market.Tests;
+
+public class AttributeRepositoryTests : BaseRepositoryTests
 {
-    public class AttributeRepositoryTests : BaseRepositoryTests
+    [Test]
+    public void InsertTest_ShouldInsertValidData()
     {
-        [Test]
-        public void InsertTest_ShouldInsertValidData()
+        // Arrange
+        var attribute = new AttributeDTO
         {
-            // Arrange
-            var attribute = new AttributeDTO
-            {
-                AttributeName = "Color".AddGuid(),
-                AttributeType = 1
-            };
+            AttributeName = "Color".AddGuid(),
+            AttributeType = 1 // Text
+        };
 
-            // Act
-            var newId = UnitOfWork.AttributeRepository.Insert(attribute);
-            var insertedAttribute = UnitOfWork.AttributeRepository.GetById(newId);
+        // Act
+        var newId = UnitOfWork.AttributeRepository.Insert(attribute);
+        var insertedAttribute = UnitOfWork.AttributeRepository.GetById(newId);
+        // Assert
+        Assert.That(newId, Is.GreaterThan(0));
+        Assert.That(insertedAttribute, Is.Not.Null);
+        Assert.That(insertedAttribute!.Id, Is.EqualTo(newId));
+        Assert.That(insertedAttribute.AttributeName, Is.EqualTo(attribute.AttributeName));
+        Assert.That(insertedAttribute.AttributeType, Is.EqualTo(attribute.AttributeType));
+    }
 
-            // Assert
-            Assert.That(newId, Is.GreaterThan(0));
-            Assert.That(insertedAttribute, Is.Not.Null);
-            Assert.That(insertedAttribute!.AttributeName, Is.EqualTo(attribute.AttributeName));
-            Assert.That(insertedAttribute!.AttributeType, Is.EqualTo(attribute.AttributeType));
-        }
-
-        [Test]
-        public void InsertTest_ShouldNotInsertInvalidAttributeType()
+    [Test]
+    public void InsertTest_ShouldNotInsertInvalidAttributeType()
+    {
+        // Arrange
+        var attribute = new AttributeDTO
         {
-            // Arrange
-            var attribute = new AttributeDTO
-            {
-                AttributeName = "InvalidType".AddGuid(),
-                AttributeType = 9
-            };
+            AttributeName = "InvalidType".AddGuid(),
+            AttributeType = 99
+        };
 
-            // Act and Assert
-            Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Insert(attribute));
-        }
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Insert(attribute));
+    }
 
-        [Test]
-        public void InsertTest_ShouldNotInsertDuplicateAttributeName()
+    [Test]
+    public void InsertTest_ShouldNotInsertDuplicateAttributeName()
+    {
+        // Arrange
+        var name = "DuplicateAttribute".AddGuid();
+
+        var first = new AttributeDTO { AttributeName = name, AttributeType = 1 };
+        var second = new AttributeDTO { AttributeName = name, AttributeType = 2 };
+
+        UnitOfWork.AttributeRepository.Insert(first);
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Insert(second));
+    }
+
+    [Test]
+    public void InsertTest_ShouldNotInsertEmptyAttributeName()
+    {
+        // Arrange
+        var attribute = new AttributeDTO
         {
-            // Arrange
-            var name = "DuplicateAttribute".AddGuid();
+            AttributeName = "   ",
+            AttributeType = 1
+        };
 
-            var first = new AttributeDTO
-            {
-                AttributeName = name,
-                AttributeType = 1
-            };
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Insert(attribute));
+    }
 
-            var second = new AttributeDTO
-            {
-                AttributeName = name,
-                AttributeType = 2
-            };
-
-            // Act
-            UnitOfWork.AttributeRepository.Insert(first);
-
-            // Assert
-            Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Insert(second));
-        }
-
-        [Test]
-        public void UpdateTest_ShouldUpdateValidData()
+    [Test]
+    public void UpdateTest_ShouldUpdateValidData()
+    {
+        // Arrange
+        var attribute = new AttributeDTO
         {
-            // Arrange
-            var attribute = new AttributeDTO
-            {
-                AttributeName = "OldAttribute".AddGuid(),
-                AttributeType = 1
-            };
+            AttributeName = "OldAttribute".AddGuid(),
+            AttributeType = 1
+        };
 
-            var newId = UnitOfWork.AttributeRepository.Insert(attribute);
-            var insertedAttribute = UnitOfWork.AttributeRepository.GetById(newId);
+        var newId = UnitOfWork.AttributeRepository.Insert(attribute);
+        var insertedAttribute = UnitOfWork.AttributeRepository.GetById(newId);
 
-            insertedAttribute!.AttributeName = "UpdatedAttribute".AddGuid();
+        insertedAttribute!.AttributeName = "UpdatedAttribute".AddGuid();
+        insertedAttribute.AttributeType = 2;
 
-            // Act
-            UnitOfWork.AttributeRepository.Update(insertedAttribute);
+        // Act
+        UnitOfWork.AttributeRepository.Update(insertedAttribute);
+        var updatedAttribute = UnitOfWork.AttributeRepository.GetById(newId);
 
-            var updatedAttribute = UnitOfWork.AttributeRepository.GetById(newId);
+        // Assert
+        Assert.That(updatedAttribute, Is.Not.Null);
+        Assert.That(updatedAttribute!.AttributeName, Is.EqualTo(insertedAttribute.AttributeName));
+        Assert.That(updatedAttribute.AttributeType, Is.EqualTo(2));
+    }
 
-            // Assert
-            Assert.That(updatedAttribute, Is.Not.Null);
-            Assert.That(updatedAttribute!.AttributeName, Is.EqualTo(insertedAttribute.AttributeName));
-            Assert.That(updatedAttribute!.AttributeType, Is.EqualTo(insertedAttribute.AttributeType));
-        }
+    [Test]
+    public void UpdateTest_ShouldNotUpdateDuplicateAttributeName()
+    {
+        // Arrange
+        var first = new AttributeDTO { AttributeName = "FirstAttr".AddGuid(), AttributeType = 1 };
+        var second = new AttributeDTO { AttributeName = "SecondAttr".AddGuid(), AttributeType = 2 };
 
-        [Test]
-        public void UpdateTest_ShouldNotUpdateDuplicateAttributeName()
+        var firstId = UnitOfWork.AttributeRepository.Insert(first);
+        var secondId = UnitOfWork.AttributeRepository.Insert(second);
+
+        var firstAttribute = UnitOfWork.AttributeRepository.GetById(firstId);
+        var secondAttribute = UnitOfWork.AttributeRepository.GetById(secondId);
+
+        secondAttribute!.AttributeName = firstAttribute!.AttributeName;
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Update(secondAttribute));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldNotUpdateInvalidAttributeType()
+    {
+        // Arrange
+        var attribute = new AttributeDTO { AttributeName = "ValidType".AddGuid(), AttributeType = 1 };
+        var id = UnitOfWork.AttributeRepository.Insert(attribute);
+        var inserted = UnitOfWork.AttributeRepository.GetById(id)!;
+
+        inserted.AttributeType = 99;
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Update(inserted));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldNotUpdateEmptyAttributeName()
+    {
+        // Arrange
+        var attribute = new AttributeDTO { AttributeName = "ValidName".AddGuid(), AttributeType = 1 };
+        var id = UnitOfWork.AttributeRepository.Insert(attribute);
+        var inserted = UnitOfWork.AttributeRepository.GetById(id)!;
+
+        inserted.AttributeName = "";
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Update(inserted));
+    }
+
+    [Test]
+    public void UpdateTest_ShouldNotUpdateNonExistentId()
+    {
+        // Arrange
+        var nonExistent = new AttributeDTO
         {
-            // Arrange
-            var first = new AttributeDTO
-            {
-                AttributeName = "FirstAttribute".AddGuid(),
-                AttributeType = 1
-            };
+            Id = -999,
+            AttributeName = "NonExistent".AddGuid(),
+            AttributeType = 1
+        };
 
-            var second = new AttributeDTO
-            {
-                AttributeName = "SecondAttribute".AddGuid(),
-                AttributeType = 2
-            };
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Update(nonExistent));
+    }
 
-            var firstId = UnitOfWork.AttributeRepository.Insert(first);
-            var secondId = UnitOfWork.AttributeRepository.Insert(second);
+    [Test]
+    public void Update_WhenEntityIsNull_ShouldThrowException()
+    {
+        // Act and Assert
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AttributeRepository.Update(null!));
+    }
 
-            var firstAttribute = UnitOfWork.AttributeRepository.GetById(firstId);
-            var secondAttribute = UnitOfWork.AttributeRepository.GetById(secondId);
-
-            secondAttribute!.AttributeName = firstAttribute!.AttributeName;
-
-            // Act and Assert
-            Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Update(secondAttribute));
-        }
-
-        [Test]
-        public void Update_WhenEntityIsNull_ShouldThrowException()
+    [Test]
+    public void DeleteTest_ShouldDeleteValidData()
+    {
+        // Arrange
+        var attribute = new AttributeDTO
         {
-            // Act and Assert
-            Assert.Throws<ArgumentNullException>(() => UnitOfWork.AttributeRepository.Update(null!));
-        }
+            AttributeName = "DeleteAttribute".AddGuid(),
+            AttributeType = 1
+        };
 
-        [Test]
-        public void DeleteTest_ShouldDeleteValidData()
+        var newId = UnitOfWork.AttributeRepository.Insert(attribute);
+
+        // Act
+        UnitOfWork.AttributeRepository.Delete(newId);
+        var deletedAttribute = UnitOfWork.AttributeRepository.GetById(newId);
+
+        // Assert
+        Assert.That(deletedAttribute, Is.Null);
+    }
+
+    [Test]
+    public void DeleteTest_ShouldNotDeleteInvalidId()
+    {
+        // Arrange
+        var invalidId = -999;
+
+        // Act and Assert
+        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Delete(invalidId));
+    }
+
+    [Test]
+    public void Delete_WhenIdIsNull_ShouldThrowException()
+    {
+        // Act and Assert
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AttributeRepository.Delete(null!));
+    }
+
+    [Test]
+    public void GetById_ShouldReturnCorrectAttribute()
+    {
+        // Arrange
+        var attribute = new AttributeDTO
         {
-            // Arrange
-            var attribute = new AttributeDTO
-            {
-                AttributeName = "DeleteAttribute".AddGuid(),
-                AttributeType = 1
-            };
+            AttributeName = "GetByIdAttr".AddGuid(),
+            AttributeType = 4 // Boolean
+        };
+        var insertedId = UnitOfWork.AttributeRepository.Insert(attribute);
 
-            var newId = UnitOfWork.AttributeRepository.Insert(attribute);
+        // Act
+        var result = UnitOfWork.AttributeRepository.GetById(insertedId);
 
-            // Act
-            UnitOfWork.AttributeRepository.Delete(newId);
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Id, Is.EqualTo(insertedId));
+    }
 
-            // Assert
-            Assert.Throws<InvalidOperationException>(() => UnitOfWork.AttributeRepository.GetById(newId));
-        }
+    [Test]
+    public void GetById_WhenNotFound_ShouldReturnNull()
+    {
+        // Act
+        var result = UnitOfWork.AttributeRepository.GetById(-1);
 
-        [Test]
-        public void Delete_WhenIdIsNull_ShouldThrowException()
+        // Assert
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void GetById_WhenIdIsNull_ShouldThrowException()
+    {
+        // Act and Assert
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AttributeRepository.GetById((object)null!));
+    }
+
+    [Test]
+    public void GetByName_ShouldReturnCorrectAttribute()
+    {
+        // Arrange
+        var name = "FindByNameAttr".AddGuid();
+        var attribute = new AttributeDTO
         {
-            // Act and Assert
-            Assert.Throws<ArgumentNullException>(() => UnitOfWork.AttributeRepository.Delete(null!));
-        }
+            AttributeName = name,
+            AttributeType = 1
+        };
+        UnitOfWork.AttributeRepository.Insert(attribute);
 
-        [Test]
-        public void DeleteTest_ShouldNotDeleteInvalidId()
+        // Act
+        var result = UnitOfWork.AttributeRepository.GetByName(name);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.AttributeName, Is.EqualTo(name));
+    }
+
+    [Test]
+    public void GetByName_WhenNotFound_ShouldReturnNull()
+    {
+        // Act
+        var result = UnitOfWork.AttributeRepository.GetByName("NonExistentAttribute".AddGuid());
+
+        // Assert
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void GetByType_ShouldReturnMatchingAttributes()
+    {
+        // Arrange
+        byte targetType = 3; 
+        var attribute1 = new AttributeDTO { AttributeName = "Date1".AddGuid(), AttributeType = targetType };
+        var attribute2 = new AttributeDTO { AttributeName = "Date2".AddGuid(), AttributeType = targetType };
+        var attribute3 = new AttributeDTO { AttributeName = "Text1".AddGuid(), AttributeType = 1 };
+
+        var id1 = UnitOfWork.AttributeRepository.Insert(attribute1);
+        var id2 = UnitOfWork.AttributeRepository.Insert(attribute2);
+        UnitOfWork.AttributeRepository.Insert(attribute3);
+
+        // Act
+        var results = UnitOfWork.AttributeRepository.GetByType(targetType).ToList();
+
+        // Assert
+        Assert.That(results, Is.Not.Null);
+        Assert.That(results.Any(a => a.Id == id1), Is.True);
+        Assert.That(results.Any(a => a.Id == id2), Is.True);
+        Assert.That(results.All(a => a.AttributeType == targetType), Is.True);
+    }
+
+    [Test]
+    public void GetAll_ShouldReturnAllInsertedRecords()
+    {
+        // Arrange
+        var attribute1 = new AttributeDTO { AttributeName = "All1".AddGuid(), AttributeType = 1 };
+        var attribute2 = new AttributeDTO { AttributeName = "All2".AddGuid(), AttributeType = 2 };
+
+        UnitOfWork.AttributeRepository.Insert(attribute1);
+        UnitOfWork.AttributeRepository.Insert(attribute2);
+
+        // Act
+        var allAttributes = UnitOfWork.AttributeRepository.GetAll().ToList();
+
+        // Assert
+        Assert.That(allAttributes.Count, Is.AtLeast(2));
+    }
+
+    [Test]
+    public void GetById_WhenAttributeIsDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        var attribute = new AttributeDTO
         {
-            // Arrange
-            var invalidId = -9;
+            AttributeName = "DeletedGetById".AddGuid(),
+            AttributeType = 1
+        };
+        var id = UnitOfWork.AttributeRepository.Insert(attribute);
 
-            // Act and Assert
-            Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Delete(invalidId));
-        }
+        // Soft-delete the attribute
+        UnitOfWork.AttributeRepository.Delete(id);
+
+        // Act
+        var result = UnitOfWork.AttributeRepository.GetById(id);
+
+        // Assert
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void GetAll_ShouldExcludeDeletedAttributes()
+    {
+        // Arrange
+        var activeAttribute = new AttributeDTO { AttributeName = "Active".AddGuid(), AttributeType = 1 };
+        var deletedAttribute = new AttributeDTO { AttributeName = "Deleted".AddGuid(), AttributeType = 1 };
+
+        var activeId = UnitOfWork.AttributeRepository.Insert(activeAttribute);
+        var deletedId = UnitOfWork.AttributeRepository.Insert(deletedAttribute);
+
+        UnitOfWork.AttributeRepository.Delete(deletedId);
+
+        // Act
+        var results = UnitOfWork.AttributeRepository.GetAll().ToList();
+
+        // Assert
+        Assert.That(results.Any(a => a.Id == activeId), Is.True);
+        Assert.That(results.Any(a => a.Id == deletedId), Is.False);
     }
 }

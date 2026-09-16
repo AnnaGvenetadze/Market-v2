@@ -4,7 +4,7 @@ using System.Data.Common;
 
 namespace Market.Repositories;
 
-internal class CorporateClientDetailsRepository(DbConnection connection)
+internal sealed class CorporateClientDetailsRepository(DbConnection connection)
     : BaseRepository<CorporateClientDetailsDTO>(connection), ICorporateClientDetailsRepository
 {
 }

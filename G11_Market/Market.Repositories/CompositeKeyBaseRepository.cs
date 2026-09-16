@@ -7,7 +7,6 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-// TODO: აღარ უნდა? რისთვის იყო
 public abstract class CompositeKeyBaseRepository<T> : ICompositeKeyBaseRepository<T>
 {
     private readonly DbConnection _connection;

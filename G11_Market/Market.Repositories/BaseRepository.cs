@@ -28,7 +28,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
-        return _connection.QueryFirst<T>(
+        return _connection.QueryFirstOrDefault<T>(
             $"sp_Get{_entityName}ById",
             new { Id = id },
             commandType: CommandType.StoredProcedure);
@@ -43,6 +43,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
 
     public int Insert(T entity)
     {
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
         var parameters = new DynamicParameters();
         var propsToInsert = typeof(T)
             .GetProperties()
