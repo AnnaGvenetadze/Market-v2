@@ -23,7 +23,7 @@ public class ClientRepositoryTests : BaseRepositoryTests
 
         // Act
 
-        var newId = UnitOfWork.ClientRepository.Insert(client);
+        var newId = UnitOfWork.ClientRepository.AssignAttribute(client);
         var inserted = UnitOfWork.ClientRepository.GetById(newId);
 
         // Assert
@@ -52,7 +52,7 @@ public class ClientRepositoryTests : BaseRepositoryTests
 
         // Act & Assert
 
-        Assert.Throws<SqlException>(() => UnitOfWork.ClientRepository.Insert(client));
+        Assert.Throws<SqlException>(() => UnitOfWork.ClientRepository.AssignAttribute(client));
     }
 
     [Test]

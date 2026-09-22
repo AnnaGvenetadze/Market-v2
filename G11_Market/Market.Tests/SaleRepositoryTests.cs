@@ -19,7 +19,7 @@ public class SaleRepositoryTests : BaseRepositoryTests
         };
 
         // Act
-        var insertedId = UnitOfWork.SaleRepository.Insert(sale);
+        var insertedId = UnitOfWork.SaleRepository.AssignAttribute(sale);
         var insertedSale = UnitOfWork.SaleRepository.GetById(insertedId);
 
         // Assert
@@ -77,7 +77,7 @@ public class SaleRepositoryTests : BaseRepositoryTests
 
         // Act & Assert
         Assert.Throws<SqlException>(
-            () => UnitOfWork.SaleRepository.Insert(sale));
+            () => UnitOfWork.SaleRepository.AssignAttribute(sale));
     }
 
     [Test]
@@ -92,7 +92,7 @@ public class SaleRepositoryTests : BaseRepositoryTests
 
         // Act & Assert
         Assert.Throws<SqlException>(
-            () => UnitOfWork.SaleRepository.Insert(sale));
+            () => UnitOfWork.SaleRepository.AssignAttribute(sale));
     }
 
     [Test]
@@ -110,7 +110,7 @@ public class SaleRepositoryTests : BaseRepositoryTests
 
         // Act & Assert
         Assert.Throws<SqlException>(
-            () => UnitOfWork.SaleRepository.Insert(sale));
+            () => UnitOfWork.SaleRepository.AssignAttribute(sale));
     }
 
     [Test]

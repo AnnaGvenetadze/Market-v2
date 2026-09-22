@@ -17,12 +17,9 @@ public interface IUnitOfWork
     IClientRepository ClientRepository { get; }
     IClientTypeRepository ClientTypeRepository { get; }
     IAttributeRepository AttributeRepository { get; }
-    IProductAttributeValueRepository ProductAttributeValueRepository { get; }
     IStockMovementRepository StockMovementRepository { get; }
     ICorporateClientDetailsRepository CorporateClientDetailsRepository { get; }
-    IEmployeeRoleRepository EmployeeRoleRepository { get; }
     ICityRepository CityRepository { get; }
-    ICategoryAttributeRepository CategoryAttributeRepository { get; }
 
     void BeginTransaction();
 

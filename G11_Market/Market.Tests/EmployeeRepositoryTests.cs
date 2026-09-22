@@ -27,7 +27,7 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
             FirstName = "Luka",
             LastName = "Mania"
         };
-        _accountId = UnitOfWork.AccountRepository.Insert(account);
+        _accountId = UnitOfWork.AccountRepository.AssignAttribute(account);
     }
 
 
@@ -48,7 +48,7 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
         };
 
         // Act
-        var insertedId = UnitOfWork.EmployeeRepository.Insert(employee);
+        var insertedId = UnitOfWork.EmployeeRepository.AssignAttribute(employee);
         var insertedEmployee = UnitOfWork.EmployeeRepository.GetById(insertedId);
 
         // Assert
@@ -69,7 +69,7 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
             lastName: "Mania",
             employeeCode: "EMP2".AddGuid());
 
-        var insertedId = UnitOfWork.EmployeeRepository.Insert(employee);
+        var insertedId = UnitOfWork.EmployeeRepository.AssignAttribute(employee);
 
         var employeeToUpdate = UnitOfWork.EmployeeRepository.GetById(insertedId);
         employeeToUpdate!.LastName = "NotMania";
@@ -96,7 +96,7 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
             lastName: "Account",
             employeeCode: "EMP3".AddGuid());
 
-        var insertedId = UnitOfWork.EmployeeRepository.Insert(employee);
+        var insertedId = UnitOfWork.EmployeeRepository.AssignAttribute(employee);
 
         // Act
         UnitOfWork.EmployeeRepository.Delete(insertedId);
@@ -120,7 +120,7 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
         };
 
         // Act & Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.Insert(employee));
+        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.AssignAttribute(employee));
     }
 
 
@@ -139,7 +139,7 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
         };
 
         // Act & Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.Insert(employee));
+        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.AssignAttribute(employee));
     }
 
 
@@ -153,14 +153,14 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
             accountId: _accountId,
             employeeCode: sharedCode);
 
-        UnitOfWork.EmployeeRepository.Insert(emp1);
+        UnitOfWork.EmployeeRepository.AssignAttribute(emp1);
 
         var emp2 = EmployeeTestDataFactory.CreateEmployee(
             accountId: _accountId,
             employeeCode: sharedCode);
 
         // Act & Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.Insert(emp2));
+        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.AssignAttribute(emp2));
     }
 
 
@@ -174,14 +174,14 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
             accountId: _accountId,
             contactEmail: sharedEmail);
 
-        UnitOfWork.EmployeeRepository.Insert(emp1);
+        UnitOfWork.EmployeeRepository.AssignAttribute(emp1);
 
         var emp2 = EmployeeTestDataFactory.CreateEmployee(
             accountId: _accountId,
             contactEmail: sharedEmail);
 
         // Act & Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.Insert(emp2));
+        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.AssignAttribute(emp2));
     }
 
 
@@ -195,14 +195,14 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
             accountId: _accountId,
             phoneNumber: sharedPhone);
 
-        UnitOfWork.EmployeeRepository.Insert(emp1);
+        UnitOfWork.EmployeeRepository.AssignAttribute(emp1);
 
         var emp2 = EmployeeTestDataFactory.CreateEmployee(
             accountId: _accountId,
             phoneNumber: sharedPhone);
 
         // Act & Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.Insert(emp2));
+        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.AssignAttribute(emp2));
     }
 
 
@@ -218,7 +218,7 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
             lastName: "Employee",
             employeeCode: targetCode);
 
-        UnitOfWork.EmployeeRepository.Insert(employee);
+        UnitOfWork.EmployeeRepository.AssignAttribute(employee);
 
         // Act
         var result = UnitOfWork.EmployeeRepository.GetByEmployeeCode(targetCode);
@@ -250,7 +250,7 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
             lastName: "Owner",
             employeeCode: "EMP6".AddGuid());
 
-        UnitOfWork.EmployeeRepository.Insert(employee);
+        UnitOfWork.EmployeeRepository.AssignAttribute(employee);
 
         // Act
         var result = UnitOfWork.EmployeeRepository.GetByAccountId(_accountId);
@@ -282,7 +282,7 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
             lastName: "Boss",
             employeeCode: "MGR1".AddGuid());
 
-        var managerId = UnitOfWork.EmployeeRepository.Insert(manager);
+        var managerId = UnitOfWork.EmployeeRepository.AssignAttribute(manager);
 
         var sub1 = EmployeeTestDataFactory.CreateEmployee(
             accountId: _accountId,
@@ -304,9 +304,9 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
             lastName: "Emp",
             employeeCode: "SUB3".AddGuid());
 
-        var id1 = UnitOfWork.EmployeeRepository.Insert(sub1);
-        var id2 = UnitOfWork.EmployeeRepository.Insert(sub2);
-        UnitOfWork.EmployeeRepository.Insert(outsideEmp);
+        var id1 = UnitOfWork.EmployeeRepository.AssignAttribute(sub1);
+        var id2 = UnitOfWork.EmployeeRepository.AssignAttribute(sub2);
+        UnitOfWork.EmployeeRepository.AssignAttribute(outsideEmp);
 
         // Act
         var subordinates = UnitOfWork.EmployeeRepository.GetSubordinates(managerId).ToList();
@@ -335,8 +335,8 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
             lastName: "User",
             employeeCode: "DEL1".AddGuid());
 
-        var activeId = UnitOfWork.EmployeeRepository.Insert(activeEmp);
-        var deletedId = UnitOfWork.EmployeeRepository.Insert(deletedEmp);
+        var activeId = UnitOfWork.EmployeeRepository.AssignAttribute(activeEmp);
+        var deletedId = UnitOfWork.EmployeeRepository.AssignAttribute(deletedEmp);
 
         UnitOfWork.EmployeeRepository.Delete(deletedId);
 
@@ -390,8 +390,8 @@ public class EmployeeRepositoryTests : BaseRepositoryTests
             lastName: "User",
             employeeCode: "ALL2".AddGuid());
 
-        UnitOfWork.EmployeeRepository.Insert(emp1);
-        UnitOfWork.EmployeeRepository.Insert(emp2);
+        UnitOfWork.EmployeeRepository.AssignAttribute(emp1);
+        UnitOfWork.EmployeeRepository.AssignAttribute(emp2);
 
         // Act
         var allEmployees = UnitOfWork.EmployeeRepository.GetAll().ToList();

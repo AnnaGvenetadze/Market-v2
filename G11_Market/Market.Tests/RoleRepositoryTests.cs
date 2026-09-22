@@ -18,7 +18,7 @@ public sealed class RoleRepositoryTests : BaseRepositoryTests
         };
 
         // Act
-        var insertedId = UnitOfWork.RoleRepository.Insert(role);
+        var insertedId = UnitOfWork.RoleRepository.AssignAttribute(role);
 
         // Assert
         var storedRole = GetRoleDirect(insertedId);
@@ -47,7 +47,7 @@ public sealed class RoleRepositoryTests : BaseRepositoryTests
 
         // Act
         var exception = Assert.Throws<SqlException>(
-            () => UnitOfWork.RoleRepository.Insert(duplicateRole));
+            () => UnitOfWork.RoleRepository.AssignAttribute(duplicateRole));
 
         // Assert
         Assert.That(exception, Is.Not.Null);

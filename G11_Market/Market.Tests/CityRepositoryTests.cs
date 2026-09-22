@@ -16,7 +16,7 @@ public class CityRepositoryTests : BaseRepositoryTests
         };
 
         // Act
-        var newId = UnitOfWork.CityRepository.Insert(city);
+        var newId = UnitOfWork.CityRepository.AssignAttribute(city);
         var insertedCity = UnitOfWork.CityRepository.GetById(newId);
 
         // Assert
@@ -38,7 +38,7 @@ public class CityRepositoryTests : BaseRepositoryTests
 
         // Act & Assert
         Assert.Throws<SqlException>(() =>
-            UnitOfWork.CityRepository.Insert(city));
+            UnitOfWork.CityRepository.AssignAttribute(city));
     }
 
     [Test]
@@ -95,7 +95,7 @@ public class CityRepositoryTests : BaseRepositoryTests
             CountryId = UpdateTestId
         };
 
-        var newId = UnitOfWork.CityRepository.Insert(city);
+        var newId = UnitOfWork.CityRepository.AssignAttribute(city);
 
         // Act
         var foundCity = UnitOfWork.CityRepository.GetByName(city.Name);
@@ -126,7 +126,7 @@ public class CityRepositoryTests : BaseRepositoryTests
             CountryId = UpdateTestId
         };
 
-        var newId = UnitOfWork.CityRepository.Insert(city);
+        var newId = UnitOfWork.CityRepository.AssignAttribute(city);
 
         // Act
         var cities = UnitOfWork.CityRepository.GetAllActive().ToList();

@@ -16,7 +16,7 @@ public class CountryRepositoryTests : BaseRepositoryTests
         };
 
         // Act
-        var newId = UnitOfWork.CountryRepository.Insert(country);
+        var newId = UnitOfWork.CountryRepository.AssignAttribute(country);
         var insertedCountry = UnitOfWork.CountryRepository.GetById(newId);
 
         // Assert
@@ -37,7 +37,7 @@ public class CountryRepositoryTests : BaseRepositoryTests
         };
 
         // Act and Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.CountryRepository.Insert(country));
+        Assert.Throws<SqlException>(() => UnitOfWork.CountryRepository.AssignAttribute(country));
     }
 
     [Test]

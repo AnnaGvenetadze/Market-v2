@@ -41,7 +41,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
             commandType: CommandType.StoredProcedure);
     }
 
-    public int Insert(T entity)
+    public int AssignAttribute(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity, nameof(entity));
         var parameters = new DynamicParameters();

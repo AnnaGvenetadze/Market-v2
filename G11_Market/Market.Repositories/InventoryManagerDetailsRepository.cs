@@ -11,7 +11,7 @@ internal sealed class InventoryManagerDetailsRepository(DbConnection connection)
 {
     private readonly DbConnection _connection = connection;
 
-    public new int Insert(InventoryManagerDetailDTO entity)
+    public new int AssignAttribute(InventoryManagerDetailDTO entity)
     {
         ArgumentNullException.ThrowIfNull(entity, nameof(entity));
 

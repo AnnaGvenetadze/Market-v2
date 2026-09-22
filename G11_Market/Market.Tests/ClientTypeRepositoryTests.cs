@@ -18,7 +18,7 @@ public sealed class ClientTypeRepositoryTests : BaseRepositoryTests
         };
 
         // Act
-        var insertedId = UnitOfWork.ClientTypeRepository.Insert(clientType);
+        var insertedId = UnitOfWork.ClientTypeRepository.AssignAttribute(clientType);
 
         // Assert
         var storedClientType = GetClientTypeDirect(insertedId);
@@ -47,7 +47,7 @@ public sealed class ClientTypeRepositoryTests : BaseRepositoryTests
 
         // Act
         var exception = Assert.Throws<SqlException>(
-            () => UnitOfWork.ClientTypeRepository.Insert(duplicateClientType));
+            () => UnitOfWork.ClientTypeRepository.AssignAttribute(duplicateClientType));
 
         // Assert
         Assert.That(exception, Is.Not.Null);
