@@ -21,7 +21,7 @@ public class SaleItemRepositoryTests : BaseRepositoryTests
 
         // Act
 
-        var newId = UnitOfWork.SaleItemRepository.AssignAttribute(saleItem);
+        var newId = UnitOfWork.SaleItemRepository.Insert(saleItem);
         var inserted = UnitOfWork.SaleItemRepository.GetById(newId);
 
         // Assert
@@ -49,7 +49,7 @@ public class SaleItemRepositoryTests : BaseRepositoryTests
 
         // Act and Assert
 
-        Assert.Throws<SqlException>(() => UnitOfWork.SaleItemRepository.AssignAttribute(saleItem));
+        Assert.Throws<SqlException>(() => UnitOfWork.SaleItemRepository.Insert(saleItem));
     }
 
     [Test]
@@ -67,7 +67,7 @@ public class SaleItemRepositoryTests : BaseRepositoryTests
             DiscountAmount = 0
         };
 
-        var newId = UnitOfWork.SaleItemRepository.AssignAttribute(saleItem);
+        var newId = UnitOfWork.SaleItemRepository.Insert(saleItem);
 
         // Act
 

@@ -14,7 +14,7 @@ public class InventoryManagerDetailsRepositoryTests : BaseRepositoryTests
 
         // Act & Assert
         Assert.Throws<SqlException>(
-            () => UnitOfWork.InventoryManagerDetailsRepository.AssignAttribute(inventoryManager));
+            () => UnitOfWork.InventoryManagerDetailsRepository.Insert(inventoryManager));
     }
 
     [Test]
@@ -140,7 +140,7 @@ public class InventoryManagerDetailsRepositoryTests : BaseRepositoryTests
 
         // Act & Assert
         Assert.Throws<SqlException>(
-            () => UnitOfWork.InventoryManagerDetailsRepository.AssignAttribute(inventoryManager));
+            () => UnitOfWork.InventoryManagerDetailsRepository.Insert(inventoryManager));
     }
 
     [Test]
@@ -153,7 +153,7 @@ public class InventoryManagerDetailsRepositoryTests : BaseRepositoryTests
 
         // Act & Assert
         Assert.Throws<SqlException>(
-            () => UnitOfWork.InventoryManagerDetailsRepository.AssignAttribute(inventoryManager));
+            () => UnitOfWork.InventoryManagerDetailsRepository.Insert(inventoryManager));
     }
 
     [Test]

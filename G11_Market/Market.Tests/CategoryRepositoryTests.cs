@@ -20,7 +20,8 @@ public class CategoryRepositoryTests : BaseRepositoryTests
     {
         var category = CreateValidCategory();
 
-        var newId = UnitOfWork.CategoryRepository.AssignAttribute(category);
+        // FIXED: Using Insert() instead of AssignAttribute()
+        var newId = UnitOfWork.CategoryRepository.Insert(category);
         var inserted = UnitOfWork.CategoryRepository.GetById(newId);
 
         Assert.That(newId, Is.GreaterThan(0));
@@ -31,26 +32,28 @@ public class CategoryRepositoryTests : BaseRepositoryTests
     [Test]
     public void Insert_NullEntity_ShouldThrowArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => UnitOfWork.CategoryRepository.AssignAttribute((CategoryDTO)null!));
+        // FIXED: Using Insert()
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.CategoryRepository.Insert((CategoryDTO)null!));
     }
 
     [Test]
     public void Insert_DuplicateName_ShouldThrowSqlException()
     {
         var category1 = CreateValidCategory();
-        UnitOfWork.CategoryRepository.AssignAttribute(category1);
+        UnitOfWork.CategoryRepository.Insert(category1);
 
         var category2 = CreateValidCategory();
         category2.CategoryName = category1.CategoryName;
 
-        Assert.Throws<SqlException>(() => UnitOfWork.CategoryRepository.AssignAttribute(category2));
+        // FIXED: Using Insert()
+        Assert.Throws<SqlException>(() => UnitOfWork.CategoryRepository.Insert(category2));
     }
 
     [Test]
     public void GetById_WhenExists_ShouldReturnCategory()
     {
         var category = CreateValidCategory();
-        var id = UnitOfWork.CategoryRepository.AssignAttribute(category);
+        var id = UnitOfWork.CategoryRepository.Insert(category);
 
         var result = UnitOfWork.CategoryRepository.GetById(id);
 
@@ -70,7 +73,7 @@ public class CategoryRepositoryTests : BaseRepositoryTests
     public void GetByName_ValidName_ShouldReturnCategory()
     {
         var category = CreateValidCategory();
-        UnitOfWork.CategoryRepository.AssignAttribute(category);
+        UnitOfWork.CategoryRepository.Insert(category);
 
         var result = UnitOfWork.CategoryRepository.GetByName(category.CategoryName);
 
@@ -89,10 +92,10 @@ public class CategoryRepositoryTests : BaseRepositoryTests
     public void GetRootCategories_ShouldReturnCategoriesWithNullParent()
     {
         var root = CreateValidCategory();
-        var rootId = UnitOfWork.CategoryRepository.AssignAttribute(root);
+        var rootId = UnitOfWork.CategoryRepository.Insert(root);
 
         var child = CreateValidCategory(rootId);
-        UnitOfWork.CategoryRepository.AssignAttribute(child);
+        UnitOfWork.CategoryRepository.Insert(child);
 
         var roots = UnitOfWork.CategoryRepository.GetRootCategories().ToList();
 
@@ -104,12 +107,12 @@ public class CategoryRepositoryTests : BaseRepositoryTests
     public void GetChildren_ValidParentId_ShouldReturnSubCategories()
     {
         var parent = CreateValidCategory();
-        var parentId = UnitOfWork.CategoryRepository.AssignAttribute(parent);
+        var parentId = UnitOfWork.CategoryRepository.Insert(parent);
 
         var child1 = CreateValidCategory(parentId);
         var child2 = CreateValidCategory(parentId);
-        UnitOfWork.CategoryRepository.AssignAttribute(child1);
-        UnitOfWork.CategoryRepository.AssignAttribute(child2);
+        UnitOfWork.CategoryRepository.Insert(child1);
+        UnitOfWork.CategoryRepository.Insert(child2);
 
         var children = UnitOfWork.CategoryRepository.GetChildren(parentId).ToList();
 
@@ -128,7 +131,7 @@ public class CategoryRepositoryTests : BaseRepositoryTests
     public void Update_ValidData_ShouldModifyCategory()
     {
         var category = CreateValidCategory();
-        var id = UnitOfWork.CategoryRepository.AssignAttribute(category);
+        var id = UnitOfWork.CategoryRepository.Insert(category);
         var inserted = UnitOfWork.CategoryRepository.GetById(id)!;
 
         inserted.CategoryName = "Updated_".AddGuid();
@@ -145,7 +148,7 @@ public class CategoryRepositoryTests : BaseRepositoryTests
     public void Update_SelfReferencingParent_ShouldThrowSqlException()
     {
         var category = CreateValidCategory();
-        var id = UnitOfWork.CategoryRepository.AssignAttribute(category);
+        var id = UnitOfWork.CategoryRepository.Insert(category);
         var inserted = UnitOfWork.CategoryRepository.GetById(id)!;
 
         inserted.ParentId = id;
@@ -157,7 +160,7 @@ public class CategoryRepositoryTests : BaseRepositoryTests
     public void Delete_ValidId_ShouldSoftDelete()
     {
         var category = CreateValidCategory();
-        var id = UnitOfWork.CategoryRepository.AssignAttribute(category);
+        var id = UnitOfWork.CategoryRepository.Insert(category);
 
         UnitOfWork.CategoryRepository.Delete(id);
 
@@ -173,15 +176,17 @@ public class CategoryRepositoryTests : BaseRepositoryTests
     {
         // 1. Create and insert a valid parent Category
         var category = CreateValidCategory();
-        var categoryId = UnitOfWork.CategoryRepository.AssignAttribute(category);
+        var categoryId = UnitOfWork.CategoryRepository.Insert(category);
 
-        // 2. Create and insert a valid Attribute with an explicit AttributeType
+        // 2. Create and insert a valid Attribute 
         var attribute = new AttributeDTO
         {
             AttributeName = "Attr_".AddGuid(),
             AttributeType = 1 
         };
-        var attributeId = UnitOfWork.CategoryRepository.AssignAttribute(attribute);
+        
+        // FIXED: You must insert an Attribute using the AttributeRepository, not the CategoryRepository.
+        var attributeId = UnitOfWork.AttributeRepository.Insert(attribute);
 
         // 3. Create the junction DTO
         var mapping = new CategoryAttributeDTO
@@ -192,6 +197,7 @@ public class CategoryRepositoryTests : BaseRepositoryTests
         };
 
         // 4. Assert assignment and unassignment succeed
+        // This is correctly calling the `AssignAttribute` on `CategoryRepository` that maps the junction table.
         Assert.DoesNotThrow(() => UnitOfWork.CategoryRepository.AssignAttribute(mapping));
         Assert.DoesNotThrow(() => UnitOfWork.CategoryRepository.UnassignAttribute(mapping));
     }

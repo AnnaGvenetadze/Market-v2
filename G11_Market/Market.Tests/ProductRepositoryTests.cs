@@ -19,7 +19,7 @@ public sealed class ProductRepositoryTests : BaseRepositoryTests
         };
 
         // Act
-        var insertedId = UnitOfWork.ProductRepository.AssignAttribute(product);
+        var insertedId = UnitOfWork.ProductRepository.Insert(product);
 
         // Assert
         var storedProduct = GetProductDirect(insertedId);
@@ -47,7 +47,7 @@ public sealed class ProductRepositoryTests : BaseRepositoryTests
 
         // Act
         var exception = Assert.Throws<SqlException>(
-            () => UnitOfWork.ProductRepository.AssignAttribute(product));
+            () => UnitOfWork.ProductRepository.Insert(product));
 
         // Assert
         Assert.That(exception, Is.Not.Null);
@@ -70,7 +70,7 @@ public sealed class ProductRepositoryTests : BaseRepositoryTests
 
         // Act
         var exception = Assert.Throws<SqlException>(
-            () => UnitOfWork.ProductRepository.AssignAttribute(duplicateProduct));
+            () => UnitOfWork.ProductRepository.Insert(duplicateProduct));
 
         // Assert
         Assert.That(exception, Is.Not.Null);

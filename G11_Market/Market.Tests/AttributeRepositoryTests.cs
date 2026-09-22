@@ -17,7 +17,7 @@ public class AttributeRepositoryTests : BaseRepositoryTests
         };
 
         // Act
-        var newId = UnitOfWork.AttributeRepository.AssignAttribute(attribute);
+        var newId = UnitOfWork.AttributeRepository.Insert(attribute);
         var insertedAttribute = UnitOfWork.AttributeRepository.GetById(newId);
         // Assert
         Assert.That(newId, Is.GreaterThan(0));
@@ -38,7 +38,7 @@ public class AttributeRepositoryTests : BaseRepositoryTests
         };
 
         // Act and Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.AssignAttribute(attribute));
+        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Insert(attribute));
     }
 
     [Test]
@@ -50,10 +50,10 @@ public class AttributeRepositoryTests : BaseRepositoryTests
         var first = new AttributeDTO { AttributeName = name, AttributeType = 1 };
         var second = new AttributeDTO { AttributeName = name, AttributeType = 2 };
 
-        UnitOfWork.AttributeRepository.AssignAttribute(first);
+        UnitOfWork.AttributeRepository.Insert(first);
 
         // Act and Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.AssignAttribute(second));
+        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Insert(second));
     }
 
     [Test]
@@ -67,7 +67,7 @@ public class AttributeRepositoryTests : BaseRepositoryTests
         };
 
         // Act and Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.AssignAttribute(attribute));
+        Assert.Throws<SqlException>(() => UnitOfWork.AttributeRepository.Insert(attribute));
     }
 
     [Test]
@@ -80,7 +80,7 @@ public class AttributeRepositoryTests : BaseRepositoryTests
             AttributeType = 1
         };
 
-        var newId = UnitOfWork.AttributeRepository.AssignAttribute(attribute);
+        var newId = UnitOfWork.AttributeRepository.Insert(attribute);
         var insertedAttribute = UnitOfWork.AttributeRepository.GetById(newId);
 
         insertedAttribute!.AttributeName = "UpdatedAttribute".AddGuid();
@@ -103,8 +103,8 @@ public class AttributeRepositoryTests : BaseRepositoryTests
         var first = new AttributeDTO { AttributeName = "FirstAttr".AddGuid(), AttributeType = 1 };
         var second = new AttributeDTO { AttributeName = "SecondAttr".AddGuid(), AttributeType = 2 };
 
-        var firstId = UnitOfWork.AttributeRepository.AssignAttribute(first);
-        var secondId = UnitOfWork.AttributeRepository.AssignAttribute(second);
+        var firstId = UnitOfWork.AttributeRepository.Insert(first);
+        var secondId = UnitOfWork.AttributeRepository.Insert(second);
 
         var firstAttribute = UnitOfWork.AttributeRepository.GetById(firstId);
         var secondAttribute = UnitOfWork.AttributeRepository.GetById(secondId);
@@ -120,7 +120,7 @@ public class AttributeRepositoryTests : BaseRepositoryTests
     {
         // Arrange
         var attribute = new AttributeDTO { AttributeName = "ValidType".AddGuid(), AttributeType = 1 };
-        var id = UnitOfWork.AttributeRepository.AssignAttribute(attribute);
+        var id = UnitOfWork.AttributeRepository.Insert(attribute);
         var inserted = UnitOfWork.AttributeRepository.GetById(id)!;
 
         inserted.AttributeType = 99;
@@ -134,7 +134,7 @@ public class AttributeRepositoryTests : BaseRepositoryTests
     {
         // Arrange
         var attribute = new AttributeDTO { AttributeName = "ValidName".AddGuid(), AttributeType = 1 };
-        var id = UnitOfWork.AttributeRepository.AssignAttribute(attribute);
+        var id = UnitOfWork.AttributeRepository.Insert(attribute);
         var inserted = UnitOfWork.AttributeRepository.GetById(id)!;
 
         inserted.AttributeName = "";
@@ -175,7 +175,7 @@ public class AttributeRepositoryTests : BaseRepositoryTests
             AttributeType = 1
         };
 
-        var newId = UnitOfWork.AttributeRepository.AssignAttribute(attribute);
+        var newId = UnitOfWork.AttributeRepository.Insert(attribute);
 
         // Act
         UnitOfWork.AttributeRepository.Delete(newId);
@@ -211,7 +211,7 @@ public class AttributeRepositoryTests : BaseRepositoryTests
             AttributeName = "GetByIdAttr".AddGuid(),
             AttributeType = 4 // Boolean
         };
-        var insertedId = UnitOfWork.AttributeRepository.AssignAttribute(attribute);
+        var insertedId = UnitOfWork.AttributeRepository.Insert(attribute);
 
         // Act
         var result = UnitOfWork.AttributeRepository.GetById(insertedId);
@@ -248,7 +248,7 @@ public class AttributeRepositoryTests : BaseRepositoryTests
             AttributeName = name,
             AttributeType = 1
         };
-        UnitOfWork.AttributeRepository.AssignAttribute(attribute);
+        UnitOfWork.AttributeRepository.Insert(attribute);
 
         // Act
         var result = UnitOfWork.AttributeRepository.GetByName(name);
@@ -277,9 +277,9 @@ public class AttributeRepositoryTests : BaseRepositoryTests
         var attribute2 = new AttributeDTO { AttributeName = "Date2".AddGuid(), AttributeType = targetType };
         var attribute3 = new AttributeDTO { AttributeName = "Text1".AddGuid(), AttributeType = 1 };
 
-        var id1 = UnitOfWork.AttributeRepository.AssignAttribute(attribute1);
-        var id2 = UnitOfWork.AttributeRepository.AssignAttribute(attribute2);
-        UnitOfWork.AttributeRepository.AssignAttribute(attribute3);
+        var id1 = UnitOfWork.AttributeRepository.Insert(attribute1);
+        var id2 = UnitOfWork.AttributeRepository.Insert(attribute2);
+        UnitOfWork.AttributeRepository.Insert(attribute3);
 
         // Act
         var results = UnitOfWork.AttributeRepository.GetByType(targetType).ToList();
@@ -298,8 +298,8 @@ public class AttributeRepositoryTests : BaseRepositoryTests
         var attribute1 = new AttributeDTO { AttributeName = "All1".AddGuid(), AttributeType = 1 };
         var attribute2 = new AttributeDTO { AttributeName = "All2".AddGuid(), AttributeType = 2 };
 
-        UnitOfWork.AttributeRepository.AssignAttribute(attribute1);
-        UnitOfWork.AttributeRepository.AssignAttribute(attribute2);
+        UnitOfWork.AttributeRepository.Insert(attribute1);
+        UnitOfWork.AttributeRepository.Insert(attribute2);
 
         // Act
         var allAttributes = UnitOfWork.AttributeRepository.GetAll().ToList();
@@ -317,7 +317,7 @@ public class AttributeRepositoryTests : BaseRepositoryTests
             AttributeName = "DeletedGetById".AddGuid(),
             AttributeType = 1
         };
-        var id = UnitOfWork.AttributeRepository.AssignAttribute(attribute);
+        var id = UnitOfWork.AttributeRepository.Insert(attribute);
 
         // Soft-delete the attribute
         UnitOfWork.AttributeRepository.Delete(id);
@@ -336,8 +336,8 @@ public class AttributeRepositoryTests : BaseRepositoryTests
         var activeAttribute = new AttributeDTO { AttributeName = "Active".AddGuid(), AttributeType = 1 };
         var deletedAttribute = new AttributeDTO { AttributeName = "Deleted".AddGuid(), AttributeType = 1 };
 
-        var activeId = UnitOfWork.AttributeRepository.AssignAttribute(activeAttribute);
-        var deletedId = UnitOfWork.AttributeRepository.AssignAttribute(deletedAttribute);
+        var activeId = UnitOfWork.AttributeRepository.Insert(activeAttribute);
+        var deletedId = UnitOfWork.AttributeRepository.Insert(deletedAttribute);
 
         UnitOfWork.AttributeRepository.Delete(deletedId);
 

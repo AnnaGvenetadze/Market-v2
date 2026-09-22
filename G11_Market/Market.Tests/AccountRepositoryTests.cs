@@ -23,7 +23,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var account = CreateValidAccount();
 
         // Act
-        var newId = UnitOfWork.AccountRepository.AssignAttribute(account);
+        var newId = UnitOfWork.AccountRepository.Insert(account);
         var insertedAccount = UnitOfWork.AccountRepository.GetById(newId);
 
         // Assert
@@ -43,10 +43,10 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var second = CreateValidAccount();
         second.Username = first.Username;
 
-        UnitOfWork.AccountRepository.AssignAttribute(first);
+        UnitOfWork.AccountRepository.Insert(first);
 
         // Act and Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.AssignAttribute(second));
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(second));
     }
 
     [Test]
@@ -57,10 +57,10 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var second = CreateValidAccount();
         second.Email = first.Email;
 
-        UnitOfWork.AccountRepository.AssignAttribute(first);
+        UnitOfWork.AccountRepository.Insert(first);
 
         // Act and Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.AssignAttribute(second));
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(second));
     }
 
     [Test]
@@ -71,7 +71,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
         account.AccountType = 99;
 
         // Act and Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.AssignAttribute(account));
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(account));
     }
 
     [Test]
@@ -82,7 +82,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
         account.Username = "   ";
 
         // Act and Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.AssignAttribute(account));
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(account));
     }
 
     [Test]
@@ -93,14 +93,14 @@ public class AccountRepositoryTests : BaseRepositoryTests
         account.Email = "";
 
         // Act and Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.AssignAttribute(account));
+        Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(account));
     }
 
     [Test]
     public void Insert_WhenEntityIsNull_ShouldThrowException()
     {
         // Act and Assert
-        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.AssignAttribute(null!));
+        Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.Insert(null!));
     }
 
     [Test]
@@ -108,7 +108,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
     {
         // Arrange
         var account = CreateValidAccount();
-        var newId = UnitOfWork.AccountRepository.AssignAttribute(account);
+        var newId = UnitOfWork.AccountRepository.Insert(account);
         var insertedAccount = UnitOfWork.AccountRepository.GetById(newId)!;
 
         insertedAccount.FirstName = "Jane";
@@ -133,8 +133,8 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var first = CreateValidAccount();
         var second = CreateValidAccount();
 
-        var firstId = UnitOfWork.AccountRepository.AssignAttribute(first);
-        var secondId = UnitOfWork.AccountRepository.AssignAttribute(second);
+        var firstId = UnitOfWork.AccountRepository.Insert(first);
+        var secondId = UnitOfWork.AccountRepository.Insert(second);
 
         var firstAccount = UnitOfWork.AccountRepository.GetById(firstId)!;
         var secondAccount = UnitOfWork.AccountRepository.GetById(secondId)!;
@@ -152,8 +152,8 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var first = CreateValidAccount();
         var second = CreateValidAccount();
 
-        var firstId = UnitOfWork.AccountRepository.AssignAttribute(first);
-        var secondId = UnitOfWork.AccountRepository.AssignAttribute(second);
+        var firstId = UnitOfWork.AccountRepository.Insert(first);
+        var secondId = UnitOfWork.AccountRepository.Insert(second);
 
         var firstAccount = UnitOfWork.AccountRepository.GetById(firstId)!;
         var secondAccount = UnitOfWork.AccountRepository.GetById(secondId)!;
@@ -169,7 +169,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
     {
         // Arrange
         var account = CreateValidAccount();
-        var id = UnitOfWork.AccountRepository.AssignAttribute(account);
+        var id = UnitOfWork.AccountRepository.Insert(account);
         var inserted = UnitOfWork.AccountRepository.GetById(id)!;
 
         inserted.AccountType = 0;
@@ -183,7 +183,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
     {
         // Arrange
         var account = CreateValidAccount();
-        var id = UnitOfWork.AccountRepository.AssignAttribute(account);
+        var id = UnitOfWork.AccountRepository.Insert(account);
         var inserted = UnitOfWork.AccountRepository.GetById(id)!;
 
         inserted.Username = "   ";
@@ -215,7 +215,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
     {
         // Arrange
         var account = CreateValidAccount();
-        var newId = UnitOfWork.AccountRepository.AssignAttribute(account);
+        var newId = UnitOfWork.AccountRepository.Insert(account);
 
         // Act
         UnitOfWork.AccountRepository.Delete(newId);
@@ -244,7 +244,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
     {
         // Arrange
         var account = CreateValidAccount();
-        var id = UnitOfWork.AccountRepository.AssignAttribute(account);
+        var id = UnitOfWork.AccountRepository.Insert(account);
 
         // Act
         var result = UnitOfWork.AccountRepository.GetById(id);
@@ -269,7 +269,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
     {
         // Arrange
         var account = CreateValidAccount();
-        var id = UnitOfWork.AccountRepository.AssignAttribute(account);
+        var id = UnitOfWork.AccountRepository.Insert(account);
         UnitOfWork.AccountRepository.Delete(id);
 
         // Act
@@ -291,7 +291,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
     {
         // Arrange
         var account = CreateValidAccount();
-        UnitOfWork.AccountRepository.AssignAttribute(account);
+        UnitOfWork.AccountRepository.Insert(account);
 
         // Act
         var result = UnitOfWork.AccountRepository.GetByUsername(account.Username);
@@ -316,7 +316,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
     {
         // Arrange
         var account = CreateValidAccount();
-        UnitOfWork.AccountRepository.AssignAttribute(account);
+        UnitOfWork.AccountRepository.Insert(account);
 
         // Act
         var result = UnitOfWork.AccountRepository.GetByEmail(account.Email);
@@ -346,8 +346,8 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var second = CreateValidAccount();
         second.AccountType = targetType;
 
-        var id1 = UnitOfWork.AccountRepository.AssignAttribute(first);
-        var id2 = UnitOfWork.AccountRepository.AssignAttribute(second);
+        var id1 = UnitOfWork.AccountRepository.Insert(first);
+        var id2 = UnitOfWork.AccountRepository.Insert(second);
 
         // Act
         var results = UnitOfWork.AccountRepository.GetByAccountType(targetType).ToList();
@@ -365,8 +365,8 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var active = CreateValidAccount();
         var deleted = CreateValidAccount();
 
-        var activeId = UnitOfWork.AccountRepository.AssignAttribute(active);
-        var deletedId = UnitOfWork.AccountRepository.AssignAttribute(deleted);
+        var activeId = UnitOfWork.AccountRepository.Insert(active);
+        var deletedId = UnitOfWork.AccountRepository.Insert(deleted);
 
         UnitOfWork.AccountRepository.Delete(deletedId);
 
