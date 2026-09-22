@@ -1,24 +1,17 @@
-﻿create procedure dbo.sp_DeleteClient
-    @Id int
+﻿CREATE PROCEDURE sp_DeleteClient
+    @Id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-as 
-begin 
-    set nocount on;
-    if @Id is null throw 50033, 'Client ID is required for deletion.', 1;
-    if not exists (select 1 from Clients where Id = @Id and IsDeleted = 0) throw 50034, 'Client not found or has already been deleted.', 1;
+    IF @Id IS NULL OR @Id <= 0
+        THROW 50000, 'Invalid Client Id.', 1;
 
-    update dbo.Clients
-    set
-        IsDeleted = 1,
-        UpdateDate = getdate()
-    where Id = @Id
-      and IsDeleted = 0;
+    UPDATE Clients
+    SET IsDeleted = 1,
+        UpdateDate = GETDATE()
+    WHERE Id = @Id AND IsDeleted = 0;
 
-    if @@rowcount = 0
-    begin
-        ;throw 50001, N'Client does not exist or has already been deleted.', 1;
-    end
-        
-    return 0;
-end
-go
+    IF @@ROWCOUNT = 0
+        THROW 50000, 'Client not found or has been deleted.', 1;
+END;

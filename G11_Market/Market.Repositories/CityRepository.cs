@@ -7,14 +7,27 @@ namespace Market.Repositories;
 internal sealed class CityRepository(DbConnection connection)
     : BaseRepository<CityDTO>(connection), ICityRepository
 {
-    public CityDTO? GetByName(string name)
+    public CityDTO? GetByNameAndCountryId(string name, int countryId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(countryId);
 
-        return Search(city => city.Name == name && city.IsDeleted == false)
+        var trimmedName = name.Trim();
+
+        return Search(city =>
+                city.CountryId == countryId &&
+                city.Name == trimmedName)
             .FirstOrDefault();
     }
 
-    public IEnumerable<CityDTO> GetAllActive()
-        => Search(city => city.IsDeleted == false);
+    public IEnumerable<CityDTO> GetByCountryId(int countryId)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(countryId);
+        return Search(city => city.CountryId == countryId);
+    }
+
+    public IEnumerable<CityDTO> GetDeletedCities()
+    {
+        return Search(city => city.IsDeleted == true);
+    }
 }

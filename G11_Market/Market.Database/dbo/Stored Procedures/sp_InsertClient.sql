@@ -1,35 +1,37 @@
-﻿create procedure dbo.sp_InsertClient
-    @AccountId int,
-    @ClientTypeId int,
-    @FirstName nvarchar(100),
-    @LastName nvarchar(100),
-    @PhoneNumber varchar(20),
-    @ContactEmail nvarchar(255),
-    @Id int output
-as
-begin
-    set nocount on;
-    set @FirstName = nullif(trim(@FirstName), '');
-    set @LastName = nullif(trim(@LastName), '');
-    set @ContactEmail = nullif(trim(@ContactEmail), '');
-    set @PhoneNumber = nullif(trim(@PhoneNumber), '');
+﻿CREATE PROCEDURE sp_InsertClient
+    @AccountId INT,
+    @ClientTypeId INT,
+    @FirstName NVARCHAR(100),
+    @LastName NVARCHAR(100),
+    @PhoneNumber VARCHAR(20) = NULL,
+    @ContactEmail NVARCHAR(255) = NULL,
+    @Id INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    if @FirstName is null throw 50010, 'FirstName cannot be empty.', 1;
-    if @LastName is null throw 50011, 'LastName cannot be empty.', 1;
-    if @ClientTypeId is null throw 50012, 'ClientTypeId is required.', 1;
-    if @AccountId is null throw 50013, 'AccountId is required.', 1;
-    if @ContactEmail is null throw 50014, 'Email cannot be empty.', 1;
-    if @ContactEmail not like '%_@_%._%' throw 50015, 'Invalid email format.', 1;
-    if @PhoneNumber is not null and @PhoneNumber like '%[^0-9+ -.()]%' throw 50020, 'PhoneNumber contains invalid characters.', 1;  
-    if exists (select 1 from Clients where ContactEmail = @ContactEmail) throw 50021, 'Email already exists.', 1;
-    if exists (select 1 from Clients where AccountId = @AccountId) throw 50006, 'Client for this AccountId already exists.', 1;
-    if not exists (select 1 from Accounts where Id = @AccountId) throw 50016, 'Invalid AccountId.', 1;
-    if not exists (select 1 from ClientTypes where Id = @ClientTypeId) throw 50017, 'Invalid ClientTypeId.', 1;
+    IF @AccountId IS NULL OR @AccountId <= 0
+        THROW 50000, 'Invalid Account Id.', 1;
 
-    insert into Clients (AccountId, ClientTypeId, FirstName, LastName, PhoneNumber, ContactEmail)
-    values (@AccountId, @ClientTypeId, @FirstName, @LastName, @PhoneNumber, @ContactEmail);
+    IF @ClientTypeId IS NULL OR @ClientTypeId <= 0
+        THROW 50000, 'Invalid ClientType Id.', 1;
 
-    set @Id = scope_identity();
+    IF @FirstName IS NULL OR TRIM(@FirstName) = ''
+        THROW 50000, 'First Name cannot be empty.', 1;
 
-    return 0;
-end
+    IF @LastName IS NULL OR TRIM(@LastName) = ''
+        THROW 50000, 'Last Name cannot be empty.', 1;
+
+    IF NOT EXISTS (SELECT 1 FROM Accounts WHERE Id = @AccountId AND IsDeleted = 0)
+        THROW 50000, 'Referenced Account does not exist or is deleted.', 1;
+
+    IF NOT EXISTS (SELECT 1 FROM ClientTypes WHERE Id = @ClientTypeId AND IsDeleted = 0)
+        THROW 50000, 'Referenced ClientType does not exist or is deleted.', 1;
+
+    INSERT INTO Clients (AccountId, ClientTypeId, FirstName, LastName, PhoneNumber, ContactEmail, IsDeleted, CreateDate)
+    VALUES (@AccountId, @ClientTypeId, TRIM(@FirstName), TRIM(@LastName), TRIM(@PhoneNumber), TRIM(@ContactEmail), 0, GETDATE());
+
+    SET @Id = SCOPE_IDENTITY();
+
+    SELECT @Id AS Id;
+END;

@@ -8,20 +8,42 @@ internal sealed class ClientRepository(DbConnection connection)
     : BaseRepository<ClientDTO>(connection), IClientRepository
 {
     public ClientDTO? GetByAccountId(int accountId)
-        => Search(client => client.AccountId == accountId && client.IsDeleted == false)
-            .FirstOrDefault();
-
-    public IEnumerable<ClientDTO> GetByClientTypeId(int clientTypeId)
-        => Search(client => client.ClientTypeId == clientTypeId && client.IsDeleted == false);
-
-    public ClientDTO? GetByPhoneNumber(string phoneNumber)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(phoneNumber, nameof(phoneNumber));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(accountId);
 
-        return Search(client => client.PhoneNumber == phoneNumber && client.IsDeleted == false)
+        return Search(client => client.AccountId == accountId)
             .FirstOrDefault();
     }
 
-    public IEnumerable<ClientDTO> GetAllActive()
-        => Search(client => client.IsDeleted == false);
+    public ClientDTO? GetByPhoneNumber(string phoneNumber)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(phoneNumber);
+
+        var trimmedPhone = phoneNumber.Trim();
+
+        return Search(client => client.PhoneNumber == trimmedPhone)
+            .FirstOrDefault();
+    }
+
+    public ClientDTO? GetByContactEmail(string contactEmail)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(contactEmail);
+
+        var trimmedEmail = contactEmail.Trim();
+
+        return Search(client => client.ContactEmail == trimmedEmail)
+            .FirstOrDefault();
+    }
+
+    public IEnumerable<ClientDTO> GetByClientTypeId(int clientTypeId)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(clientTypeId);
+
+        return Search(client => client.ClientTypeId == clientTypeId);
+    }
+
+    public IEnumerable<ClientDTO> GetDeletedClients()
+    {
+        return Search(client => client.IsDeleted == true);
+    }
 }

@@ -20,7 +20,6 @@ public class CategoryRepositoryTests : BaseRepositoryTests
     {
         var category = CreateValidCategory();
 
-        // FIXED: Using Insert() instead of AssignAttribute()
         var newId = UnitOfWork.CategoryRepository.Insert(category);
         var inserted = UnitOfWork.CategoryRepository.GetById(newId);
 
@@ -32,7 +31,6 @@ public class CategoryRepositoryTests : BaseRepositoryTests
     [Test]
     public void Insert_NullEntity_ShouldThrowArgumentNullException()
     {
-        // FIXED: Using Insert()
         Assert.Throws<ArgumentNullException>(() => UnitOfWork.CategoryRepository.Insert((CategoryDTO)null!));
     }
 
@@ -45,7 +43,6 @@ public class CategoryRepositoryTests : BaseRepositoryTests
         var category2 = CreateValidCategory();
         category2.CategoryName = category1.CategoryName;
 
-        // FIXED: Using Insert()
         Assert.Throws<SqlException>(() => UnitOfWork.CategoryRepository.Insert(category2));
     }
 
@@ -174,7 +171,6 @@ public class CategoryRepositoryTests : BaseRepositoryTests
     [Test]
     public void AssignAndUnassignAttribute_ShouldExecuteSuccessfully()
     {
-        // 1. Arrange
         var category = CreateValidCategory();
         var categoryId = UnitOfWork.CategoryRepository.Insert(category);
 
@@ -185,7 +181,6 @@ public class CategoryRepositoryTests : BaseRepositoryTests
         };
         var attributeId = UnitOfWork.AttributeRepository.Insert(attribute);
 
-        // Sanity check: Ensure the attribute was actually inserted and returned a valid ID
         Assert.That(attributeId, Is.GreaterThan(0), "Attribute Insert failed to return a valid ID. Check sp_InsertAttribute output parameter.");
 
         var mapping = new CategoryAttributeDTO
@@ -195,9 +190,6 @@ public class CategoryRepositoryTests : BaseRepositoryTests
             OrderPosition = 1
         };
 
-        // 2. Act & Assert
-        // We do NOT use Assert.DoesNotThrow here so that if SQL throws an error, 
-        // the test runner will print the exact SQL error message.
         UnitOfWork.CategoryRepository.AssignAttribute(mapping);
         UnitOfWork.CategoryRepository.UnassignAttribute(mapping);
     }
