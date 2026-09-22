@@ -1,22 +1,26 @@
-CREATE PROCEDURE dbo.sp_UpdateClientType
+CREATE PROCEDURE sp_UpdateClientType
     @Id INT,
     @Name NVARCHAR(100),
-    @Description NVARCHAR(MAX)
+    @Description NVARCHAR(MAX) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    UPDATE dbo.ClientTypes
-    SET
-        Name = @Name,
-        Description = @Description,
+    IF @Id IS NULL OR @Id <= 0
+        THROW 50000, 'Invalid ClientType Id.', 1;
+
+    IF @Name IS NULL OR TRIM(@Name) = ''
+        THROW 50000, 'ClientType Name cannot be empty.', 1;
+
+    IF EXISTS (SELECT 1 FROM ClientTypes WHERE Name = TRIM(@Name) AND Id <> @Id AND IsDeleted = 0)
+        THROW 50000, 'A ClientType with this name already exists.', 1;
+
+    UPDATE ClientTypes
+    SET Name = TRIM(@Name),
+        Description = TRIM(@Description),
         UpdateDate = GETDATE()
-    WHERE Id = @Id
-      AND IsDeleted = 0;
+    WHERE Id = @Id AND IsDeleted = 0;
 
     IF @@ROWCOUNT = 0
-    BEGIN
-        RAISERROR('Client type with Id %d was not found or has been deleted.', 16, 1, @Id);
-    END;
+        THROW 50000, 'ClientType not found or already deleted.', 1;
 END;
-GO
