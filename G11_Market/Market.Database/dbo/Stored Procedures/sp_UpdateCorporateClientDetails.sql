@@ -1,29 +1,33 @@
-﻿create procedure dbo.sp_UpdateCorporateClientDetails
-    @AccountId int,
-    @CompanyName nvarchar(255),
-    @TaxNumber nvarchar(100),
-    @LegalAddress nvarchar(max),
-    @ContactPersonName nvarchar(255)
-as 
-begin 
-    set nocount on;
-    set @CompanyName = nullif(trim(@CompanyName), '');
-    set @TaxNumber = nullif(trim(@TaxNumber), '');
-    set @LegalAddress = nullif(trim(@LegalAddress), '');
-    set @ContactPersonName = nullif(trim(@ContactPersonName), '');
-    if @AccountId is null throw 50009, 'AccountId is required for updates.', 1;
-    if @CompanyName is null throw 50004, 'CompanyName cannot be empty.', 1;
-    if @TaxNumber is null throw 50005, 'TaxNumber cannot be empty.', 1;
-    if not exists (select 1 from CorporateClientDetails where Id = @AccountId and IsDeleted = 0) throw 50032, 'Corporate client details not found or have been deleted.', 1;
-    if exists (select 1 from CorporateClientDetails where TaxNumber = @TaxNumber and Id <> @AccountId and IsDeleted = 0) throw 50027, 'TaxNumber already exists.', 1;
+﻿CREATE PROCEDURE sp_UpdateCorporateClientDetails
+    @Id INT,
+    @CompanyName NVARCHAR(255),
+    @TaxNumber NVARCHAR(100),
+    @LegalAddress NVARCHAR(MAX) = NULL,
+    @ContactPersonName NVARCHAR(255) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    update CorporateClientDetails
-    set CompanyName = @CompanyName,
-        TaxNumber = @TaxNumber,
-        LegalAddress = @LegalAddress,
-        ContactPersonName = @ContactPersonName,
-        UpdateDate = getdate()
-    where Id = @AccountId and IsDeleted = 0;
-      
-    return 0;
-end
+    IF @Id IS NULL OR @Id <= 0
+        THROW 50000, 'Invalid CorporateClientDetails Id.', 1;
+
+    IF @CompanyName IS NULL OR TRIM(@CompanyName) = ''
+        THROW 50000, 'Company Name cannot be empty.', 1;
+
+    IF @TaxNumber IS NULL OR TRIM(@TaxNumber) = ''
+        THROW 50000, 'Tax Number cannot be empty.', 1;
+
+    IF EXISTS (SELECT 1 FROM CorporateClientDetails WHERE TaxNumber = TRIM(@TaxNumber) AND Id <> @Id AND IsDeleted = 0)
+        THROW 50000, 'A corporate client with this tax number already exists.', 1;
+
+    UPDATE CorporateClientDetails
+    SET CompanyName = TRIM(@CompanyName),
+        TaxNumber = TRIM(@TaxNumber),
+        LegalAddress = TRIM(@LegalAddress),
+        ContactPersonName = TRIM(@ContactPersonName),
+        UpdateDate = GETDATE()
+    WHERE Id = @Id AND IsDeleted = 0;
+
+    IF @@ROWCOUNT = 0
+        THROW 50000, 'Corporate client details not found or already deleted.', 1;
+END;

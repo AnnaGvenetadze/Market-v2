@@ -1,15 +1,17 @@
-﻿create procedure dbo.sp_DeleteCorporateClientDetails
-    @Id int
-as 
-begin 
-    set nocount on;
-    if @Id is null throw 50009, 'AccountId is required for deletion.', 1;
-    if not exists (select 1 from CorporateClientDetails where Id = @Id and IsDeleted = 0) throw 50032, 'Corporate client details not found or have already been deleted.', 1;
+﻿CREATE PROCEDURE sp_DeleteCorporateClientDetails
+    @Id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    update CorporateClientDetails
-    set IsDeleted = 1,
-        UpdateDate = getdate()
-    where Id = @Id;
+    IF @Id IS NULL OR @Id <= 0
+        THROW 50000, 'Invalid CorporateClientDetails Id.', 1;
 
-    return 0;
-end
+    UPDATE CorporateClientDetails
+    SET IsDeleted = 1,
+        UpdateDate = GETDATE()
+    WHERE Id = @Id AND IsDeleted = 0;
+
+    IF @@ROWCOUNT = 0
+        THROW 50000, 'Corporate client details not found or already deleted.', 1;
+END;

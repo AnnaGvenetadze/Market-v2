@@ -62,4 +62,5 @@ BEGIN
     VALUES (@Username, @PasswordHash, @Email, @AccountType, @FirstName, @LastName);
 
     SET @Id = SCOPE_IDENTITY();
+    SELECT @Id AS Id;
 END;

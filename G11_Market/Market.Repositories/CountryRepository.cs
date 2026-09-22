@@ -10,9 +10,8 @@ internal sealed class CountryRepository(DbConnection connection)
     public CountryDTO? GetByCode(string countryCode)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(countryCode);
-
-        return Search(country =>
-                country.CountryCode == countryCode)
+        var trimmedCode = countryCode.Trim();
+        return Search(c => c.CountryCode == trimmedCode)
             .FirstOrDefault();
     }
 }

@@ -1,13 +1,17 @@
-﻿create procedure sp_DeleteCountry
-    @Id int
-as
-begin
-    set nocount on;
+﻿CREATE PROCEDURE sp_DeleteCountry
+    @Id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    update Countries
-    set IsDeleted = 1, 
-        UpdateDate = GetDate() 
-    where Id = @Id and IsDeleted = 0;
+    IF @Id IS NULL OR @Id <= 0
+        THROW 50000, 'Invalid Country Id.', 1;
 
-    return 0;
-end
+    UPDATE Countries
+    SET IsDeleted = 1,
+        UpdateDate = GETDATE()
+    WHERE Id = @Id AND IsDeleted = 0;
+
+    IF @@ROWCOUNT = 0
+        THROW 50000, 'Country not found or already deleted.', 1;
+END;

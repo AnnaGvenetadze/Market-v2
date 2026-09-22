@@ -1,11 +1,10 @@
-﻿create procedure sp_GetCountryById
-    @Id int
-as
+﻿CREATE PROCEDURE sp_GetAllCountries
+AS
 BEGIN
     SET NOCOUNT ON;
 
     SELECT 
         Id, Name, CountryCode, CreateDate, UpdateDate
     FROM Countries
-    WHERE Id = @Id AND IsDeleted = 0;
+    WHERE IsDeleted = 0;
 END;

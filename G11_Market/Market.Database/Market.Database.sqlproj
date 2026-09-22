@@ -157,6 +157,7 @@
     <Build Include="dbo\Stored Procedures\sp_DeleteClientType.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAllAttributes.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateCategory.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllCountries.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Stored Procedures\sp_InsertCategory.sql" />
@@ -167,7 +168,6 @@
     <Build Include="dbo\Stored Procedures\sp_ActivateCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAllCategoryAttributes.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteCategoryAttribute.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetClients.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateClient.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteClient.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertProductAttributeValue.sql" />

@@ -1,23 +1,30 @@
-﻿create procedure dbo.sp_InsertCorporateClientDetails
-    @CompanyName nvarchar(255),
-    @TaxNumber nvarchar(100),
-    @LegalAddress nvarchar(max),
-    @ContactPersonName nvarchar(255),
-    @Id int output
-as
-begin
-    set nocount on;
-    set @CompanyName = nullif(trim(@CompanyName), '');
-    set @TaxNumber = nullif(trim(@TaxNumber), '');
-    set @LegalAddress = nullif(trim(@LegalAddress), '');
-    set @ContactPersonName = nullif(trim(@ContactPersonName), '');
-    if @CompanyName is null throw 50004, 'CompanyName cannot be empty.', 1;
-    if @TaxNumber is null throw 50005, 'TaxNumber cannot be empty.', 1;
+﻿CREATE PROCEDURE sp_InsertCorporateClientDetails
+    @Id INT OUTPUT,
+    @CompanyName NVARCHAR(255),
+    @TaxNumber NVARCHAR(100),
+    @LegalAddress NVARCHAR(MAX) = NULL,
+    @ContactPersonName NVARCHAR(255) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    insert into CorporateClientDetails (CompanyName, TaxNumber, LegalAddress, ContactPersonName)
-    values (@CompanyName, @TaxNumber, @LegalAddress, @ContactPersonName);
+    IF @Id IS NULL OR @Id <= 0
+        THROW 50000, 'Invalid Account Id.', 1;
 
-    set @Id = scope_identity();
+    IF @CompanyName IS NULL OR TRIM(@CompanyName) = ''
+        THROW 50000, 'Company Name cannot be empty.', 1;
 
-    return 0;
-end
+    IF @TaxNumber IS NULL OR TRIM(@TaxNumber) = ''
+        THROW 50000, 'Tax Number cannot be empty.', 1;
+
+    IF NOT EXISTS (SELECT 1 FROM Accounts WHERE Id = @Id AND IsDeleted = 0)
+        THROW 50000, 'Referenced Account does not exist or is deleted.', 1;
+
+    IF EXISTS (SELECT 1 FROM CorporateClientDetails WHERE TaxNumber = TRIM(@TaxNumber) AND IsDeleted = 0)
+        THROW 50000, 'A corporate client with this tax number already exists.', 1;
+
+    INSERT INTO CorporateClientDetails (Id, CompanyName, TaxNumber, LegalAddress, ContactPersonName, IsDeleted, CreateDate)
+    VALUES (@Id, TRIM(@CompanyName), TRIM(@TaxNumber), TRIM(@LegalAddress), TRIM(@ContactPersonName), 0, GETDATE());
+
+    SELECT @Id AS Id;
+END;
