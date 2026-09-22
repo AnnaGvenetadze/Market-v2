@@ -174,21 +174,20 @@ public class CategoryRepositoryTests : BaseRepositoryTests
     [Test]
     public void AssignAndUnassignAttribute_ShouldExecuteSuccessfully()
     {
-        // 1. Create and insert a valid parent Category
+        // 1. Arrange
         var category = CreateValidCategory();
         var categoryId = UnitOfWork.CategoryRepository.Insert(category);
 
-        // 2. Create and insert a valid Attribute 
         var attribute = new AttributeDTO
         {
             AttributeName = "Attr_".AddGuid(),
-            AttributeType = 1 
+            AttributeType = 1
         };
-        
-        // FIXED: You must insert an Attribute using the AttributeRepository, not the CategoryRepository.
         var attributeId = UnitOfWork.AttributeRepository.Insert(attribute);
 
-        // 3. Create the junction DTO
+        // Sanity check: Ensure the attribute was actually inserted and returned a valid ID
+        Assert.That(attributeId, Is.GreaterThan(0), "Attribute Insert failed to return a valid ID. Check sp_InsertAttribute output parameter.");
+
         var mapping = new CategoryAttributeDTO
         {
             CategoryId = categoryId,
@@ -196,9 +195,10 @@ public class CategoryRepositoryTests : BaseRepositoryTests
             OrderPosition = 1
         };
 
-        // 4. Assert assignment and unassignment succeed
-        // This is correctly calling the `AssignAttribute` on `CategoryRepository` that maps the junction table.
-        Assert.DoesNotThrow(() => UnitOfWork.CategoryRepository.AssignAttribute(mapping));
-        Assert.DoesNotThrow(() => UnitOfWork.CategoryRepository.UnassignAttribute(mapping));
+        // 2. Act & Assert
+        // We do NOT use Assert.DoesNotThrow here so that if SQL throws an error, 
+        // the test runner will print the exact SQL error message.
+        UnitOfWork.CategoryRepository.AssignAttribute(mapping);
+        UnitOfWork.CategoryRepository.UnassignAttribute(mapping);
     }
 }
