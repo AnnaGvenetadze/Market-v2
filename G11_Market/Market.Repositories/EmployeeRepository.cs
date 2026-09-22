@@ -16,7 +16,15 @@ internal sealed class EmployeeRepository(DbConnection connection) : BaseReposito
 
     public IEnumerable<EmployeeDTO> GetAllActive() => Search(e => e.IsDeleted == false);
 
-    public void AssignAttribute(EmployeeRoleDTO employeeRole)
+    public IEnumerable<RoleDTO> GetRoles(int employeeId)
+    {
+        return _connection.Query<RoleDTO>(
+            "sp_GetEmployeeRolesByEmployeeId",
+            new { EmployeeId = employeeId },
+            commandType: CommandType.StoredProcedure);
+    }
+
+    public void AssignRole(EmployeeRoleDTO employeeRole)
     {
         _connection.Execute(
             "sp_AssignEmployeeRole",
@@ -28,7 +36,7 @@ internal sealed class EmployeeRepository(DbConnection connection) : BaseReposito
             commandType: CommandType.StoredProcedure);
     }
 
-    public void UnassignAttribute(EmployeeRoleDTO employeeRole)
+    public void UnassignRole(EmployeeRoleDTO employeeRole)
     {
         _connection.Execute(
             "sp_UnassignEmployeeRole",

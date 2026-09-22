@@ -100,10 +100,7 @@
     <Build Include="dbo\Tables\ProductAttributeValues.sql" />
     <Build Include="dbo\User-Defined Function\fn_IsCircularCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetEmployeeByAcountId.sql" />
-    <Build Include="dbo\Stored Procedures\sp_DeleteEmployeesRole.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetEmployeeRolesByEmployeeId.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertClientType.sql" />
-    <Build Include="dbo\Stored Procedures\sp_InsertEmployeeRole.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteProductAttributeValue.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteProduct.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteAccount.sql" />
@@ -173,7 +170,7 @@
     <Build Include="dbo\Stored Procedures\sp_InsertProductAttributeValue.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateProductAttributeValue.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertInventoryManager.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetInventoryManagerById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetInventoryManagerDetailById.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAllInventoryManagers.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteInventoryManagerDetail.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteSaleItem.sql" />

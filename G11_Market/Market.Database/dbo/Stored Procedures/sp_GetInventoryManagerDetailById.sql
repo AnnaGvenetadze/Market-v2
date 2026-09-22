@@ -1,4 +1,4 @@
-﻿create procedure dbo.sp_GetInventoryManagerById
+﻿create procedure dbo.sp_GetInventoryManagerDetailById
     @Id int
 as
 begin

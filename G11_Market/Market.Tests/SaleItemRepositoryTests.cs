@@ -52,30 +52,24 @@ public class SaleItemRepositoryTests : BaseRepositoryTests
         Assert.Throws<SqlException>(() => UnitOfWork.SaleItemRepository.Insert(saleItem));
     }
 
-    [Test]
 
+    [Test]
     public void DeleteTest_ShouldRemoveItem()
     {
         // Arrange
+        var existingSaleItem =
+            UnitOfWork.SaleItemRepository.GetById(DeleteTestId);
 
-        var saleItem = new SaleItemDTO
-        {
-            SaleId = 3,
-            ProductId = 3,
-            Quantity = 5,
-            UnitPrice = 300,
-            DiscountAmount = 0
-        };
-
-        var newId = UnitOfWork.SaleItemRepository.Insert(saleItem);
+        Assert.That(existingSaleItem, Is.Not.Null);
 
         // Act
-
-        UnitOfWork.SaleItemRepository.Delete(newId);
+        UnitOfWork.SaleItemRepository.Delete(DeleteTestId);
 
         // Assert
+        var deletedSaleItem =
+            UnitOfWork.SaleItemRepository.GetById(DeleteTestId);
 
-        Assert.Throws<InvalidOperationException>(() => UnitOfWork.SaleItemRepository.GetById(newId));
+        Assert.That(deletedSaleItem, Is.Null);
     }
 
     [Test]
