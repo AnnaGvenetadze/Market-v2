@@ -3,7 +3,6 @@ using Market.Services.Interfaces;
 using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
-// todo: Make sure that all units are passing. Add new if needed.
  
 
 internal sealed class UnitOfWork : IUnitOfWork, IDisposable
