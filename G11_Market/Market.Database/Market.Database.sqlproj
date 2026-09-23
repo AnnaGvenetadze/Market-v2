@@ -172,7 +172,7 @@
     <Build Include="dbo\Stored Procedures\sp_DeleteSaleItem.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetSaleItemById.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertSaleItem.sql" />
-    <Build Include="dbo\Stored Procedures\sp_UpdateSaleItem.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateSaleItemQuantity.sql" />
     <None Include="TEST.Database.publish.xml" />
     <None Include="DEV.Database.publish.xml" />
   </ItemGroup>

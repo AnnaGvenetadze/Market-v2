@@ -1,8 +1,12 @@
-﻿CREATE PROCEDURE dbo.sp_DeleteSaleItem
-    @Id INT
+﻿CREATE PROCEDURE dbo.sp_UpdateSaleItemQuantity
+    @Id INT,
+    @Quantity INT
 AS
 BEGIN
     SET NOCOUNT ON;
+
+    IF @Quantity <= 0
+        THROW 50039, 'Quantity must be greater than zero.', 1;
 
     IF NOT EXISTS
     (
@@ -21,9 +25,10 @@ BEGIN
         WHERE si.Id = @Id
           AND s.Status = 0
     )
-        THROW 50042, 'Sale item can be deleted only while the sale is draft.', 1;
+        THROW 50041, 'Sale item can be changed only while the sale is draft.', 1;
 
-    DELETE FROM dbo.SaleItems
+    UPDATE dbo.SaleItems
+    SET Quantity = @Quantity
     WHERE Id = @Id;
 END;
 GO
