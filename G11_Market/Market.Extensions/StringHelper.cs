@@ -35,4 +35,14 @@ public static class StringHelper
     }
 
     private static bool IsVowel(char c) => "aeiouAEIOU".IndexOf(c) >= 0;
+
+    public static string ToHashCode(this string input)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(input);
+
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        var bytes = System.Text.Encoding.UTF8.GetBytes(input);
+        var hashBytes = sha256.ComputeHash(bytes);
+        return Convert.ToBase64String(hashBytes);
+    }
 }
