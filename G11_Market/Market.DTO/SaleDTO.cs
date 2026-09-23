@@ -1,4 +1,5 @@
-﻿using Market.Extensions.Attributes;
+﻿using Market.DTO.Enums;
+using Market.Extensions.Attributes;
 
 namespace Market.DTO;
 
@@ -9,7 +10,7 @@ public sealed class SaleDTO
     [IgnoreOnUpdate]
     public int CreatedEmployeeId { get; set; }
     public int? CancelledByEmployeeId { get; set; }
-    public byte Status { get; set; }
+    public SaleStatus Status { get; set; }
     [IgnoreOnInsert]
     [IgnoreOnUpdate]
     public DateTime CreatedDate { get; set; }

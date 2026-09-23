@@ -1,20 +1,30 @@
-﻿create procedure dbo.sp_InsertSale
-    @CreatedEmployeeId int,
-    @Status tinyint = 0,                   
-    @CreatedDate datetime = null,
-    @CancelledByEmployeeId int = null,
-    @CancelledDate datetime = null,
-    @CancelReason nvarchar(200) = null,
-    @Id int output
-as
-begin
-    set nocount on;
+﻿CREATE PROCEDURE dbo.sp_InsertSale
+    @CreatedEmployeeId INT,
+    @Id INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    if not exists (select 1 from Employees where Id = @CreatedEmployeeId) throw 50101, 'Employee not found.', 1;
-    insert into Sales (CreatedEmployeeId,Status,CreatedDate,CancelledByEmployeeId,CancelledDate,CancelReason)
-    values (@CreatedEmployeeId,@Status,isnull(@CreatedDate, getdate()),@CancelledByEmployeeId,@CancelledDate,@CancelReason);
+    IF NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.Employees
+        WHERE Id = @CreatedEmployeeId
+          AND IsDeleted = 0
+    )
+        THROW 50101, 'Employee not found or inactive.', 1;
 
-    set @Id = scope_identity();
-    return 0;
-end
+    INSERT INTO dbo.Sales
+    (
+        CreatedEmployeeId,
+        Status
+    )
+    VALUES
+    (
+        @CreatedEmployeeId,
+        0 -- Draft
+    );
 
+    SET @Id = CONVERT(INT, SCOPE_IDENTITY());
+END;
+GO

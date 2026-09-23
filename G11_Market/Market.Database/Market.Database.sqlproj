@@ -88,8 +88,7 @@
     <Build Include="dbo\Stored Procedures\sp_InsertEmployee.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertClient.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertCorporateClientDetails.sql" />
-    <Build Include="dbo\Stored Procedures\sp_DeleteSale.sql" />
-    <Build Include="dbo\Stored Procedures\sp_CompleteSale.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CancelSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_LoginAccount.sql" />
     <Build Include="dbo\Stored Procedures\sp_ResetAccountPassword.sql" />
@@ -123,7 +122,6 @@
     <Build Include="dbo\Stored Procedures\sp_InsertCategoryAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateCategoryAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetSaleById.sql" />
-    <Build Include="dbo\Stored Procedures\sp_UpdateSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAllSales.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAttributeById.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteAttribute.sql" />
@@ -137,8 +135,6 @@
     <Build Include="dbo\Stored Procedures\sp_DeleteCity.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetCityById.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertCity.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetSalesByDateRange.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetSalesByStatus.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetSaleTotal.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateCity.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetProductById.sql" />
