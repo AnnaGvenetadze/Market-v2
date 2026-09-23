@@ -7,11 +7,21 @@ public static class StringHelper
         if (string.IsNullOrEmpty(singular))
             return singular;
 
-        // Simple pluralization rules
-        if (singular.EndsWith("y", StringComparison.OrdinalIgnoreCase) && !IsVowel(singular[^2]))
+        // TODO: განაზოგადე
+        // თუ სახელი უკვე მთავრდება "Details"-ით,
+        // მას plural suffix აღარ უნდა დაემატოს.
+        if (singular.EndsWith("Details", StringComparison.OrdinalIgnoreCase))
+        {
+            return singular;
+        }
+
+
+        if (singular.EndsWith("y", StringComparison.OrdinalIgnoreCase)
+            && !IsVowel(singular[^2]))
         {
             return singular[..^1] + "ies";
         }
+
         if (singular.EndsWith("s", StringComparison.OrdinalIgnoreCase) ||
             singular.EndsWith("x", StringComparison.OrdinalIgnoreCase) ||
             singular.EndsWith("z", StringComparison.OrdinalIgnoreCase) ||

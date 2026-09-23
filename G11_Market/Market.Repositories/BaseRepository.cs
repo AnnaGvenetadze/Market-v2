@@ -48,11 +48,36 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
         var propsToInsert = typeof(T)
             .GetProperties()
             .Where(p => !Attribute.IsDefined(p, typeof(IgnoreOnInsertAttribute)));
+        
+        // თუ არ აქვს [IgnoreOnInsert]
+        var idProperty = propsToInsert 
+            .FirstOrDefault(p => p.Name == "Id");
+
         foreach (var prop in propsToInsert)
         {
+            if (prop.Name == "Id")
+                continue;
+
             parameters.Add(prop.Name, prop.GetValue(entity));
         }
-        parameters.Add("Id", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+        // თუ Id INSERT-ში მონაწილეობს, ანუ entity-ს უკვე აქვს Id
+        // და ის SQL-ში უნდა გადავცეთ.
+        if (idProperty != null)
+        {
+            parameters.Add(
+                "Id",
+                idProperty.GetValue(entity),
+                dbType: DbType.Int32,
+                direction: ParameterDirection.InputOutput);
+        }
+        else // თვითგენერირებადი id
+        {
+            parameters.Add(
+                "Id",
+                dbType: DbType.Int32,
+                direction: ParameterDirection.Output);
+        }
 
         _connection.Execute(
             $"sp_Insert{_entityName}",
@@ -61,6 +86,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
 
         return parameters.Get<int>("Id");
     }
+
 
     public void Update(T entity)
     {
