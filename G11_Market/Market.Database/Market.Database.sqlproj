@@ -151,6 +151,9 @@
     <Build Include="dbo\Stored Procedures\sp_GetAllAttributes.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAllCountries.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetStockByProductId.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetStockMovementsByProductId.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetOutOfStockProducts.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Stored Procedures\sp_InsertCategory.sql" />
