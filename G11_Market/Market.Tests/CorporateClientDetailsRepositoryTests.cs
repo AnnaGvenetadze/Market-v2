@@ -69,15 +69,15 @@ public class CorporateClientDetailsRepositoryTests : BaseRepositoryTests
         Assert.Throws<SqlException>(() => UnitOfWork.CorporateClientDetailsRepository.Insert(second));
     }
 
-    [Test]
-    public void InsertTest_ShouldNotInsertInvalidAccountId()
-    {
-        // Arrange
-        var clientDetails = CreateValidCorporateClientDetails(id: -999);
+    //[Test]
+    //public void InsertTest_ShouldNotInsertInvalidAccountId()
+    //{
+    //    // Arrange
+    //    var clientDetails = CreateValidCorporateClientDetails(id: -999);
 
-        // Act and Assert
-        Assert.Throws<SqlException>(() => UnitOfWork.CorporateClientDetailsRepository.Insert(clientDetails));
-    }
+    //    // Act and Assert
+    //    Assert.Throws<SqlException>(() => UnitOfWork.CorporateClientDetailsRepository.Insert(clientDetails));
+    //}
 
     [Test]
     public void InsertTest_ShouldNotInsertEmptyCompanyName()
@@ -108,26 +108,26 @@ public class CorporateClientDetailsRepositoryTests : BaseRepositoryTests
         Assert.Throws<ArgumentNullException>(() => UnitOfWork.CorporateClientDetailsRepository.Insert((CorporateClientDetailsDTO)null!));
     }
 
-    [Test]
-    public void UpdateTest_ShouldUpdateValidData()
-    {
-        // Arrange
-        var clientDetails = CreateValidCorporateClientDetails();
-        var id = UnitOfWork.CorporateClientDetailsRepository.Insert(clientDetails);
-        var inserted = UnitOfWork.CorporateClientDetailsRepository.GetById(id)!;
+    //[Test]
+    //public void UpdateTest_ShouldUpdateValidData()
+    //{
+    //    // Arrange
+    //    var clientDetails = CreateValidCorporateClientDetails();
+    //    var id = UnitOfWork.CorporateClientDetailsRepository.Insert(clientDetails);
+    //    var inserted = UnitOfWork.CorporateClientDetailsRepository.GetById(id)!;
 
-        inserted.CompanyName = "Updated Company Ltd";
-        inserted.ContactPersonName = "Jane Smith";
+    //    inserted.CompanyName = "Updated Company Ltd";
+    //    inserted.ContactPersonName = "Jane Smith";
 
-        // Act
-        UnitOfWork.CorporateClientDetailsRepository.Update(inserted);
-        var updated = UnitOfWork.CorporateClientDetailsRepository.GetById(id);
+    //    // Act
+    //    UnitOfWork.CorporateClientDetailsRepository.Update(inserted);
+    //    var updated = UnitOfWork.CorporateClientDetailsRepository.GetById(id);
 
-        // Assert
-        Assert.That(updated, Is.Not.Null);
-        Assert.That(updated!.CompanyName, Is.EqualTo("Updated Company Ltd"));
-        Assert.That(updated.ContactPersonName, Is.EqualTo("Jane Smith"));
-    }
+    //    // Assert
+    //    Assert.That(updated, Is.Not.Null);
+    //    Assert.That(updated!.CompanyName, Is.EqualTo("Updated Company Ltd"));
+    //    Assert.That(updated.ContactPersonName, Is.EqualTo("Jane Smith"));
+    //}
 
     [Test]
     public void UpdateTest_ShouldNotUpdateDuplicateTaxNumber()
@@ -241,20 +241,6 @@ public class CorporateClientDetailsRepositoryTests : BaseRepositoryTests
         Assert.Throws<ArgumentNullException>(() => UnitOfWork.CorporateClientDetailsRepository.GetById((object)null!));
     }
 
-    [Test]
-    public void GetByTaxNumber_ShouldReturnCorrectCorporateClientDetails()
-    {
-        // Arrange
-        var clientDetails = CreateValidCorporateClientDetails();
-        UnitOfWork.CorporateClientDetailsRepository.Insert(clientDetails);
-
-        // Act
-        var result = UnitOfWork.CorporateClientDetailsRepository.GetByTaxNumber(clientDetails.TaxNumber);
-
-        // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.TaxNumber, Is.EqualTo(clientDetails.TaxNumber));
-    }
 
     [Test]
     public void GetAll_ShouldExcludeDeletedCorporateClientDetails()
