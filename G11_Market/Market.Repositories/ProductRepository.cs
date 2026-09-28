@@ -1,5 +1,7 @@
-﻿using Market.DTO;
+﻿using Dapper;
+using Market.DTO;
 using Market.Services.Interfaces.Repositories;
+using System.Data;
 using System.Data.Common;
 
 namespace Market.Repositories;
@@ -39,5 +41,53 @@ internal sealed class ProductRepository(DbConnection connection)
             product.Price >= minPrice &&
             product.Price <= maxPrice &&
             product.IsDeleted == false);
+    }
+
+    public void InsertAttributeValue(ProductAttributeValueDTO value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        _connection.Execute(
+            "dbo.sp_InsertProductAttributeValue",
+            value,
+            commandType: CommandType.StoredProcedure);
+    }
+
+    public void UpdateAttributeValue(ProductAttributeValueDTO value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        _connection.Execute(
+            "dbo.sp_UpdateProductAttributeValue",
+            value,
+            commandType: CommandType.StoredProcedure);
+    }
+
+    public IEnumerable<ProductAttributeValueDTO> GetAttributeValues(int productId)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId);
+
+        var parameters = new DynamicParameters();
+        parameters.Add("ProductId", productId);
+
+        return _connection.Query<ProductAttributeValueDTO>(
+            "dbo.sp_GetProductAttributeValuesByProductId",
+            parameters,
+            commandType: CommandType.StoredProcedure);
+    }
+
+    public void DeleteAttributeValue(int productId, int attributeId)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(attributeId);
+
+        var parameters = new DynamicParameters();
+        parameters.Add("ProductId", productId);
+        parameters.Add("AttributeId", attributeId);
+
+        _connection.Execute(
+            "dbo.sp_DeleteProductAttributeValue",
+            parameters,
+            commandType: CommandType.StoredProcedure);
     }
 }

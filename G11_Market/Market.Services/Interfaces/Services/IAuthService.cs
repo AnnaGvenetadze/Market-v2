@@ -1,18 +1,18 @@
 ﻿namespace Market.Services.Interfaces.Services;
 
 // TODO: თქვენი მეთოდები დააიმპლემენტირეთ 
-public interface IAuthService
-{
-    bool Login(string username, string password);
+//public interface IAuthService
+//{
+//    bool Login(string username, string password);
 
-    void Logout();
+//    void Logout();
 
-    bool IsAuthenticated();
+//    bool IsAuthenticated();
 
-    CurrentUserDTO? GetCurrentUser();
+//    CurrentUserDTO? GetCurrentUser();
 
-    bool HasRole(string roleName);
+//    bool HasRole(string roleName);
 
-    // AuthService კლასის შიდა დამხმარე მეთოდი:
-    // private IEnumerable<RoleDTO> GetCurrentRoles();
-}
+//    // AuthService კლასის შიდა დამხმარე მეთოდი:
+//    // private IEnumerable<RoleDTO> GetCurrentRoles();
+//}

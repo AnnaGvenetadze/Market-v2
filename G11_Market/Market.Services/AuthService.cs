@@ -4,7 +4,7 @@ using Market.Services.Interfaces.Services;
 
 namespace Market.Services;
 
-public class AuthService : IAuthService
+public class AuthService /*: IAuthService*/
 {
     private readonly IUnitOfWork _unitOfWork;
 

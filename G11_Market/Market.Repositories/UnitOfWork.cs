@@ -27,7 +27,7 @@ internal sealed class UnitOfWork : IUnitOfWork, IDisposable
     private readonly Lazy<ClientRepository> _clientRepository;
     private readonly Lazy<ClientTypeRepository> _clientTypeRepository;
     private readonly Lazy<AttributeRepository> _attributeRepository;
-
+    
     public UnitOfWork(DbConnection connection)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));

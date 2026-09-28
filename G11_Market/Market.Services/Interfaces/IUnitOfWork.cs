@@ -13,13 +13,13 @@ public interface IUnitOfWork
     IRoleRepository RoleRepository { get; }
     IInventoryManagerDetailsRepository InventoryManagerDetailsRepository { get; }
     ICountryRepository CountryRepository { get; }
+    ICityRepository CityRepository { get; }
     IAccountRepository AccountRepository { get; }
     IClientRepository ClientRepository { get; }
     IClientTypeRepository ClientTypeRepository { get; }
     IAttributeRepository AttributeRepository { get; }
     IStockMovementRepository StockMovementRepository { get; }
     ICorporateClientDetailsRepository CorporateClientDetailsRepository { get; }
-    ICityRepository CityRepository { get; }
 
     void BeginTransaction();
 
@@ -38,5 +38,4 @@ public interface IUnitOfWork
     void RollbackToSavePoint(string savePoint);
 
     void RollbackToRoot();
-
 }
