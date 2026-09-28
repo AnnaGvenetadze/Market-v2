@@ -393,4 +393,125 @@ public sealed class ProductRepositoryTests : BaseRepositoryTests
             """,
             new { Id = productId });
     }
+
+    [Test]
+    public void GetAttributeValues_ShouldReturnCorrectValues()
+    {
+        // Act
+        var values = UnitOfWork.ProductRepository
+            .GetAttributeValues(1)
+            .ToList();
+
+        // Assert
+        Assert.That(values, Has.Count.EqualTo(1));
+
+        var value = values.Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(value.ProductId, Is.EqualTo(1));
+            Assert.That(value.AttributeId, Is.EqualTo(1));
+            Assert.That(value.TextValue, Is.EqualTo("Samsung"));
+            Assert.That(value.NumberValue, Is.Null);
+            Assert.That(value.DateValue, Is.Null);
+            Assert.That(value.BooleanValue, Is.Null);
+        });
+    }
+
+    [Test]
+    public void InsertAttributeValue_ShouldAddValue()
+    {
+        // Arrange
+        // Seed-ში ეს წყვილი უკვე არსებობს, ამიტომ ჯერ ვათავისუფლებთ.
+        UnitOfWork.ProductRepository.DeleteAttributeValue(1, 1);
+
+        var value = new ProductAttributeValueDTO
+        {
+            ProductId = 1,
+            AttributeId = 1,
+            TextValue = "LG"
+        };
+
+        // Act
+        UnitOfWork.ProductRepository.InsertAttributeValue(value);
+
+        // Assert
+        var values = UnitOfWork.ProductRepository
+            .GetAttributeValues(1)
+            .ToList();
+
+        Assert.That(values, Has.Count.EqualTo(1));
+
+        var addedValue = values.Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(addedValue.ProductId, Is.EqualTo(1));
+            Assert.That(addedValue.AttributeId, Is.EqualTo(1));
+            Assert.That(addedValue.TextValue, Is.EqualTo("LG"));
+            Assert.That(addedValue.NumberValue, Is.Null);
+            Assert.That(addedValue.DateValue, Is.Null);
+            Assert.That(addedValue.BooleanValue, Is.Null);
+        });
+    }
+
+    [Test]
+    public void UpdateAttributeValue_ShouldUpdateValue()
+    {
+        // Arrange
+        var value = new ProductAttributeValueDTO
+        {
+            ProductId = 2,
+            AttributeId = 2,
+            NumberValue = 3.75m
+        };
+
+        // Act
+        UnitOfWork.ProductRepository.UpdateAttributeValue(value);
+
+        // Assert
+        var values = UnitOfWork.ProductRepository
+            .GetAttributeValues(2)
+            .ToList();
+
+        Assert.That(values, Has.Count.EqualTo(1));
+
+        var updatedValue = values.Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(updatedValue.ProductId, Is.EqualTo(2));
+            Assert.That(updatedValue.AttributeId, Is.EqualTo(2));
+            Assert.That(updatedValue.NumberValue, Is.EqualTo(3.75m));
+            Assert.That(updatedValue.TextValue, Is.Null);
+            Assert.That(updatedValue.DateValue, Is.Null);
+            Assert.That(updatedValue.BooleanValue, Is.Null);
+        });
+    }
+
+    [Test]
+    public void DeleteAttributeValue_ShouldDeleteValue()
+    {
+        // Act
+        UnitOfWork.ProductRepository.DeleteAttributeValue(2, 2);
+
+        // Assert
+        var deletedProductValues = UnitOfWork.ProductRepository
+            .GetAttributeValues(2)
+            .ToList();
+
+        var otherProductValues = UnitOfWork.ProductRepository
+            .GetAttributeValues(1)
+            .ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(deletedProductValues, Is.Empty);
+            Assert.That(otherProductValues, Has.Count.EqualTo(1));
+        });
+
+        Assert.That(
+            otherProductValues.Single().TextValue,
+            Is.EqualTo("Samsung"));
+    }
 }
