@@ -1,18 +1,8 @@
-﻿namespace Market.Services.Interfaces.Services;
+﻿using Market.DTO;
 
-// TODO: თქვენი მეთოდები დააიმპლემენტირეთ 
-//public interface IAuthService
-//{
-//    bool Login(string username, string password);
+namespace Market.Services.Interfaces.Services;
 
-//    void Logout();
-
-//    bool IsAuthenticated();
-
-//    CurrentUserDTO? GetCurrentUser();
-
-//    bool HasRole(string roleName);
-
-//    // AuthService კლასის შიდა დამხმარე მეთოდი:
-//    // private IEnumerable<RoleDTO> GetCurrentRoles();
-//}
+public interface IAuthService
+{
+    Task<LoginResultDTO> Login(string username, string password, CancellationToken cancellationToken = default);
+}

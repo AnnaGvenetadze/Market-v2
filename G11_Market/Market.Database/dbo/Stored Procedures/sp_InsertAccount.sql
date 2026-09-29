@@ -1,10 +1,11 @@
-﻿CREATE PROCEDURE sp_InsertAccount
+﻿CREATE PROCEDURE dbo.sp_InsertAccount
     @Username NVARCHAR(50),
     @PasswordHash NVARCHAR(255),
     @Email NVARCHAR(255),
     @AccountType TINYINT,
     @FirstName NVARCHAR(50),
     @LastName NVARCHAR(50),
+    @Hwid VARCHAR(64) = '',
     @Id INT OUTPUT
 AS
 BEGIN
@@ -58,8 +59,24 @@ BEGIN
         RETURN;
     END;
 
-    INSERT INTO Accounts (Username, PasswordHash, Email, AccountType, FirstName, LastName)
-    VALUES (@Username, @PasswordHash, @Email, @AccountType, @FirstName, @LastName);
+    INSERT INTO Accounts (
+        Username, 
+        PasswordHash, 
+        Email, 
+        AccountType, 
+        FirstName, 
+        LastName, 
+        Hwid
+    )
+    VALUES (
+        @Username, 
+        @PasswordHash, 
+        @Email, 
+        @AccountType, 
+        @FirstName, 
+        @LastName, 
+        ISNULL(@Hwid, '')
+    );
 
     SET @Id = SCOPE_IDENTITY();
     SELECT @Id AS Id;

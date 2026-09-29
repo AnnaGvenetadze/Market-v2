@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE sp_UpdateAccount
+﻿CREATE PROCEDURE dbo.sp_UpdateAccount
     @Id INT,
     @Username NVARCHAR(50),
     @PasswordHash NVARCHAR(255),
@@ -9,6 +9,12 @@
 AS
 BEGIN
     SET NOCOUNT ON;
+
+    IF @Id IS NULL OR @Id <= 0
+    BEGIN
+        RAISERROR('Invalid Account Id.', 16, 1);
+        RETURN;
+    END;
 
     IF @Username IS NULL OR LTRIM(RTRIM(@Username)) = ''
     BEGIN
@@ -48,7 +54,7 @@ BEGIN
 
     IF EXISTS (
         SELECT 1 
-        FROM Accounts 
+        FROM dbo.Accounts 
         WHERE Username = @Username 
           AND Id <> @Id 
           AND IsDeleted = 0
@@ -60,7 +66,7 @@ BEGIN
 
     IF EXISTS (
         SELECT 1 
-        FROM Accounts 
+        FROM dbo.Accounts 
         WHERE Email = @Email 
           AND Id <> @Id 
           AND IsDeleted = 0
@@ -70,18 +76,19 @@ BEGIN
         RETURN;
     END;
 
-    UPDATE Accounts
+    UPDATE dbo.Accounts
     SET Username = @Username,
         PasswordHash = @PasswordHash,
         Email = @Email,
         AccountType = @AccountType,
         FirstName = @FirstName,
         LastName = @LastName,
-        UpdateDate = GETDATE()
+        UpdateDate = GETUTCDATE()
     WHERE Id = @Id AND IsDeleted = 0;
 
     IF @@ROWCOUNT = 0
     BEGIN
         RAISERROR('Account with Id %d was not found or is inactive.', 16, 1, @Id);
+        RETURN;
     END;
 END;
