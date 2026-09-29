@@ -18,16 +18,15 @@ BEGIN
     IF @DiscountAmount < 0
         THROW 50034, 'DiscountAmount cannot be negative.', 1;
 
-    IF NOT EXISTS
-    (
+    IF NOT EXISTS (
         SELECT 1
         FROM dbo.Sales
         WHERE Id = @SaleId
     )
         THROW 50035, 'Sale not found.', 1;
 
-    IF NOT EXISTS
-    (
+    -- Ensures items are added ONLY to Draft sales (Status = 0)
+    IF NOT EXISTS (
         SELECT 1
         FROM dbo.Sales
         WHERE Id = @SaleId
@@ -35,8 +34,7 @@ BEGIN
     )
         THROW 50038, 'Sale items can be added only to a draft sale.', 1;
 
-    IF NOT EXISTS
-    (
+    IF NOT EXISTS (
         SELECT 1
         FROM dbo.Products
         WHERE Id = @ProductId
@@ -44,8 +42,7 @@ BEGIN
     )
         THROW 50036, 'Product not found or inactive.', 1;
 
-    IF EXISTS
-    (
+    IF EXISTS (
         SELECT 1
         FROM dbo.SaleItems
         WHERE SaleId = @SaleId
@@ -53,16 +50,14 @@ BEGIN
     )
         THROW 50037, 'This product already exists in the sale.', 1;
 
-    INSERT INTO dbo.SaleItems
-    (
+    INSERT INTO dbo.SaleItems (
         SaleId,
         ProductId,
         Quantity,
         UnitPrice,
         DiscountAmount
     )
-    VALUES
-    (
+    VALUES (
         @SaleId,
         @ProductId,
         @Quantity,
@@ -72,4 +67,3 @@ BEGIN
 
     SET @Id = CONVERT(INT, SCOPE_IDENTITY());
 END;
-GO

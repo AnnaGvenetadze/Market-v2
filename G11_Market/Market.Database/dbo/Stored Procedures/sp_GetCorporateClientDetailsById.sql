@@ -4,8 +4,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT 
-    *
+    SELECT *
     FROM CorporateClientDetails
     WHERE Id = @Id AND IsDeleted = 0;
 END;

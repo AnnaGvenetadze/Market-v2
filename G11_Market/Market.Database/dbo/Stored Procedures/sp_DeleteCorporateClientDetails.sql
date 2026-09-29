@@ -11,7 +11,4 @@ BEGIN
     SET IsDeleted = 1,
         UpdateDate = GETDATE()
     WHERE Id = @Id AND IsDeleted = 0;
-
-    IF @@ROWCOUNT = 0
-        THROW 50000, 'Corporate client details not found or already deleted.', 1;
 END;
