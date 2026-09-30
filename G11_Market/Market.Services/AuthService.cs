@@ -17,7 +17,7 @@ public class AuthService : IAuthService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<LoginResultDTO> Login(string username, string password, CancellationToken cancellationToken = default)
+    public async Task<AuthResultDTO> Login(string username, string password, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(username);
         ArgumentException.ThrowIfNullOrWhiteSpace(password);
@@ -38,6 +38,32 @@ public class AuthService : IAuthService
             return FailedLogin("Access Denied: This account is registered to a different physical device.");
 
         return await SuccessfulLoginAsync(user, now, cancellationToken);
+    }
+
+    public async Task Logout(CancellationToken cancellationToken = default)
+    {
+        _logger.Information("User logged out at {Time}.", DateTime.UtcNow);
+    }
+
+    public async Task Register(string username, string password, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(username);
+        ArgumentException.ThrowIfNullOrWhiteSpace(password);
+        var existingUser = await GetUserByUsernameAsync(username, cancellationToken);
+        if (existingUser is not null)
+            throw new InvalidOperationException("Username already exists.");
+        string hashedPassword = PasswordHasher.HashPassword(password);
+        string hwid = HardwareFingerprintHelper.GenerateHardwareFingerprint();
+        var newUser = new AccountDTO
+        {
+            Username = username,
+            PasswordHash = hashedPassword,
+            Hwid = hwid,
+            FailedLoginAttempts = 0,
+            LockoutTime = null
+        };
+        _unitOfWork.AccountRepository.Insert(newUser);
+        _logger.Information("New user registered: {Username} at {Time}.", username, DateTime.UtcNow);
     }
 
     private async Task<AccountDTO?> GetUserByUsernameAsync(string username, CancellationToken cancellationToken)
@@ -77,7 +103,7 @@ public class AuthService : IAuthService
         return false;
     }
 
-    private async Task<LoginResultDTO> FailedLoginAsync(AccountDTO user, DateTime now, CancellationToken cancellationToken)
+    private async Task<AuthResultDTO> FailedLoginAsync(AccountDTO user, DateTime now, CancellationToken cancellationToken)
     {
         int failedAttempts = user.FailedLoginAttempts + 1;
         DateTime? lockoutTime = null;
@@ -107,22 +133,22 @@ public class AuthService : IAuthService
         return true;
     }
 
-    private async Task<LoginResultDTO> SuccessfulLoginAsync(AccountDTO user, DateTime now, CancellationToken cancellationToken)
+    private async Task<AuthResultDTO> SuccessfulLoginAsync(AccountDTO user, DateTime now, CancellationToken cancellationToken)
     {
         _unitOfWork.AccountRepository.UpdateLoginAttempts(user.Id, 0, now, null);
 
         _logger.Information("User {UserId} logged in successfully at {Time}.", user.Id, now);
 
-        return new LoginResultDTO
+        return new AuthResultDTO
         {
             IsSuccess = true,
             UserId = user.Id
         };
     }
 
-    private static LoginResultDTO FailedLogin(string errorMessage)
+    private static AuthResultDTO FailedLogin(string errorMessage)
     {
-        return new LoginResultDTO
+        return new AuthResultDTO
         {
             IsSuccess = false,
             ErrorMessage = errorMessage

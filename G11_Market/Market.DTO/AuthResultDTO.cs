@@ -1,6 +1,6 @@
 ﻿namespace Market.DTO;
 
-public record LoginResultDTO
+public record AuthResultDTO
 {
     public bool IsSuccess { get; init; }
     public int? UserId { get; init; }
