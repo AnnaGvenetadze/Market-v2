@@ -1,6 +1,7 @@
 ﻿using Market.DTO;
 using Market.Tests.Helpers;
 using Microsoft.Data.SqlClient;
+using NUnit.Framework;
 
 namespace Market.Tests;
 
@@ -27,12 +28,15 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var insertedAccount = UnitOfWork.AccountRepository.GetById(newId);
 
         // Assert
-        Assert.That(newId, Is.GreaterThan(0));
-        Assert.That(insertedAccount, Is.Not.Null);
-        Assert.That(insertedAccount!.Id, Is.EqualTo(newId));
-        Assert.That(insertedAccount.Username, Is.EqualTo(account.Username));
-        Assert.That(insertedAccount.Email, Is.EqualTo(account.Email));
-        Assert.That(insertedAccount.AccountType, Is.EqualTo(account.AccountType));
+        Assert.Multiple(() =>
+        {
+            Assert.That(newId, Is.GreaterThan(0));
+            Assert.That(insertedAccount, Is.Not.Null);
+            Assert.That(insertedAccount!.Id, Is.EqualTo(newId));
+            Assert.That(insertedAccount.Username, Is.EqualTo(account.Username));
+            Assert.That(insertedAccount.Email, Is.EqualTo(account.Email));
+            Assert.That(insertedAccount.AccountType, Is.EqualTo(account.AccountType));
+        });
     }
 
     [Test]
@@ -45,7 +49,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
 
         UnitOfWork.AccountRepository.Insert(first);
 
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(second));
     }
 
@@ -59,7 +63,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
 
         UnitOfWork.AccountRepository.Insert(first);
 
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(second));
     }
 
@@ -70,7 +74,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var account = CreateValidAccount();
         account.AccountType = 99;
 
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(account));
     }
 
@@ -81,7 +85,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var account = CreateValidAccount();
         account.Username = "   ";
 
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(account));
     }
 
@@ -92,14 +96,14 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var account = CreateValidAccount();
         account.Email = "";
 
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Insert(account));
     }
 
     [Test]
     public void Insert_WhenEntityIsNull_ShouldThrowException()
     {
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.Insert(null!));
     }
 
@@ -120,10 +124,13 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var updatedAccount = UnitOfWork.AccountRepository.GetById(newId);
 
         // Assert
-        Assert.That(updatedAccount, Is.Not.Null);
-        Assert.That(updatedAccount!.FirstName, Is.EqualTo("Jane"));
-        Assert.That(updatedAccount.LastName, Is.EqualTo("Smith"));
-        Assert.That(updatedAccount.AccountType, Is.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(updatedAccount, Is.Not.Null);
+            Assert.That(updatedAccount!.FirstName, Is.EqualTo("Jane"));
+            Assert.That(updatedAccount.LastName, Is.EqualTo("Smith"));
+            Assert.That(updatedAccount.AccountType, Is.EqualTo(2));
+        });
     }
 
     [Test]
@@ -141,7 +148,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
 
         secondAccount.Username = firstAccount.Username;
 
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Update(secondAccount));
     }
 
@@ -160,7 +167,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
 
         secondAccount.Email = firstAccount.Email;
 
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Update(secondAccount));
     }
 
@@ -174,7 +181,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
 
         inserted.AccountType = 0;
 
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Update(inserted));
     }
 
@@ -188,7 +195,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
 
         inserted.Username = "   ";
 
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Update(inserted));
     }
 
@@ -199,19 +206,19 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var nonExistent = CreateValidAccount();
         nonExistent.Id = -999;
 
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Update(nonExistent));
     }
 
     [Test]
     public void Update_WhenEntityIsNull_ShouldThrowException()
     {
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.Update(null!));
     }
 
     [Test]
-    public void DeleteTest_ShouldDeleteValidData() 
+    public void DeleteTest_ShouldDeleteValidData()
     {
         // Arrange
         var account = CreateValidAccount();
@@ -228,14 +235,14 @@ public class AccountRepositoryTests : BaseRepositoryTests
     [Test]
     public void DeleteTest_ShouldNotDeleteInvalidId()
     {
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<SqlException>(() => UnitOfWork.AccountRepository.Delete(-999));
     }
 
     [Test]
     public void Delete_WhenIdIsNull_ShouldThrowException()
     {
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.Delete(null!));
     }
 
@@ -250,8 +257,11 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var result = UnitOfWork.AccountRepository.GetById(id);
 
         // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.Id, Is.EqualTo(id));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Id, Is.EqualTo(id));
+        });
     }
 
     [Test]
@@ -282,7 +292,7 @@ public class AccountRepositoryTests : BaseRepositoryTests
     [Test]
     public void GetById_WhenIdIsNull_ShouldThrowException()
     {
-        // Act and Assert
+        // Act & Assert
         Assert.Throws<ArgumentNullException>(() => UnitOfWork.AccountRepository.GetById((object)null!));
     }
 
@@ -297,8 +307,11 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var result = UnitOfWork.AccountRepository.GetByUsername(account.Username);
 
         // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.Username, Is.EqualTo(account.Username));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Username, Is.EqualTo(account.Username));
+        });
     }
 
     [Test]
@@ -322,8 +335,11 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var result = UnitOfWork.AccountRepository.GetByEmail(account.Email);
 
         // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.Email, Is.EqualTo(account.Email));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Email, Is.EqualTo(account.Email));
+        });
     }
 
     [Test]
@@ -353,9 +369,12 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var results = UnitOfWork.AccountRepository.GetByAccountType(targetType).ToList();
 
         // Assert
-        Assert.That(results.Any(a => a.Id == id1), Is.True);
-        Assert.That(results.Any(a => a.Id == id2), Is.True);
-        Assert.That(results.All(a => a.AccountType == targetType), Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Any(a => a.Id == id1), Is.True);
+            Assert.That(results.Any(a => a.Id == id2), Is.True);
+            Assert.That(results.All(a => a.AccountType == targetType), Is.True);
+        });
     }
 
     [Test]
@@ -374,7 +393,10 @@ public class AccountRepositoryTests : BaseRepositoryTests
         var results = UnitOfWork.AccountRepository.GetAll().ToList();
 
         // Assert
-        Assert.That(results.Any(a => a.Id == activeId), Is.True);
-        Assert.That(results.Any(a => a.Id == deletedId), Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Any(a => a.Id == activeId), Is.True);
+            Assert.That(results.Any(a => a.Id == deletedId), Is.False);
+        });
     }
 }

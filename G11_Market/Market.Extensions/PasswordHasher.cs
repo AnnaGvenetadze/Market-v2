@@ -10,6 +10,9 @@ public static class PasswordHasher
     }
     public static bool VerifyHashedPassword(string hashedPassword, string providedPassword)
     {
+        if (string.IsNullOrWhiteSpace(providedPassword) || string.IsNullOrWhiteSpace(hashedPassword))
+            return false;
+
         return BCrypt.Net.BCrypt.Verify(providedPassword, hashedPassword);
     }
 }

@@ -17,6 +17,25 @@ public partial class ExpressionTranslator<T> : ExpressionVisitor
         return (_sql.ToString(), _parameters);
     }
 
+    protected override Expression VisitUnary(UnaryExpression node)
+    {
+        if (node.NodeType == ExpressionType.Not)
+        {
+            if (node.Operand is MemberExpression member && member.Expression is ParameterExpression)
+            {
+                _sql.Append($"({member.Member.Name} = 0)");
+                return node;
+            }
+
+            _sql.Append("NOT (");
+            Visit(node.Operand);
+            _sql.Append(")");
+            return node;
+        }
+
+        return base.VisitUnary(node);
+    }
+
     protected override Expression VisitBinary(BinaryExpression node)
     {
         if (IsNullConstant(node.Right) || IsNullConstant(node.Left))

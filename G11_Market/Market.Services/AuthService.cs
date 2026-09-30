@@ -19,8 +19,11 @@ public class AuthService : IAuthService
 
     public async Task<AuthResultDTO> Login(string username, string password, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(username);
-        ArgumentException.ThrowIfNullOrWhiteSpace(password);
+        if (string.IsNullOrWhiteSpace(username))
+            throw new ArgumentException("Username cannot be null or whitespace.", nameof(username));
+
+        if (string.IsNullOrWhiteSpace(password))
+            throw new ArgumentException("Password cannot be null or whitespace.", nameof(password));
 
         DateTime now = DateTime.UtcNow;
 
@@ -31,7 +34,7 @@ public class AuthService : IAuthService
         if (IsAccountLocked(user, now))
             return FailedLogin("Account is temporarily locked. Try again later.");
 
-        if (!PasswordHasher.VerifyHashedPassword(password, user.PasswordHash))
+        if (!PasswordHasher.VerifyHashedPassword(user.PasswordHash, password))
             return await FailedLoginAsync(user, now, cancellationToken);
 
         if (!ValidateHardwareFingerprint(user))
@@ -43,48 +46,51 @@ public class AuthService : IAuthService
     public async Task Logout(CancellationToken cancellationToken = default)
     {
         _logger.Information("User logged out at {Time}.", DateTime.UtcNow);
+        await Task.CompletedTask;
     }
 
     public async Task Register(string username, string password, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(username);
-        ArgumentException.ThrowIfNullOrWhiteSpace(password);
+        if (string.IsNullOrWhiteSpace(username))
+            throw new ArgumentException("Username cannot be null or whitespace.", nameof(username));
+
+        if (string.IsNullOrWhiteSpace(password))
+            throw new ArgumentException("Password cannot be null or whitespace.", nameof(password));
+
         var existingUser = await GetUserByUsernameAsync(username, cancellationToken);
         if (existingUser is not null)
             throw new InvalidOperationException("Username already exists.");
+
         string hashedPassword = PasswordHasher.HashPassword(password);
         string hwid = HardwareFingerprintHelper.GenerateHardwareFingerprint();
+
         var newUser = new AccountDTO
         {
             Username = username,
             PasswordHash = hashedPassword,
+            Email = $"{username}@test.com",
+            FirstName = username,
+            LastName = "User",
+            AccountType = 1,
             Hwid = hwid,
             FailedLoginAttempts = 0,
-            LockoutTime = null
+            LockoutTime = null,
+            IsDeleted = false
         };
+
         _unitOfWork.AccountRepository.Insert(newUser);
         _logger.Information("New user registered: {Username} at {Time}.", username, DateTime.UtcNow);
+        await Task.CompletedTask;
     }
 
     private async Task<AccountDTO?> GetUserByUsernameAsync(string username, CancellationToken cancellationToken)
     {
-        var user = _unitOfWork
-            .AccountRepository
-            .Search(a => a.Username == username && !a.IsDeleted)
-            .FirstOrDefault();
+        var user = _unitOfWork.AccountRepository.GetByUsername(username);
 
-        if (user is null)
+        if (user is null || user.IsDeleted)
             return null;
 
-        return new AccountDTO
-        {
-            Id = user.Id,
-            Username = user.Username,
-            PasswordHash = user.PasswordHash,
-            Hwid = user.Hwid,
-            FailedLoginAttempts = user.FailedLoginAttempts,
-            LockoutTime = user.LockoutTime
-        };
+        return user;
     }
 
     private bool IsAccountLocked(AccountDTO user, DateTime now)
@@ -92,7 +98,13 @@ public class AuthService : IAuthService
         if (!user.LockoutTime.HasValue)
             return false;
 
-        if (user.LockoutTime > now)
+        DateTime lockoutTime = user.LockoutTime.Value;
+        if (lockoutTime.Kind == DateTimeKind.Unspecified)
+        {
+            lockoutTime = DateTime.SpecifyKind(lockoutTime, DateTimeKind.Utc);
+        }
+
+        if (lockoutTime > now)
         {
             _logger.Warning("Login denied for locked user {UserId} until {LockoutTime}", user.Id, user.LockoutTime);
             return true;
@@ -116,7 +128,7 @@ public class AuthService : IAuthService
 
         _unitOfWork.AccountRepository.UpdateLoginAttempts(user.Id, failedAttempts, now, lockoutTime);
 
-        return FailedLogin("Invalid credentials.");
+        return await Task.FromResult(FailedLogin("Invalid credentials."));
     }
 
     private bool ValidateHardwareFingerprint(AccountDTO user)
@@ -139,11 +151,11 @@ public class AuthService : IAuthService
 
         _logger.Information("User {UserId} logged in successfully at {Time}.", user.Id, now);
 
-        return new AuthResultDTO
+        return await Task.FromResult(new AuthResultDTO
         {
             IsSuccess = true,
             UserId = user.Id
-        };
+        });
     }
 
     private static AuthResultDTO FailedLogin(string errorMessage)

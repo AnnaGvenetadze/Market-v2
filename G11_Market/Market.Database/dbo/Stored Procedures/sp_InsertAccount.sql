@@ -1,12 +1,17 @@
 ﻿CREATE PROCEDURE dbo.sp_InsertAccount
-    @Username NVARCHAR(50),
-    @PasswordHash NVARCHAR(255),
-    @Email NVARCHAR(255),
-    @AccountType TINYINT,
-    @FirstName NVARCHAR(50),
-    @LastName NVARCHAR(50),
-    @Hwid VARCHAR(64) = '',
-    @Id INT OUTPUT
+    @Id INT = NULL OUTPUT,
+    @Username NVARCHAR(50) = NULL,
+    @PasswordHash NVARCHAR(255) = NULL,
+    @Email NVARCHAR(255) = NULL,
+    @AccountType TINYINT = NULL,
+    @FirstName NVARCHAR(50) = NULL,
+    @LastName NVARCHAR(50) = NULL,
+    @Hwid VARCHAR(64) = NULL,
+    @FailedLoginAttempts INT = 0,
+    @LockoutTime DATETIME = NULL,
+    @IsDeleted BIT = 0,
+    @CreateDate DATETIME = NULL,
+    @UpdateDate DATETIME = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -47,26 +52,31 @@ BEGIN
         RETURN;
     END;
 
-    IF EXISTS (SELECT 1 FROM Accounts WHERE Username = @Username AND IsDeleted = 0)
+    IF EXISTS (SELECT 1 FROM dbo.Accounts WHERE Username = @Username AND IsDeleted = 0)
     BEGIN
         RAISERROR('An active account with this username already exists.', 16, 1);
         RETURN;
     END;
 
-    IF EXISTS (SELECT 1 FROM Accounts WHERE Email = @Email AND IsDeleted = 0)
+    IF EXISTS (SELECT 1 FROM dbo.Accounts WHERE Email = @Email AND IsDeleted = 0)
     BEGIN
         RAISERROR('An active account with this email already exists.', 16, 1);
         RETURN;
     END;
 
-    INSERT INTO Accounts (
+    INSERT INTO dbo.Accounts (
         Username, 
         PasswordHash, 
         Email, 
         AccountType, 
         FirstName, 
         LastName, 
-        Hwid
+        Hwid,
+        FailedLoginAttempts,
+        LockoutTime,
+        IsDeleted,
+        CreateDate,
+        UpdateDate
     )
     VALUES (
         @Username, 
@@ -75,9 +85,13 @@ BEGIN
         @AccountType, 
         @FirstName, 
         @LastName, 
-        ISNULL(@Hwid, '')
+        ISNULL(@Hwid, ''),
+        ISNULL(@FailedLoginAttempts, 0),
+        @LockoutTime,
+        ISNULL(@IsDeleted, 0),
+        ISNULL(@CreateDate, GETUTCDATE()),
+        @UpdateDate
     );
 
     SET @Id = SCOPE_IDENTITY();
-    SELECT @Id AS Id;
 END;
