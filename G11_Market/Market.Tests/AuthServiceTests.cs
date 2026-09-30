@@ -194,6 +194,8 @@ public class AuthServiceTests : BaseRepositoryTests
         account.LockoutTime = lockoutTime;
 
         UnitOfWork.AccountRepository.Insert(account);
+        var storedAccount = UnitOfWork.AccountRepository.GetByUsername(username);
+
 
         // Act
         var result = await _authService.Login(username, "CorrectPassword123!");
