@@ -49,13 +49,16 @@ public class AuthService : IAuthService
         await Task.CompletedTask;
     }
 
-    public async Task Register(string username, string password, CancellationToken cancellationToken = default)
+    public async Task Register(string username, string password, string email, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(username))
             throw new ArgumentException("Username cannot be null or whitespace.", nameof(username));
 
         if (string.IsNullOrWhiteSpace(password))
             throw new ArgumentException("Password cannot be null or whitespace.", nameof(password));
+
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Email cannot be null or whitespace.", nameof(email));
 
         var existingUser = await GetUserByUsernameAsync(username, cancellationToken);
         if (existingUser is not null)
@@ -68,7 +71,7 @@ public class AuthService : IAuthService
         {
             Username = username,
             PasswordHash = hashedPassword,
-            Email = $"{username}@test.com",
+            Email = email,
             FirstName = username,
             LastName = "User",
             AccountType = 1,
