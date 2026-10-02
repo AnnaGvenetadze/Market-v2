@@ -15,12 +15,16 @@ public abstract class BaseRepositoryTests
     protected SqlConnection Connection;
     protected IUnitOfWork UnitOfWork;
 
-    [SetUp]
-    public void BaseSetup()
+    [OneTimeSetUp]
+    public void OneTimeSetup()
     {
         DatabaseHelper.ClearDatabase();
         DatabaseHelper.SeedDatabase();
+    }
 
+    [SetUp]
+    public void BaseSetup()
+    {
         Connection = new SqlConnection(ConnectionString);
         UnitOfWork = UnitOfWorkFactory.Create(Connection);
     }
