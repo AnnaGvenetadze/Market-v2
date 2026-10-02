@@ -1,8 +1,12 @@
-﻿CREATE TABLE Attributes (
-    Id INT PRIMARY KEY IDENTITY(1,1),
-    AttributeName NVARCHAR(100) NOT NULL UNIQUE,
-    AttributeType TINYINT NOT NULL CHECK(AttributeType in (1, 2, 3, 4)), -- 1: Text, 2: Number, 3: Date, 4: Boolean
-    IsDeleted BIT NOT NULL DEFAULT 0,
-    CreatedDate DATETIME NOT NULL DEFAULT GETDATE(),
-    UpdatedDate DATETIME NULL
+﻿CREATE TABLE [dbo].[Attributes] (
+    [Id]            INT            IDENTITY (1, 1) NOT NULL,
+    [AttributeName] NVARCHAR (100) NOT NULL,
+    [AttributeType] TINYINT        NOT NULL,
+    [IsDeleted]     BIT            DEFAULT ((0)) NOT NULL,
+    [CreatedDate]   DATETIME       DEFAULT (getdate()) NOT NULL,
+    [UpdatedDate]   DATETIME       NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC),
+    CHECK ([AttributeType]=(4) OR [AttributeType]=(3) OR [AttributeType]=(2) OR [AttributeType]=(1)),
+    UNIQUE NONCLUSTERED ([AttributeName] ASC)
 );
+
