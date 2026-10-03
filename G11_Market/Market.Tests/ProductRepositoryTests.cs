@@ -515,4 +515,34 @@ public sealed class ProductRepositoryTests : BaseRepositoryTests
             otherProductValues.Single().TextValue,
             Is.EqualTo("Samsung"));
     }
+
+    [Test]
+    public void Restore_ShouldRestoreDeletedProduct()
+    {
+        // Arrange
+        UnitOfWork.ProductRepository.Delete(DeleteTestId);
+
+        // Act
+        UnitOfWork.ProductRepository.Restore(DeleteTestId);
+
+        // Assert
+        var product = UnitOfWork.ProductRepository.GetById(DeleteTestId);
+
+        Assert.That(product, Is.Not.Null);
+        Assert.That(product!.IsDeleted, Is.False);
+    }
+
+    [Test]
+    public void Restore_WhenProductDoesNotExist_ShouldThrow()
+    {
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.ProductRepository.Restore(int.MaxValue));
+    }
+
+    [Test]
+    public void Restore_WhenProductIsNotDeleted_ShouldThrow()
+    {
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.ProductRepository.Restore(1));
+    }
 }

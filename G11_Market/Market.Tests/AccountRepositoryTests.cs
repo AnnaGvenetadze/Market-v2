@@ -399,4 +399,34 @@
 //            Assert.That(results.Any(a => a.Id == deletedId), Is.False);
 //        });
 //    }
+
+//[Test]
+//public void Restore_ShouldRestoreDeletedAccount()
+//{
+//    // Arrange
+//    UnitOfWork.AccountRepository.Delete(DeleteTestId);
+
+//    // Act
+//    UnitOfWork.AccountRepository.Restore(DeleteTestId);
+
+//    // Assert
+//    var account = UnitOfWork.AccountRepository.GetById(DeleteTestId);
+
+//    Assert.That(account, Is.Not.Null);
+//    Assert.That(account!.IsDeleted, Is.False);
+//}
+
+//[Test]
+//public void Restore_WhenAccountDoesNotExist_ShouldThrow()
+//{
+//    Assert.Throws<SqlException>(() =>
+//        UnitOfWork.AccountRepository.Restore(int.MaxValue));
+//}
+
+//[Test]
+//public void Restore_WhenAccountIsNotDeleted_ShouldThrow()
+//{
+//    Assert.Throws<SqlException>(() =>
+//        UnitOfWork.AccountRepository.Restore(1));
+//}
 //}

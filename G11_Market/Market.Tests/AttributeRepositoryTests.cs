@@ -272,7 +272,7 @@ public class AttributeRepositoryTests : BaseRepositoryTests
     public void GetByType_ShouldReturnMatchingAttributes()
     {
         // Arrange
-        byte targetType = 3; 
+        byte targetType = 3;
         var attribute1 = new AttributeDTO { AttributeName = "Date1".AddGuid(), AttributeType = targetType };
         var attribute2 = new AttributeDTO { AttributeName = "Date2".AddGuid(), AttributeType = targetType };
         var attribute3 = new AttributeDTO { AttributeName = "Text1".AddGuid(), AttributeType = 1 };
@@ -347,5 +347,35 @@ public class AttributeRepositoryTests : BaseRepositoryTests
         // Assert
         Assert.That(results.Any(a => a.Id == activeId), Is.True);
         Assert.That(results.Any(a => a.Id == deletedId), Is.False);
+    }
+
+    [Test]
+    public void Restore_ShouldRestoreDeletedAttribute()
+    {
+        // Arrange
+        UnitOfWork.AttributeRepository.Delete(DeleteTestId);
+
+        // Act
+        UnitOfWork.AttributeRepository.Restore(DeleteTestId);
+
+        // Assert
+        var attribute = UnitOfWork.AttributeRepository.GetById(DeleteTestId);
+
+        Assert.That(attribute, Is.Not.Null);
+        Assert.That(attribute!.IsDeleted, Is.False);
+    }
+
+    [Test]
+    public void Restore_WhenAttributeDoesNotExist_ShouldThrow()
+    {
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.AttributeRepository.Restore(int.MaxValue));
+    }
+
+    [Test]
+    public void Restore_WhenAttributeIsNotDeleted_ShouldThrow()
+    {
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.AttributeRepository.Restore(1));
     }
 }

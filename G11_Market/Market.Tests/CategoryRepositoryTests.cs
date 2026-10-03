@@ -193,4 +193,34 @@ public class CategoryRepositoryTests : BaseRepositoryTests
         UnitOfWork.CategoryRepository.AssignAttribute(mapping);
         UnitOfWork.CategoryRepository.UnassignAttribute(mapping);
     }
+
+    [Test]
+    public void Restore_ShouldRestoreDeletedCategory()
+    {
+        // Arrange
+        UnitOfWork.CategoryRepository.Delete(DeleteTestId);
+
+        // Act
+        UnitOfWork.CategoryRepository.Restore(DeleteTestId);
+
+        // Assert
+        var category = UnitOfWork.CategoryRepository.GetById(DeleteTestId);
+
+        Assert.That(category, Is.Not.Null);
+        Assert.That(category!.IsDeleted, Is.False);
+    }
+
+    [Test]
+    public void Restore_WhenCategoryDoesNotExist_ShouldThrow()
+    {
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.CategoryRepository.Restore(int.MaxValue));
+    }
+
+    [Test]
+    public void Restore_WhenCategoryIsNotDeleted_ShouldThrow()
+    {
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.CategoryRepository.Restore(1));
+    }
 }

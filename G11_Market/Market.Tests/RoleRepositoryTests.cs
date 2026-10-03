@@ -249,4 +249,34 @@ public sealed class RoleRepositoryTests : BaseRepositoryTests
             """,
             new { Id = roleId });
     }
+
+    [Test]
+    public void Restore_ShouldRestoreDeletedRole()
+    {
+        // Arrange
+        UnitOfWork.RoleRepository.Delete(DeleteTestId);
+
+        // Act
+        UnitOfWork.RoleRepository.Restore(DeleteTestId);
+
+        // Assert
+        var role = UnitOfWork.RoleRepository.GetById(DeleteTestId);
+
+        Assert.That(role, Is.Not.Null);
+        Assert.That(role!.IsDeleted, Is.False);
+    }
+
+    [Test]
+    public void Restore_WhenRoleDoesNotExist_ShouldThrow()
+    {
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.RoleRepository.Restore(int.MaxValue));
+    }
+
+    [Test]
+    public void Restore_WhenRoleIsNotDeleted_ShouldThrow()
+    {
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.RoleRepository.Restore(1));
+    }
 }

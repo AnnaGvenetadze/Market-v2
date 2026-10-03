@@ -400,6 +400,37 @@
 //        Assert.That(allEmployees.Count, Is.AtLeast(2));
 //    }
 
+//[Test]
+//public void Restore_ShouldRestoreDeletedEmployee()
+//{
+//    // Arrange
+//    UnitOfWork.EmployeeRepository.Delete(DeleteTestId);
+
+//    // Act
+//    UnitOfWork.EmployeeRepository.Restore(DeleteTestId);
+
+//    // Assert
+//    var employee = UnitOfWork.EmployeeRepository.GetById(DeleteTestId);
+
+//    Assert.That(employee, Is.Not.Null);
+//    Assert.That(employee!.IsDeleted, Is.False);
+//}
+
+//[Test]
+//public void Restore_WhenEmployeeDoesNotExist_ShouldThrow()
+//{
+//    Assert.Throws<SqlException>(() =>
+//        UnitOfWork.EmployeeRepository.Restore(int.MaxValue));
+//}
+
+//[Test]
+//public void Restore_WhenEmployeeIsNotDeleted_ShouldThrow()
+//{
+//    Assert.Throws<SqlException>(() =>
+//        UnitOfWork.EmployeeRepository.Restore(1));
+//}
+
+
 //    [TearDown]
 //    public void TearDown()
 //    {
