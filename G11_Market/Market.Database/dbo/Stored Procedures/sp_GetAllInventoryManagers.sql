@@ -8,4 +8,3 @@ BEGIN
     WHERE IsDeleted = 0
     ORDER BY Id;
 END;
-go

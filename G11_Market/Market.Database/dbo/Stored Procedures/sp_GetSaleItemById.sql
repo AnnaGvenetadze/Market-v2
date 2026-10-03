@@ -7,4 +7,3 @@ BEGIN
     FROM dbo.SaleItems
     WHERE Id = @Id;
 END;
-GO

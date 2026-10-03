@@ -86,7 +86,6 @@
     <Build Include="dbo\Tables\CategoryAttributes.sql" />
     <Build Include="dbo\Tables\ProductAttributeValues.sql" />
     <Build Include="dbo\User-Defined Function\fn_IsCircularCategory.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetEmployeeByAcountId.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteProductAttributeValue.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteProduct.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteAccount.sql" />

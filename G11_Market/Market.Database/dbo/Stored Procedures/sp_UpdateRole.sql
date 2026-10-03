@@ -17,4 +17,3 @@ BEGIN
         RAISERROR('Role with Id %d was not found or has been deleted.', 16, 1, @Id);
     END;
 END;
-GO

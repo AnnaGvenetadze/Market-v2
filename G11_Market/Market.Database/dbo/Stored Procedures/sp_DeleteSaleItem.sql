@@ -26,4 +26,3 @@ BEGIN
     DELETE FROM dbo.SaleItems
     WHERE Id = @Id;
 END;
-GO

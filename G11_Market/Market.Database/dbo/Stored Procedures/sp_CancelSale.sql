@@ -20,4 +20,3 @@ BEGIN
         CancelReason = @CancelReason
     WHERE Id = @Id AND Status = 0;
 END;
-GO

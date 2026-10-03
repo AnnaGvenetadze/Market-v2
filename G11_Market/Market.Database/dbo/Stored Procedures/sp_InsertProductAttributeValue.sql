@@ -30,4 +30,3 @@ BEGIN
 
     SET @Id = 0;
 END;
-go

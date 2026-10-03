@@ -14,4 +14,3 @@ BEGIN
     FROM dbo.Roles
     WHERE Id = @Id AND IsDeleted = 0;
 END;
-GO

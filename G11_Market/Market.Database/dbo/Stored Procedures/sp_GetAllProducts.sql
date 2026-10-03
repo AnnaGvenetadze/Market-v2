@@ -14,4 +14,3 @@ BEGIN
     FROM dbo.Products
     WHERE IsDeleted = 0;
 END;
-GO

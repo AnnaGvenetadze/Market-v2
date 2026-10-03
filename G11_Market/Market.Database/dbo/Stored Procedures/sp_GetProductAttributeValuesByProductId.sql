@@ -32,4 +32,3 @@ begin
     where pav.ProductId = @ProductId
     order by a.AttributeName;
 end;
-go
