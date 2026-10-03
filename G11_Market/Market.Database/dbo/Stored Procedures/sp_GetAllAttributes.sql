@@ -1,4 +1,5 @@
-﻿create procedure sp_GetAllAttributes
+﻿
+CREATE   PROCEDURE dbo.sp_GetAllAttributes
 as 
 begin 
     set nocount on;

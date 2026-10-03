@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE dbo.sp_AssignEmployeeRole
+﻿
+CREATE   PROCEDURE dbo.sp_AssignEmployeeRole
     @EmployeeId INT,
     @RoleId INT
 AS

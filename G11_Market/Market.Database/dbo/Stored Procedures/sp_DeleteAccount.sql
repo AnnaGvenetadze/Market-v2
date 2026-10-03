@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE sp_DeleteAccount
+﻿
+CREATE   PROCEDURE dbo.sp_DeleteAccount
     @Id INT
 AS
 BEGIN

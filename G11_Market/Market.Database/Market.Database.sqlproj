@@ -64,10 +64,6 @@
     <Folder Include="dbo\User-Defined Function" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Stored Procedures\sp_InsertCountry.sql" />
-    <Build Include="dbo\Stored Procedures\sp_UpdateCountry.sql" />
-    <Build Include="dbo\Stored Procedures\sp_DeleteCountry.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetCountryById.sql" />
     <None Include="Scripts\ScriptsIgnoredOnImport.sql" />
     <Build Include="dbo\Tables\Categories.sql" />
     <Build Include="dbo\Tables\Products.sql" />
@@ -80,8 +76,6 @@
     <Build Include="dbo\Tables\Sales.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertAccount.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertEmployee.sql" />
-    <Build Include="dbo\Stored Procedures\sp_InsertClient.sql" />
-    <Build Include="dbo\Stored Procedures\sp_InsertCorporateClientDetails.sql" />
     <Build Include="dbo\Stored Procedures\sp_CancelSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_LoginAccount.sql" />
@@ -93,22 +87,15 @@
     <Build Include="dbo\Tables\ProductAttributeValues.sql" />
     <Build Include="dbo\User-Defined Function\fn_IsCircularCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetEmployeeByAcountId.sql" />
-    <Build Include="dbo\Stored Procedures\sp_InsertClientType.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteProductAttributeValue.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteProduct.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteAccount.sql" />
-    <Build Include="dbo\Stored Procedures\sp_DeleteCorporateClientDetails.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteEmployee.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAccountById.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAllAccounts.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetAllClients.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetAllCorporateClientDetails.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAllEmployees.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetClientById.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetCorporateClientDetailsById.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetProductAttributeValuesByProductId.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetEmployeeById.sql" />
-    <Build Include="dbo\Stored Procedures\sp_UpdateCorporateClientDetails.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertProduct.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateProduct.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetCategoryAttributeById.sql" />
@@ -117,17 +104,10 @@
     <Build Include="dbo\Stored Procedures\sp_UpdateCategoryAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetSaleById.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAllSales.sql" />
-    <Build Include="dbo\Stored Procedures\sp_DeleteAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateAttribute.sql" />
-    <Build Include="dbo\Stored Procedures\sp_UpdateInventoryManagerDetail.sql" />
     <Build Include="dbo\Stored Procedures\sp_AssignCattegoryAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_UnassignCategoryAttribute.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetAllCities.sql" />
-    <Build Include="dbo\Stored Procedures\sp_DeleteCity.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetCityById.sql" />
-    <Build Include="dbo\Stored Procedures\sp_InsertCity.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetSaleTotal.sql" />
-    <Build Include="dbo\Stored Procedures\sp_UpdateCity.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetProductById.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAllProducts.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetRoleById.sql" />
@@ -135,13 +115,8 @@
     <Build Include="dbo\Stored Procedures\sp_InsertRole.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateRole.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteRole.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetClientTypeById.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetAllClientTypes.sql" />
-    <Build Include="dbo\Stored Procedures\sp_UpdateClientType.sql" />
-    <Build Include="dbo\Stored Procedures\sp_DeleteClientType.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAllAttributes.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateCategory.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetAllCountries.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateAccountLoginAttempts.sql" />
   </ItemGroup>
   <ItemGroup>
@@ -151,18 +126,23 @@
     <None Include="dbo\Views\vw_CategoriesWithParent.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetCategoryById.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteCategoryAttribute.sql" />
-    <Build Include="dbo\Stored Procedures\sp_UpdateClient.sql" />
-    <Build Include="dbo\Stored Procedures\sp_DeleteClient.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertProductAttributeValue.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateProductAttributeValue.sql" />
-    <Build Include="dbo\Stored Procedures\sp_InsertInventoryManager.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetInventoryManagerDetailById.sql" />
-    <Build Include="dbo\Stored Procedures\sp_DeleteInventoryManagerDetail.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteSaleItem.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetSaleItemById.sql" />
     <Build Include="dbo\Stored Procedures\sp_InsertSaleItem.sql" />
     <Build Include="dbo\Stored Procedures\sp_UpdateSaleItemQuantity.sql" />
     <None Include="TEST.Database.publish.xml" />
     <None Include="DEV.Database.publish.xml" />
+    <Build Include="dbo\Stored Procedures\sp_UnassignEmployeeRole_1.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetStockMovementsByProductId_1.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetStockByProductId_1.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetOutOfStockProducts_1.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetEmployeeRolesByEmployeeId_1.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetCategoryAttributes.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAttributeById_1.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteAttributes.sql" />
+    <Build Include="dbo\Stored Procedures\sp_AssignEmployeeRole_1.sql" />
+    <Build Include="dbo\Stored Procedures\sp_ActivateCategory_1.sql" />
   </ItemGroup>
 </Project>

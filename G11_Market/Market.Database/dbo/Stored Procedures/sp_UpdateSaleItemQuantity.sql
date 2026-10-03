@@ -1,11 +1,12 @@
-﻿CREATE PROCEDURE dbo.sp_UpdateSaleItemQuantity
+﻿
+CREATE   PROCEDURE dbo.sp_UpdateSaleItemQuantity
     @Id INT,
     @Quantity INT
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    IF @Quantity <= 0
+    IF @Quantity IS NULL OR @Quantity <= 0
         THROW 50039, 'Quantity must be greater than zero.', 1;
 
     IF NOT EXISTS

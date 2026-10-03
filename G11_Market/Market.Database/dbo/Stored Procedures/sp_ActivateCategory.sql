@@ -1,32 +1,12 @@
-﻿create procedure dbo.sp_ActivateCategory
-    @CategoryID int
-as
-begin
-    set nocount on;
+﻿
 
-    if exists (
-        select 1
-        from dbo.Categories c
-        inner join dbo.Categories p
-            on c.ParentID = p.ID
-        where c.ID = @CategoryID
-          and p.IsDeleted = 0
-    )
-    begin
-        raiserror('parent category is inactive.', 16, 1);
-        return;
-    end;
-
-    update dbo.Categories
-    set
-        IsDeleted = 1,
-        UpdatedDate = getdate()
-    where ID = @CategoryID;
-
-    if @@rowcount = 0
-    begin
-        raiserror('category was not found.', 16, 1);
-        return;
-    end;
-end;
-go
+CREATE   PROCEDURE dbo.sp_ActivateCategory
+    @CategoryID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF EXISTS (SELECT 1 FROM dbo.Categories c JOIN dbo.Categories p ON p.Id = c.ParentId
+        WHERE c.Id = @CategoryID AND p.IsDeleted = 1) THROW 50000, 'Parent category is inactive.', 1;
+    UPDATE dbo.Categories SET IsDeleted = 0, UpdatedDate = GETDATE() WHERE Id = @CategoryID;
+    IF @@ROWCOUNT = 0 THROW 50000, 'Category not found.', 1;
+END;

@@ -1,4 +1,5 @@
-﻿create procedure sp_DeleteProductAttributeValue
+﻿
+CREATE   PROCEDURE dbo.sp_DeleteProductAttributeValue
 	@ProductId int,
 	@AttributeId int
 as

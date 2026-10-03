@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE sp_UpdateCategory
+﻿
+CREATE   PROCEDURE dbo.sp_UpdateCategory
     @Id INT,
     @ParentId INT = NULL,
     @CategoryName NVARCHAR(100),
@@ -19,7 +20,7 @@ BEGIN
         RETURN;
     END
 
-    IF EXISTS (SELECT 1 FROM Categories WHERE CategoryName = @CategoryName AND Id <> @Id AND IsDeleted = 0)
+    IF EXISTS (SELECT 1 FROM Categories WHERE CategoryName = @CategoryName AND Id <> @Id)
     BEGIN
         RAISERROR('Category name already exists.', 16, 1);
         RETURN;

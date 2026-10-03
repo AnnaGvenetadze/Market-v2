@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE dbo.sp_GetOutOfStockProducts
+﻿
+CREATE   PROCEDURE dbo.sp_GetOutOfStockProducts
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -21,4 +22,3 @@ BEGIN
     HAVING COALESCE(SUM(sm.QuantityChange), 0) <= 0
     ORDER BY p.ProductName;
 END;
-GO

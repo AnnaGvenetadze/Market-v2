@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE sp_InsertCategoryAttribute
+﻿
+CREATE   PROCEDURE dbo.sp_InsertCategoryAttribute
     @CategoryId INT,
     @AttributeId INT,
     @OrderPosition INT
@@ -35,7 +36,8 @@ BEGIN
         RETURN -3;
     END;
 
-    EXEC sp_ValidateAttribute @AttributeId;
+    IF NOT EXISTS (SELECT 1 FROM dbo.Attributes WHERE Id = @AttributeId AND IsDeleted = 0)
+        THROW 50000, 'Attribute not found or deleted.', 1;
 
     IF EXISTS
     (

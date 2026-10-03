@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE sp_GetAttributeById
+﻿
+CREATE   PROCEDURE dbo.sp_GetAttributeById
     @Id INT
 AS
 BEGIN

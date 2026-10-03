@@ -1,4 +1,5 @@
-﻿create procedure sp_GetEmployeeRolesByEmployeeId
+﻿
+CREATE   PROCEDURE dbo.sp_GetEmployeeRolesByEmployeeId
 	@EmployeeId int
 as
 begin
@@ -7,9 +8,8 @@ begin
 	r.Name,
 	r.Description
 	from Roles as r
-	inner join EmployeesRoles as er	
+	inner join EmployeeRoles as er	
 		on r.Id = er.RoleId
 	where er.EmployeeId = @EmployeeId
 	  and r.IsDeleted = 0;
 end
-go

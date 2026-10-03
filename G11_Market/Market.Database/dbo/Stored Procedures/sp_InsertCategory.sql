@@ -1,4 +1,5 @@
-﻿CREATE Procedure dbo.sp_InsertCategory
+﻿
+CREATE   PROCEDURE dbo.sp_InsertCategory
     @ParentId INT = NULL,
     @CategoryName NVARCHAR(100),
     @Description NVARCHAR(1000) = NULL,
@@ -21,7 +22,7 @@ BEGIN
         RETURN;
     END
 
-    IF EXISTS (SELECT 1 FROM dbo.Categories WHERE CategoryName = @CategoryName AND IsDeleted = 0)
+    IF EXISTS (SELECT 1 FROM dbo.Categories WHERE CategoryName = @CategoryName)
     BEGIN
         RAISERROR('Category name already exists.', 16, 1);
         RETURN;

@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE dbo.sp_InsertSaleItem
+﻿
+CREATE   PROCEDURE dbo.sp_InsertSaleItem
     @SaleId INT,
     @ProductId INT,
     @Quantity INT,
@@ -9,14 +10,16 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    IF @Quantity <= 0
+    IF @Quantity IS NULL OR @Quantity <= 0
         THROW 50032, 'Quantity must be greater than zero.', 1;
 
-    IF @UnitPrice < 0
+    IF @UnitPrice IS NULL OR @UnitPrice < 0
         THROW 50033, 'UnitPrice cannot be negative.', 1;
 
-    IF @DiscountAmount < 0
+    IF @DiscountAmount IS NULL OR @DiscountAmount < 0
         THROW 50034, 'DiscountAmount cannot be negative.', 1;
+
+    IF @DiscountAmount > @UnitPrice THROW 50000, 'Discount cannot exceed unit price.', 1;
 
     IF NOT EXISTS (
         SELECT 1

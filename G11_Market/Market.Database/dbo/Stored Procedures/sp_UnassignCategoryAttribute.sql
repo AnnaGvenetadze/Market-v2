@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE dbo.sp_UnassignCategoryAttribute
+﻿
+CREATE   PROCEDURE dbo.sp_UnassignCategoryAttribute
     @CategoryId INT,
     @AttributeId INT
 AS
@@ -29,6 +30,9 @@ BEGIN
         RETURN -3;
     END;
 
+    IF EXISTS (SELECT 1 FROM dbo.ProductAttributeValues v JOIN dbo.Products p ON p.Id = v.ProductId
+        WHERE p.CategoryId = @CategoryId AND v.AttributeId = @AttributeId)
+        THROW 50000, 'Remove associated product attribute values before unassigning.', 1;
     DELETE FROM dbo.CategoryAttributes
     WHERE CategoryId = @CategoryId
       AND AttributeId = @AttributeId;

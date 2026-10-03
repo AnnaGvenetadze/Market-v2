@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE sp_UpdateAttribute
+﻿
+CREATE   PROCEDURE dbo.sp_UpdateAttribute
     @Id INT,
     @AttributeName NVARCHAR(100),
     @AttributeType TINYINT
@@ -36,6 +37,9 @@ BEGIN
         RETURN;
     END
 
+    IF EXISTS (SELECT 1 FROM dbo.ProductAttributeValues WHERE AttributeId = @Id)
+       AND EXISTS (SELECT 1 FROM dbo.Attributes WHERE Id = @Id AND AttributeType <> @AttributeType)
+        THROW 50000, 'Cannot change the type of an attribute with existing values.', 1;
     UPDATE Attributes
     SET AttributeName = @AttributeName,
         AttributeType = @AttributeType,

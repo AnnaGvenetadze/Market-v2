@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE sp_InsertAttribute
+﻿
+CREATE   PROCEDURE dbo.sp_InsertAttribute
     @AttributeName NVARCHAR(100),
     @AttributeType TINYINT,
     @Id INT OUTPUT
@@ -8,7 +9,7 @@ BEGIN
 
     SET @Id = NULL;
 
-    SET @AttributeName = NULLIF(TRIM(@AttributeName), '');
+    SET @AttributeName = NULLIF(LTRIM(RTRIM(@AttributeName)), '');
 
     IF @AttributeName IS NULL
     BEGIN
@@ -27,7 +28,6 @@ BEGIN
         SELECT 1
         FROM Attributes
         WHERE AttributeName = @AttributeName
-          AND IsDeleted = 0
     )
     BEGIN
         RAISERROR('Attribute with the same name already exists.', 16, 1);

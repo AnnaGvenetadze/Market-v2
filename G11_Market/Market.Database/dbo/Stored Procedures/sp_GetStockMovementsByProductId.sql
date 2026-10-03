@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE dbo.sp_GetStockMovementsByProductId
+﻿
+CREATE   PROCEDURE dbo.sp_GetStockMovementsByProductId
     @ProductId INT
 AS
 BEGIN
@@ -26,4 +27,3 @@ BEGIN
     WHERE ProductId = @ProductId
     ORDER BY CreatedDate, Id;
 END;
-GO
