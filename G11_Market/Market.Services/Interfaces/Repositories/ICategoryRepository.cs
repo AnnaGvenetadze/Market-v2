@@ -1,6 +1,4 @@
-﻿using System.Data;
-using System.Data.Common;
-using Market.DTO;
+﻿using Market.DTO;
 
 namespace Market.Services.Interfaces.Repositories;
 

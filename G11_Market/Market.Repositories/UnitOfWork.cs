@@ -18,14 +18,8 @@ internal sealed class UnitOfWork : IUnitOfWork, IDisposable
     private readonly Lazy<StockMovementRepository> _stockMovementRepository;
     private readonly Lazy<SaleRepository> _saleRepository;
     private readonly Lazy<SaleItemRepository> _saleItemRepository;
-    private readonly Lazy<InventoryManagerDetailsRepository> _inventoryManagerDetailsRepository;
     private readonly Lazy<RoleRepository> _roleRepository;
-    private readonly Lazy<CorporateClientDetailsRepository> _corporateClientDetailsRepository;
-    private readonly Lazy<CountryRepository> _countryRepository;
-    private readonly Lazy<CityRepository> _cityRepository;
     private readonly Lazy<AccountRepository> _accountRepository;
-    private readonly Lazy<ClientRepository> _clientRepository;
-    private readonly Lazy<ClientTypeRepository> _clientTypeRepository;
     private readonly Lazy<AttributeRepository> _attributeRepository;
     
     public UnitOfWork(DbConnection connection)
@@ -38,15 +32,9 @@ internal sealed class UnitOfWork : IUnitOfWork, IDisposable
         _saleRepository = new Lazy<SaleRepository>(() => new SaleRepository(_connection));
         _saleItemRepository = new Lazy<SaleItemRepository>(() => new SaleItemRepository(_connection));
         _roleRepository = new Lazy<RoleRepository>(() => new RoleRepository(_connection));
-        _inventoryManagerDetailsRepository = new Lazy<InventoryManagerDetailsRepository>(() => new InventoryManagerDetailsRepository(_connection));
-        _countryRepository = new Lazy<CountryRepository>(() => new CountryRepository(_connection));
         _accountRepository = new Lazy<AccountRepository>(() => new AccountRepository(_connection));
-        _clientRepository = new Lazy<ClientRepository>(() => new ClientRepository(_connection));
-        _clientTypeRepository = new Lazy<ClientTypeRepository>(() => new ClientTypeRepository(_connection));
         _attributeRepository = new Lazy<AttributeRepository>(() => new AttributeRepository(_connection));
         _stockMovementRepository = new Lazy<StockMovementRepository>(() => new StockMovementRepository(_connection));
-        _corporateClientDetailsRepository = new Lazy<CorporateClientDetailsRepository>(() => new CorporateClientDetailsRepository(_connection));
-        _cityRepository = new Lazy<CityRepository>(() => new CityRepository(_connection));
 
         _disposed = false;
     }
@@ -72,26 +60,8 @@ internal sealed class UnitOfWork : IUnitOfWork, IDisposable
     public IRoleRepository RoleRepository
         => GetRepository(_roleRepository);
 
-    public IInventoryManagerDetailsRepository InventoryManagerDetailsRepository
-        => GetRepository(_inventoryManagerDetailsRepository);
-
-    public ICorporateClientDetailsRepository CorporateClientDetailsRepository
-        => GetRepository(_corporateClientDetailsRepository);
-
-    public ICountryRepository CountryRepository
-        => GetRepository(_countryRepository);
-
-    public ICityRepository CityRepository
-        => GetRepository(_cityRepository);
-
     public IAccountRepository AccountRepository
         => GetRepository(_accountRepository);
-
-    public IClientRepository ClientRepository
-        => GetRepository(_clientRepository);
-
-    public IClientTypeRepository ClientTypeRepository
-        => GetRepository(_clientTypeRepository);
 
     public IAttributeRepository AttributeRepository
         => GetRepository(_attributeRepository);

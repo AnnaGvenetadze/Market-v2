@@ -10,7 +10,7 @@ public sealed class SaleDTO
 
     public int CreatedEmployeeId { get; set; }
     public int? CancelledByEmployeeId { get; set; }
-    public byte Status { get; set; }
+    public SaleStatus Status { get; set; }
 
     [IgnoreOnInsert]
     [IgnoreOnUpdate]

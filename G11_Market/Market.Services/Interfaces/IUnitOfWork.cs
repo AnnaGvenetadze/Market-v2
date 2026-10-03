@@ -11,15 +11,9 @@ public interface IUnitOfWork
     ISaleRepository SaleRepository { get; }
     ISaleItemRepository SaleItemRepository { get; }
     IRoleRepository RoleRepository { get; }
-    IInventoryManagerDetailsRepository InventoryManagerDetailsRepository { get; }
-    ICountryRepository CountryRepository { get; }
-    ICityRepository CityRepository { get; }
     IAccountRepository AccountRepository { get; }
-    IClientRepository ClientRepository { get; }
-    IClientTypeRepository ClientTypeRepository { get; }
     IAttributeRepository AttributeRepository { get; }
     IStockMovementRepository StockMovementRepository { get; }
-    ICorporateClientDetailsRepository CorporateClientDetailsRepository { get; }
 
     void BeginTransaction();
 
