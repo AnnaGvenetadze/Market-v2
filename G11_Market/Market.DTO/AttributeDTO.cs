@@ -7,8 +7,7 @@ public sealed class AttributeDTO
     [IgnoreOnInsert]
     public int Id { get; set; }
 
-    public string AttributeName { get; set; } = string.Empty;
-
+    public string AttributeName { get; set; } = null!;
     public byte AttributeType { get; set; }
 
     [IgnoreOnInsert]

@@ -1,20 +1,14 @@
 ﻿using Market.Extensions.Attributes;
 
-namespace Market.DTO;
-
 public sealed class EmployeeDTO
 {
     [IgnoreOnInsert]
-    //[IgnoreOnUpdate]
     public int Id { get; set; }
+
     public int AccountId { get; set; }
     public int? ManagerEmployeeId { get; set; }
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
-    public string EmployeeCode { get; set; } = string.Empty;
+    public string EmployeeCode { get; set; } = null!;
     public DateTime HireDate { get; set; }
-    public string? PhoneNumber { get; set; }
-    public string? ContactEmail { get; set; }
 
     [IgnoreOnInsert]
     [IgnoreOnUpdate]
@@ -27,4 +21,9 @@ public sealed class EmployeeDTO
     [IgnoreOnInsert]
     [IgnoreOnUpdate]
     public DateTime? UpdateDate { get; set; }
+
+    public string FirstName { get; set; } = null!;
+    public string LastName { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public string PhoneNumber { get; set; } = null!;
 }

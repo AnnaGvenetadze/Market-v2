@@ -8,18 +8,11 @@ public sealed class StockMovementDTO
     public int Id { get; set; }
 
     public int ProductId { get; set; }
-
-    // 0 = Sale, 1 = Refill, 2 = Adjustment
     public byte MovementType { get; set; }
-
     public int QuantityChange { get; set; }
-
     public int QuantityBefore { get; set; }
-
     public int? SaleItemId { get; set; }
-
     public int ChangedByEmployeeId { get; set; }
-
     public string? Reason { get; set; }
 
     [IgnoreOnInsert]
