@@ -1,39 +1,47 @@
-﻿-- Self-referencing tables: break self FK links first
-UPDATE Employees
+﻿-- =========================================================
+-- ClearDatabase.txt
+-- Market-v2 / branch: market-v2-develop-AG
+-- IMPORTANT:
+-- Do not use GO here. DatabaseHelper executes this file with
+-- SqlCommand.ExecuteNonQuery() as one batch.
+-- =========================================================
+
+-- Break self-referencing foreign keys first.
+UPDATE dbo.Employees
 SET ManagerEmployeeId = NULL;
 
-UPDATE Categories
+UPDATE dbo.Categories
 SET ParentId = NULL;
 
--- Transaction / movement tables
-DELETE FROM StockMovements;
-DELETE FROM SaleItems;
-DELETE FROM Sales;
+-- Transaction / stock tables.
+DELETE FROM dbo.StockMovements;
+DELETE FROM dbo.SaleItems;
+DELETE FROM dbo.Sales;
 
--- Product-related child tables
-DELETE FROM ProductAttributeValues;
-DELETE FROM CategoryAttributes;
+-- Product child tables.
+DELETE FROM dbo.ProductAttributeValues;
+DELETE FROM dbo.CategoryAttributes;
 
--- Employee/account child tables
-DELETE FROM EmployeeRoles;
+-- Employee child table.
+DELETE FROM dbo.EmployeeRoles;
 
--- Main entity tables
-DELETE FROM Employees;
-DELETE FROM Products;
+-- Main entities.
+DELETE FROM dbo.Products;
+DELETE FROM dbo.Employees;
 
--- Parent/reference tables
-DELETE FROM Accounts;
-DELETE FROM Roles;
-DELETE FROM Attributes;
-DELETE FROM Categories;
+-- Parent / reference entities.
+DELETE FROM dbo.Accounts;
+DELETE FROM dbo.Roles;
+DELETE FROM dbo.Attributes;
+DELETE FROM dbo.Categories;
 
--- Reseed identity tables
-DBCC CHECKIDENT ('StockMovements', RESEED, 0);
-DBCC CHECKIDENT ('SaleItems', RESEED, 0);
-DBCC CHECKIDENT ('Sales', RESEED, 0);
-DBCC CHECKIDENT ('Products', RESEED, 0);
-DBCC CHECKIDENT ('Employees', RESEED, 0);
-DBCC CHECKIDENT ('Accounts', RESEED, 0);
-DBCC CHECKIDENT ('Roles', RESEED, 0);
-DBCC CHECKIDENT ('Attributes', RESEED, 0);
-DBCC CHECKIDENT ('Categories', RESEED, 0);
+-- Reset identity values.
+DBCC CHECKIDENT ('dbo.StockMovements', RESEED, 0);
+DBCC CHECKIDENT ('dbo.SaleItems',      RESEED, 0);
+DBCC CHECKIDENT ('dbo.Sales',          RESEED, 0);
+DBCC CHECKIDENT ('dbo.Products',       RESEED, 0);
+DBCC CHECKIDENT ('dbo.Employees',      RESEED, 0);
+DBCC CHECKIDENT ('dbo.Accounts',       RESEED, 0);
+DBCC CHECKIDENT ('dbo.Roles',          RESEED, 0);
+DBCC CHECKIDENT ('dbo.Attributes',     RESEED, 0);
+DBCC CHECKIDENT ('dbo.Categories',     RESEED, 0);

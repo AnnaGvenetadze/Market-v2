@@ -56,8 +56,8 @@ public class SaleRepositoryTests : BaseRepositoryTests
     public void GetSalesByDateRange_ShouldReturnSalesInsideRange()
     {
         // Arrange
-        var dateFrom = DateTime.Now.AddMinutes(-5);
-        var dateTo = DateTime.Now.AddMinutes(5);
+        var dateFrom = DateTime.UtcNow.AddMinutes(-5);
+        var dateTo = DateTime.UtcNow.AddMinutes(5);
 
         // Act
         var sales = UnitOfWork.SaleRepository

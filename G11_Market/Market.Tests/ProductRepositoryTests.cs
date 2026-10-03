@@ -35,7 +35,7 @@ public sealed class ProductRepositoryTests : BaseRepositoryTests
     }
 
     [Test]
-    public void Insert_WithUnknownCategory_ShouldThrowForeignKeyViolation()
+    public void Insert_WithUnknownCategory_ShouldThrowSqlException()
     {
         // Arrange
         var product = new ProductDTO
@@ -51,7 +51,8 @@ public sealed class ProductRepositoryTests : BaseRepositoryTests
 
         // Assert
         Assert.That(exception, Is.Not.Null);
-        Assert.That(exception!.Number, Is.EqualTo(547));
+        Assert.That(exception!.Number, Is.EqualTo(50000));
+        Assert.That(exception.Message, Does.Contain("Active category not found"));
     }
 
     [Test]
