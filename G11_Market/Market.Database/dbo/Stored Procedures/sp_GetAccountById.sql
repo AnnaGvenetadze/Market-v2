@@ -3,9 +3,7 @@
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    SELECT *
-    FROM Accounts
-    WHERE Id = @Id
-      AND IsDeleted = 0;
+    SELECT Id, Username, PasswordHash, IsDeleted, CreateDate, UpdateDate, LastLoginAtUtc, FailedLoginAttempts, LockoutEndUtc, IsActive
+    FROM dbo.Accounts
+    WHERE Id = @Id AND IsDeleted = 0;
 END;

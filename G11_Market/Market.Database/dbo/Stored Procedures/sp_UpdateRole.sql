@@ -1,18 +1,16 @@
-CREATE PROCEDURE dbo.sp_UpdateRole
+﻿CREATE   PROCEDURE dbo.sp_UpdateRole
     @Id INT,
     @Name NVARCHAR(100),
-    @Description NVARCHAR(MAX)
+    @Description NVARCHAR(MAX) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
 
     UPDATE dbo.Roles
-    SET
-        Name = @Name,
+    SET Name = @Name,
         Description = @Description,
-        UpdateDate = GETDATE()
-    WHERE Id = @Id
-      AND IsDeleted = 0;
+        UpdateDate = GETUTCDATE()
+    WHERE Id = @Id AND IsDeleted = 0;
 
     IF @@ROWCOUNT = 0
     BEGIN

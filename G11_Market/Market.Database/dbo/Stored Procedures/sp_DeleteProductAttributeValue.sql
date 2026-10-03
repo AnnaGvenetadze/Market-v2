@@ -1,45 +1,24 @@
-﻿
-CREATE   PROCEDURE dbo.sp_DeleteProductAttributeValue
-	@ProductId int,
-	@AttributeId int
-as
-begin
-	set nocount on;
+﻿CREATE   PROCEDURE dbo.sp_DeleteProductAttributeValue
+    @ProductId INT = NULL,
+    @AttributeId INT = NULL,
+    @Id INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-	if not exists (
-		select 1
-		from Products
-		where Id = @ProductId
-	)
-	begin
-		raiserror('Product was not found.', 16, 1);
-		return -1;
-	end
+    IF @ProductId IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.Products WHERE Id = @ProductId)
+    BEGIN
+        RAISERROR('Product was not found.', 16, 1);
+        RETURN -1;
+    END;
 
-	if not exists (
-		select 1
-		from Attributes
-		where Id = @AttributeId
-	)
-	begin
-		raiserror('Attribute was not found.', 16, 1);
-		return -2;
-	end
+    IF @AttributeId IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.Attributes WHERE Id = @AttributeId)
+    BEGIN
+        RAISERROR('Attribute was not found.', 16, 1);
+        RETURN -2;
+    END;
 
-	if not exists (
-		select 1
-		from ProductAttributeValues
-		where AttributeId = @AttributeId
-		  AND ProductId = @ProductId
-	)
-	begin
-		raiserror('Attribute value was not found.', 16, 1);
-		return -3;
-	end
-
-	delete from ProductAttributeValues
-	where ProductId = @ProductId
-	  AND AttributeId = @AttributeId
-		
-	return 0;
-end
+    DELETE FROM dbo.ProductAttributeValues
+    WHERE (@ProductId IS NULL OR ProductId = @ProductId)
+      AND (@AttributeId IS NULL OR AttributeId = @AttributeId);
+END;

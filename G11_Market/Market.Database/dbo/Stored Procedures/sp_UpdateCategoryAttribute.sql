@@ -18,18 +18,9 @@ BEGIN
         RETURN -2;
     END;
 
-    IF @OrderPosition IS NULL
-    BEGIN
-        SET @OrderPosition = 0;
-    END;
+    IF @OrderPosition IS NULL SET @OrderPosition = 0;
 
-    IF NOT EXISTS
-    (
-        SELECT 1
-        FROM Categories
-        WHERE Id = @CategoryId
-          AND IsDeleted = 0
-    )
+    IF NOT EXISTS (SELECT 1 FROM dbo.Categories WHERE Id = @CategoryId AND IsDeleted = 0)
     BEGIN
         RAISERROR('Category was not found.', 16, 1);
         RETURN -3;
@@ -38,22 +29,13 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM dbo.Attributes WHERE Id = @AttributeId AND IsDeleted = 0)
         THROW 50000, 'Attribute not found or deleted.', 1;
 
-    IF NOT EXISTS
-    (
-        SELECT 1
-        FROM CategoryAttributes
-        WHERE CategoryId = @CategoryId
-          AND AttributeId = @AttributeId
-    )
+    IF NOT EXISTS (SELECT 1 FROM dbo.CategoryAttributes WHERE CategoryId = @CategoryId AND AttributeId = @AttributeId)
     BEGIN
         RAISERROR('Category attribute was not found.', 16, 1);
         RETURN -4;
     END;
 
-    UPDATE CategoryAttributes
+    UPDATE dbo.CategoryAttributes
     SET OrderPosition = @OrderPosition
-    WHERE CategoryId = @CategoryId
-      AND AttributeId = @AttributeId;
-
-    RETURN 0;
+    WHERE CategoryId = @CategoryId AND AttributeId = @AttributeId;
 END;

@@ -1,12 +1,9 @@
-﻿create procedure dbo.sp_GetCategoryById
-    @Id int
-as
-begin
-    set nocount on;
-
-    select *
-    from Categories
-    where Id = @Id and IsDeleted = 0;
-
-    return 0;
-end
+﻿CREATE   PROCEDURE dbo.sp_GetCategoryById
+    @Id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT Id, ParentId, CategoryName, Description, IsDeleted, CreatedDate, UpdatedDate
+    FROM dbo.Categories
+    WHERE Id = @Id AND IsDeleted = 0;
+END;

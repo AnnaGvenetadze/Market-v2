@@ -10,21 +10,8 @@ BEGIN
     IF NULLIF(LTRIM(RTRIM(@ProductName)), '') IS NULL THROW 50000, 'ProductName is required.', 1;
     IF NOT EXISTS (SELECT 1 FROM dbo.Categories WHERE Id = @CategoryId AND IsDeleted = 0) THROW 50000, 'Active category not found.', 1;
 
-
-    INSERT INTO dbo.Products
-    (
-        CategoryId,
-        ProductName,
-        Price,
-        IsDeleted
-    )
-    VALUES
-    (
-        @CategoryId,
-        @ProductName,
-        @Price,
-        0
-    );
+    INSERT INTO dbo.Products (CategoryId, ProductName, Price, IsDeleted, CreatedDate)
+    VALUES (@CategoryId, @ProductName, @Price, 0, GETUTCDATE());
 
     SET @Id = CONVERT(INT, SCOPE_IDENTITY());
 END;

@@ -122,7 +122,6 @@
   <ItemGroup>
     <Build Include="dbo\Stored Procedures\sp_InsertCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteCategory.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetAllCategories.sql" />
     <None Include="dbo\Views\vw_CategoriesWithParent.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetCategoryById.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteCategoryAttribute.sql" />
@@ -134,17 +133,35 @@
     <Build Include="dbo\Stored Procedures\sp_UpdateSaleItemQuantity.sql" />
     <None Include="TEST.Database.publish.xml" />
     <None Include="DEV.Database.publish.xml" />
-    <Build Include="dbo\Stored Procedures\sp_GetCategoryAttributes.sql" />
-    <Build Include="dbo\Stored Procedures\sp_DeleteAttributes.sql" />
     <Build Include="dbo\Stored Procedures\sp_UnassignEmployeeRole.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetEmployeeRolesByEmployeeId.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetOutOfStockProducts.sql" />
     <Build Include="dbo\Stored Procedures\sp_ActivateCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_AssignEmployeeRole.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetAllCategoryAttributes.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAllInventoryManagers.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAttributeById.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetStockByProductId.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetStockMovementsByProductId.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetCategoryAttributes.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateStockMovement.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateSaleItem.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateSale.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateEmployeeRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_InsertStockMovement.sql" />
+    <Build Include="dbo\Stored Procedures\sp_InsertEmployeeRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetStockMovementById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetProductAttributeValueById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetEmployeeRoleById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetEmployeeByAccountId.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllStockMovements.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllSaleItems.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllProductAttributeValues.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllEmployeeRoles.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllCategoryAttributes.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllCategories.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteStockMovement.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteSale.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteEmployeeRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteAttribute.sql" />
   </ItemGroup>
 </Project>

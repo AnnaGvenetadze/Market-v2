@@ -6,42 +6,37 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    IF NOT EXISTS (SELECT 1 FROM Attributes WHERE Id = @Id AND IsDeleted = 0)
+    IF NOT EXISTS (SELECT 1 FROM dbo.Attributes WHERE Id = @Id AND IsDeleted = 0)
     BEGIN
         RAISERROR('Attribute with Id %d was not found or is deleted.', 16, 1, @Id);
         RETURN;
-    END
+    END;
 
     IF @AttributeName IS NULL OR LTRIM(RTRIM(@AttributeName)) = ''
     BEGIN
         RAISERROR('AttributeName cannot be empty.', 16, 1);
         RETURN;
-    END
+    END;
 
     IF @AttributeType NOT IN (1, 2, 3, 4)
     BEGIN
         RAISERROR('Invalid AttributeType. Must be 1, 2, 3, or 4.', 16, 1);
         RETURN;
-    END
+    END;
 
-    IF EXISTS (
-        SELECT 1 
-        FROM Attributes 
-        WHERE AttributeName = @AttributeName 
-          AND Id <> @Id 
-          AND IsDeleted = 0
-    )
+    IF EXISTS (SELECT 1 FROM dbo.Attributes WHERE AttributeName = @AttributeName AND Id <> @Id AND IsDeleted = 0)
     BEGIN
         RAISERROR('Another active attribute with this name already exists.', 16, 1);
         RETURN;
-    END
+    END;
 
     IF EXISTS (SELECT 1 FROM dbo.ProductAttributeValues WHERE AttributeId = @Id)
        AND EXISTS (SELECT 1 FROM dbo.Attributes WHERE Id = @Id AND AttributeType <> @AttributeType)
         THROW 50000, 'Cannot change the type of an attribute with existing values.', 1;
-    UPDATE Attributes
+
+    UPDATE dbo.Attributes
     SET AttributeName = @AttributeName,
         AttributeType = @AttributeType,
-        UpdatedDate = GETDATE()
+        UpdatedDate = GETUTCDATE()
     WHERE Id = @Id AND IsDeleted = 0;
 END;

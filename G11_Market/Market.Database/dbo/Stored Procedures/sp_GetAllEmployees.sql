@@ -1,8 +1,8 @@
-﻿create procedure dbo.sp_GetAllEmployees
-as 
-begin 
-    set nocount on;
-    select * from Employees where IsDeleted = 0;
-        
-    return 0;
-end
+﻿CREATE   PROCEDURE dbo.sp_GetAllEmployees
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT Id, AccountId, ManagerEmployeeId, EmployeeCode, HireDate, IsDeleted, CreateDate, UpdateDate, FirstName, LastName, Email, PhoneNumber
+    FROM dbo.Employees 
+    WHERE IsDeleted = 0;
+END;

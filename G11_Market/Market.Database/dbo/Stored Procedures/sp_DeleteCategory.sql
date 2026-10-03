@@ -1,12 +1,13 @@
-﻿create procedure dbo.sp_DeleteCategory
-    @Id int
+﻿
+CREATE   PROCEDURE dbo.sp_DeleteCategory
+    @Id INT
 AS
 BEGIN
     SET NOCOUNT ON;
 
     UPDATE dbo.Categories
     SET IsDeleted = 1,
-        UpdatedDate = GETDATE()
+        UpdatedDate = GETUTCDATE()
     WHERE Id = @Id AND IsDeleted = 0;
 
     IF @@ROWCOUNT = 0

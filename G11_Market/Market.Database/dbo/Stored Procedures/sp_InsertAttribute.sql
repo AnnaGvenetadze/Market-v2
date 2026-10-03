@@ -5,9 +5,6 @@
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    SET @Id = NULL;
-
     SET @AttributeName = NULLIF(LTRIM(RTRIM(@AttributeName)), '');
 
     IF @AttributeName IS NULL
@@ -22,29 +19,14 @@ BEGIN
         RETURN -2;
     END;
 
-    IF EXISTS
-    (
-        SELECT 1
-        FROM Attributes
-        WHERE AttributeName = @AttributeName
-    )
+    IF EXISTS (SELECT 1 FROM dbo.Attributes WHERE AttributeName = @AttributeName AND IsDeleted = 0)
     BEGIN
         RAISERROR('Attribute with the same name already exists.', 16, 1);
         RETURN -3;
     END;
 
-    INSERT INTO Attributes
-    (
-        AttributeName,
-        AttributeType
-    )
-    VALUES
-    (
-        @AttributeName,
-        @AttributeType
-    );
+    INSERT INTO dbo.Attributes (AttributeName, AttributeType, IsDeleted, CreatedDate)
+    VALUES (@AttributeName, @AttributeType, 0, GETUTCDATE());
 
     SET @Id = CONVERT(INT, SCOPE_IDENTITY());
-
-    RETURN 0;
 END;

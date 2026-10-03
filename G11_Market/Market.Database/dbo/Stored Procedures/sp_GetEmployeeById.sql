@@ -1,13 +1,14 @@
-﻿create procedure dbo.sp_GetEmployeeById
-    @Id int
-as 
-begin 
-    set nocount on;
+﻿CREATE   PROCEDURE dbo.sp_GetEmployeeById
+    @Id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    if @Id is null throw 50035, 'Employee ID is required.', 1;
-    if not exists (select 1 from Employees where Id = @Id and IsDeleted = 0) throw 50036, 'Employee not found or has been deleted.', 1;
+    IF @Id IS NULL THROW 50035, 'Employee ID is required.', 1;
+    IF NOT EXISTS (SELECT 1 FROM dbo.Employees WHERE Id = @Id AND IsDeleted = 0) 
+        THROW 50036, 'Employee not found or has been deleted.', 1;
 
-    select * from Employees where Id = @Id and IsDeleted = 0;
-        
-    return 0;
-end
+    SELECT Id, AccountId, ManagerEmployeeId, EmployeeCode, HireDate, IsDeleted, CreateDate, UpdateDate, FirstName, LastName, Email, PhoneNumber
+    FROM dbo.Employees 
+    WHERE Id = @Id AND IsDeleted = 0;
+END;

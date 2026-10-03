@@ -1,9 +1,8 @@
-﻿
-CREATE   PROCEDURE dbo.sp_GetAllAttributes
-as 
-begin 
-    set nocount on;
-    select * from Attributes where IsDeleted = 0;
-        
-    return 0;
-end
+﻿CREATE   PROCEDURE dbo.sp_GetAllAttributes
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT Id, AttributeName, AttributeType, IsDeleted, CreatedDate, UpdatedDate
+    FROM dbo.Attributes 
+    WHERE IsDeleted = 0;
+END;

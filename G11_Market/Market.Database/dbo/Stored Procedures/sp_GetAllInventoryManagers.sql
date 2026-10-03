@@ -1,20 +1,11 @@
-﻿create procedure dbo.sp_GetAllInventoryManagers
-as
-begin
-    set nocount on;
+﻿CREATE   PROCEDURE dbo.sp_GetAllInventoryManagers
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-    select
-        Id,
-        StockAdjustmentLimit,
-        CanApproveStockCorrection,
-        CanApproveNegativeStock,
-        IsDeleted,
-        CreateDate,
-        UpdateDate
-    from dbo.InventoryManagerDetails
-    where IsDeleted = 0
-    order by Id;
-
-    return 0;
-end;
+    SELECT Id, StockAdjustmentLimit, CanApproveStockCorrection, CanApproveNegativeStock, IsDeleted, CreateDate, UpdateDate
+    FROM dbo.InventoryManagerDetails
+    WHERE IsDeleted = 0
+    ORDER BY Id;
+END;
 go

@@ -13,15 +13,12 @@ BEGIN
         AND NOT EXISTS (SELECT 1 FROM dbo.CategoryAttributes ca WHERE ca.CategoryId = @CategoryId AND ca.AttributeId = v.AttributeId))
         THROW 50000, 'Existing product attributes are incompatible with the new category.', 1;
 
-
     UPDATE dbo.Products
-    SET
-        CategoryId = @CategoryId,
+    SET CategoryId = @CategoryId,
         ProductName = @ProductName,
         Price = @Price,
-        UpdatedDate = GETDATE()
-    WHERE Id = @Id
-      AND IsDeleted = 0;
+        UpdatedDate = GETUTCDATE()
+    WHERE Id = @Id AND IsDeleted = 0;
 
     IF @@ROWCOUNT = 0
     BEGIN

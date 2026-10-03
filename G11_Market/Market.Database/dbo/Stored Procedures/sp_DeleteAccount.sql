@@ -4,15 +4,12 @@ CREATE   PROCEDURE dbo.sp_DeleteAccount
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    UPDATE Accounts
+    UPDATE dbo.Accounts
     SET IsDeleted = 1,
-        UpdateDate = GETDATE()
+        UpdateDate = GETUTCDATE()
     WHERE Id = @Id AND IsDeleted = 0;
 
     IF @@ROWCOUNT = 0
-    BEGIN
         RAISERROR('Account with Id %d was not found or is already deleted.', 16, 1, @Id);
-    END;
 END;
 GO

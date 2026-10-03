@@ -1,8 +1,8 @@
-﻿create procedure dbo.sp_GetAllAccounts
-as 
-begin 
-    set nocount on;
-    select * from Accounts where IsDeleted = 0;
-        
-    return 0;
-end
+﻿CREATE   PROCEDURE dbo.sp_GetAllAccounts
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT Id, Username, PasswordHash, IsDeleted, CreateDate, UpdateDate, LastLoginAtUtc, FailedLoginAttempts, LockoutEndUtc, IsActive
+    FROM dbo.Accounts
+    WHERE IsDeleted = 0;
+END;

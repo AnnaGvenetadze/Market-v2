@@ -11,25 +11,25 @@ BEGIN
     BEGIN
         RAISERROR('A category cannot be its own parent.', 16, 1);
         RETURN;
-    END
+    END;
 
-    IF @ParentId IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Categories WHERE Id = @ParentId AND IsDeleted = 0)
+    IF @ParentId IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.Categories WHERE Id = @ParentId AND IsDeleted = 0)
     BEGIN
         RAISERROR('Specified ParentId does not exist or is deleted.', 16, 1);
         RETURN;
-    END
+    END;
 
-    IF EXISTS (SELECT 1 FROM Categories WHERE CategoryName = @CategoryName AND Id <> @Id)
+    IF EXISTS (SELECT 1 FROM dbo.Categories WHERE CategoryName = @CategoryName AND Id <> @Id AND IsDeleted = 0)
     BEGIN
         RAISERROR('Category name already exists.', 16, 1);
         RETURN;
-    END
+    END;
 
-    UPDATE Categories
+    UPDATE dbo.Categories
     SET ParentId = @ParentId,
         CategoryName = @CategoryName,
         Description = @Description,
-        UpdatedDate = GETDATE()
+        UpdatedDate = GETUTCDATE()
     WHERE Id = @Id AND IsDeleted = 0;
 
     IF @@ROWCOUNT = 0

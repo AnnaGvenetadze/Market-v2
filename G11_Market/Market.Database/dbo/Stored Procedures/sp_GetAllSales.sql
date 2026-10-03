@@ -1,8 +1,7 @@
-﻿create procedure dbo.sp_GetAllSales
-as 
-begin 
-    set nocount on;
-    select * from Sales;
-        
-    return 0;
-end
+﻿CREATE   PROCEDURE dbo.sp_GetAllSales
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT Id, CreatedEmployeeId, CancelledByEmployeeId, Status, CreatedDate, CancelledDate, CancelReason
+    FROM dbo.Sales;
+END;

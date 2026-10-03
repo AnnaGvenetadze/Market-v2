@@ -1,13 +1,14 @@
 ﻿CREATE   PROCEDURE dbo.sp_ResetAccountPassword
-    @AccountId int,
-    @NewPasswordHash nvarchar(255)
-as
-begin
-    set nocount on;
-    set @NewPasswordHash = LTRIM(RTRIM(@NewPasswordHash));
-    if @NewPasswordHash is null or @NewPasswordHash = '' throw 50041, 'Password hash is required.', 1;
-    if not exists (select 1 from Accounts where Id = @AccountId and IsDeleted = 0) throw 50043, 'Account not found.', 1;
-    update Accounts
-    set PasswordHash = @NewPasswordHash, UpdateDate = GETDATE() where Id = @AccountId;
-    return 0;
-end
+    @AccountId INT,
+    @NewPasswordHash NVARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET @NewPasswordHash = LTRIM(RTRIM(@NewPasswordHash));
+    IF @NewPasswordHash IS NULL OR @NewPasswordHash = '' THROW 50041, 'Password hash is required.', 1;
+    IF NOT EXISTS (SELECT 1 FROM dbo.Accounts WHERE Id = @AccountId AND IsDeleted = 0) THROW 50043, 'Account not found.', 1;
+
+    UPDATE dbo.Accounts
+    SET PasswordHash = @NewPasswordHash, UpdateDate = GETUTCDATE() 
+    WHERE Id = @AccountId;
+END;
