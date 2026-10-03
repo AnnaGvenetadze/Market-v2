@@ -13,6 +13,7 @@ public interface IProductService
     IEnumerable<ProductDTO> GetProductsByCategoryId(int categoryId);
     IEnumerable<ProductDTO> GetProductsByPriceRange(decimal minPrice, decimal maxPrice);
     IEnumerable<ProductAttributeValueDTO> GetProductAttributeValues(int productId);
+    ProductDetailsDTO? GetProductDetails(int productId);
     void AddProductAttributeValue(ProductAttributeValueDTO attributeValue);
     void UpdateProductAttributeValue(ProductAttributeValueDTO attributeValue);
     void DeleteProductAttributeValue(int productId, int attributeId);

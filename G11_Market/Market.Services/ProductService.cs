@@ -139,6 +139,30 @@ public class ProductService : IProductService
         return _unitOfWork.ProductRepository.GetAttributeValues(productId);
     }
 
+    public ProductDetailsDTO? GetProductDetails(int productId)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId);
+
+        var details = _unitOfWork.ProductRepository.GetProductDetails(productId);
+
+        if (details is null)
+        {
+            _logger.Warning(
+                "Product with ID {ProductId} was not found.",
+                productId);
+
+            return null;
+        }
+        if (details.Product.IsDeleted)
+        {
+            _logger.Information(
+                "Product with ID {ProductId} is inactive.",
+                productId);
+        }
+
+        return details;
+    }
+
     public void AddProductAttributeValue(ProductAttributeValueDTO attributeValue)
     {
         ArgumentNullException.ThrowIfNull(attributeValue);

@@ -169,5 +169,6 @@
     <Build Include="sp_RestoreProduct.sql" />
     <Build Include="sp_RestoreEmployee.sql" />
     <Build Include="sp_RestoreRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetProductDetails.sql" />
   </ItemGroup>
 </Project>

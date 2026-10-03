@@ -76,6 +76,25 @@ internal sealed class ProductRepository(DbConnection connection)
             commandType: CommandType.StoredProcedure);
     }
 
+    public ProductDetailsDTO? GetProductDetails(int productId)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId);
+
+        using var multi = _connection.QueryMultiple(
+            "dbo.sp_GetProductDetails",
+            new { ProductId = productId },
+            commandType: CommandType.StoredProcedure);
+
+        var product = multi.ReadFirstOrDefault<ProductDTO>();
+        var category = multi.ReadFirstOrDefault<CategoryDTO>();
+        var attributes = multi.Read<ProductDetailAttributeDTO>().ToList();
+
+        if (product is null || category is null)
+            return null;
+
+        return new ProductDetailsDTO(product, category, attributes);
+    }
+
     public void DeleteAttributeValue(int productId, int attributeId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId);
