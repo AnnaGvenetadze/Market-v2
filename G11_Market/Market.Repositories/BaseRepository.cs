@@ -117,6 +117,15 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
             commandType: CommandType.StoredProcedure);
     }
 
+    public void Restore(object id)
+    {
+        ArgumentNullException.ThrowIfNull(id, nameof(id));
+        _connection.Execute(
+            $"sp_Restore{_entityName}",
+            new { Id = id },
+            commandType: CommandType.StoredProcedure);
+    }
+
     public IEnumerable<T> Search(Expression<Func<T, bool>> expression)
     {
         ExpressionTranslator<T> translator = new();

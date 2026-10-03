@@ -162,5 +162,9 @@
     <Build Include="dbo\Stored Procedures\sp_DeleteSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteEmployeeRole.sql" />
     <Build Include="dbo\Stored Procedures\sp_DeleteAttribute.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RestoreAccount.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RestoreAttribute.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RestoreCategory.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RestoreCategoryAttribute.sql" />
   </ItemGroup>
 </Project>

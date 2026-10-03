@@ -8,6 +8,7 @@ public interface IBaseRepository<T>
     int Insert(T entity);
     void Update(T entity);
     void Delete(object id);
+    void Restore(object id);
     IEnumerable<T> GetAll();
     IEnumerable<T> Search(Expression<Func<T, bool>> expression);
 }
