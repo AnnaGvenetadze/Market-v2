@@ -200,23 +200,6 @@ VALUES
 
 
 -- =========================================================
--- InventoryManagerDetails
--- Id references Employees(Id)
--- =========================================================
-INSERT INTO InventoryManagerDetails
-(
-    Id,
-    StockAdjustmentLimit,
-    CanApproveStockCorrection,
-    CanApproveNegativeStock
-)
-VALUES
-    (1, 1000.00, 1, 1),
-    (2, 500.00, 1, 0),
-    (3, 250.00, 0, 0);
-
-
--- =========================================================
 -- Categories
 -- Expected Ids: 1, 2, 3
 -- =========================================================

@@ -15,10 +15,7 @@ DELETE FROM ProductAttributeValues;
 DELETE FROM CategoryAttributes;
 
 -- Employee/account child tables
-DELETE FROM InventoryManagerDetails;
 DELETE FROM EmployeeRoles;
-DELETE FROM CorporateClientDetails;
-DELETE FROM Clients;
 
 -- Main entity tables
 DELETE FROM Employees;
@@ -27,11 +24,8 @@ DELETE FROM Products;
 -- Parent/reference tables
 DELETE FROM Accounts;
 DELETE FROM Roles;
-DELETE FROM ClientTypes;
 DELETE FROM Attributes;
 DELETE FROM Categories;
-DELETE FROM Cities;
-DELETE FROM Countries;
 
 -- Reseed identity tables
 DBCC CHECKIDENT ('StockMovements', RESEED, 0);
@@ -39,11 +33,7 @@ DBCC CHECKIDENT ('SaleItems', RESEED, 0);
 DBCC CHECKIDENT ('Sales', RESEED, 0);
 DBCC CHECKIDENT ('Products', RESEED, 0);
 DBCC CHECKIDENT ('Employees', RESEED, 0);
-DBCC CHECKIDENT ('Clients', RESEED, 0);
 DBCC CHECKIDENT ('Accounts', RESEED, 0);
 DBCC CHECKIDENT ('Roles', RESEED, 0);
-DBCC CHECKIDENT ('ClientTypes', RESEED, 0);
 DBCC CHECKIDENT ('Attributes', RESEED, 0);
 DBCC CHECKIDENT ('Categories', RESEED, 0);
-DBCC CHECKIDENT ('Cities', RESEED, 0);
-DBCC CHECKIDENT ('Countries', RESEED, 0);
