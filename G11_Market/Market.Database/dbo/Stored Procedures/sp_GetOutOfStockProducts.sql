@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_GetOutOfStockProducts
+﻿CREATE   PROCEDURE dbo.sp_GetOutOfStockProducts
 AS
 BEGIN
     SET NOCOUNT ON;

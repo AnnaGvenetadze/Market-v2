@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_ResetAccountPassword
+﻿CREATE   PROCEDURE dbo.sp_ResetAccountPassword
     @AccountId int,
     @NewPasswordHash nvarchar(255)
 as

@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_LoginAccount
+﻿CREATE   PROCEDURE dbo.sp_LoginAccount
     @Username nvarchar(50)
 as
 begin

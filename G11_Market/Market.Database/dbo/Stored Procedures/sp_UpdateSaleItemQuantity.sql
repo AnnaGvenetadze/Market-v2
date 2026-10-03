@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_UpdateSaleItemQuantity
+﻿CREATE   PROCEDURE dbo.sp_UpdateSaleItemQuantity
     @Id INT,
     @Quantity INT
 AS

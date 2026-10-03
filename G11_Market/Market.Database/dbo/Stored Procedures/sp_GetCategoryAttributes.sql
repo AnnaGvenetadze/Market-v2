@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_GetCategoryAttributes
+﻿CREATE   PROCEDURE dbo.sp_GetCategoryAttributes
     @CategoryId INT
 AS
 BEGIN

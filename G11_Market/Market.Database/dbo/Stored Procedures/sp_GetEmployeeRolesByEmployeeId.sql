@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_GetEmployeeRolesByEmployeeId
+﻿CREATE   PROCEDURE dbo.sp_GetEmployeeRolesByEmployeeId
 	@EmployeeId int
 as
 begin

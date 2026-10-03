@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_InsertCategoryAttribute
+﻿CREATE   PROCEDURE dbo.sp_InsertCategoryAttribute
     @CategoryId INT,
     @AttributeId INT,
     @OrderPosition INT

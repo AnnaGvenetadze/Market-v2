@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_UpdateCategory
+﻿CREATE   PROCEDURE dbo.sp_UpdateCategory
     @Id INT,
     @ParentId INT = NULL,
     @CategoryName NVARCHAR(100),

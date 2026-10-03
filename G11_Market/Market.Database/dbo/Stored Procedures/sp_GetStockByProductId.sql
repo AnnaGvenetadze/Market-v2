@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_GetStockByProductId
+﻿CREATE   PROCEDURE dbo.sp_GetStockByProductId
     @ProductId INT
 AS
 BEGIN

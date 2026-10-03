@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_UpdateAttribute
+﻿CREATE   PROCEDURE dbo.sp_UpdateAttribute
     @Id INT,
     @AttributeName NVARCHAR(100),
     @AttributeType TINYINT

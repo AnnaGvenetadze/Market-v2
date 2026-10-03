@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_DeleteAttributes
+﻿CREATE   PROCEDURE dbo.sp_DeleteAttributes
     @Id INT
 AS
 BEGIN

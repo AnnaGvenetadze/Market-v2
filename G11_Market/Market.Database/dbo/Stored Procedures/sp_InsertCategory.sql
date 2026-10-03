@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_InsertCategory
+﻿CREATE   PROCEDURE dbo.sp_InsertCategory
     @ParentId INT = NULL,
     @CategoryName NVARCHAR(100),
     @Description NVARCHAR(1000) = NULL,

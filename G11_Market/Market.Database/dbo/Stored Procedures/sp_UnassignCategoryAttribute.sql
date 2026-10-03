@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_UnassignCategoryAttribute
+﻿CREATE   PROCEDURE dbo.sp_UnassignCategoryAttribute
     @CategoryId INT,
     @AttributeId INT
 AS

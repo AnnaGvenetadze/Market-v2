@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_UpdateEmployee
+﻿CREATE   PROCEDURE dbo.sp_UpdateEmployee
     @Id int,
     @AccountId int,
     @ManagerEmployeeId int,

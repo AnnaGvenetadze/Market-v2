@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_InsertAccount
+﻿CREATE   PROCEDURE dbo.sp_InsertAccount
     @Id INT = NULL OUTPUT,
     @Username NVARCHAR(50),
     @PasswordHash NVARCHAR(255),

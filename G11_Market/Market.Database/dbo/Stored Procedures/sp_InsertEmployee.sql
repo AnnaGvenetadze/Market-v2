@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_InsertEmployee
+﻿CREATE   PROCEDURE dbo.sp_InsertEmployee
     @AccountId int,
     @FirstName nvarchar(50),
     @LastName nvarchar(50),

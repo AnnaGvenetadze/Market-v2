@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_InsertProduct
+﻿CREATE   PROCEDURE dbo.sp_InsertProduct
     @CategoryId INT,
     @ProductName NVARCHAR(100),
     @Price DECIMAL(18, 2),

@@ -1,6 +1,4 @@
-﻿
-
-CREATE   PROCEDURE dbo.sp_ActivateCategory
+﻿CREATE   PROCEDURE dbo.sp_ActivateCategory
     @CategoryID INT
 AS
 BEGIN

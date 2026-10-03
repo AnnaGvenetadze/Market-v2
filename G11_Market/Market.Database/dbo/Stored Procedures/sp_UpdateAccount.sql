@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_UpdateAccount
+﻿CREATE   PROCEDURE dbo.sp_UpdateAccount
     @Id INT,
     @Username NVARCHAR(50) = NULL,
     @PasswordHash NVARCHAR(255) = NULL,

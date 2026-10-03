@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_UpdateProductAttributeValue
+﻿CREATE   PROCEDURE dbo.sp_UpdateProductAttributeValue
     @ProductId INT,
     @AttributeId INT,
     @TextValue NVARCHAR(500) = NULL,

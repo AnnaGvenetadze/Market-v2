@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_DeleteCategoryAttribute
+﻿CREATE   PROCEDURE dbo.sp_DeleteCategoryAttribute
     @CategoryId INT,
     @AttributeId INT
 AS

@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_UpdateAccountLoginAttempts
+﻿CREATE   PROCEDURE dbo.sp_UpdateAccountLoginAttempts
     @Id INT,
     @FailedLoginAttempts INT,
     @LockoutEndUtc DATETIME2(7) = NULL,

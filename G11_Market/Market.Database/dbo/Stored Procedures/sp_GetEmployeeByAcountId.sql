@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_GetEmployeeByAcountId
+﻿CREATE   PROCEDURE dbo.sp_GetEmployeeByAcountId
     @AccountId INT
 AS
 BEGIN

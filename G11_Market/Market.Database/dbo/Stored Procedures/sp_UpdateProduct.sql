@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_UpdateProduct
+﻿CREATE   PROCEDURE dbo.sp_UpdateProduct
     @Id INT,
     @CategoryId INT,
     @ProductName NVARCHAR(100),

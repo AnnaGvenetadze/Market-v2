@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_InsertProductAttributeValue
+﻿CREATE   PROCEDURE dbo.sp_InsertProductAttributeValue
     @ProductId INT,
     @AttributeId INT,
     @TextValue NVARCHAR(500) = NULL,

@@ -1,5 +1,4 @@
-﻿
-CREATE   PROCEDURE dbo.sp_GetSaleTotal
+﻿CREATE   PROCEDURE dbo.sp_GetSaleTotal
     @Id INT
 AS
 BEGIN
