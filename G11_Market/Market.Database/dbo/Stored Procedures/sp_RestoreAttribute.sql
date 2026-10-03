@@ -1,10 +1,10 @@
-﻿CREATE   PROCEDURE dbo.sp_RestoreAttribute
+﻿CREATE PROCEDURE dbo.sp_RestoreAttribute
     @Id INT
 AS
 BEGIN
     SET NOCOUNT ON;
     UPDATE dbo.Attributes
-    SET IsDeleted = 0
+    SET IsDeleted = 0, UpdatedDate = GETUTCDATE()
     WHERE Id = @Id AND IsDeleted = 1;
 
     IF @@ROWCOUNT = 0
