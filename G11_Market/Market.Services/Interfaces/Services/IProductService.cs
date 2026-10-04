@@ -9,7 +9,7 @@ public interface IProductService
     void DeleteProduct(int productId);
     void RestoreProduct(int productId);
     ProductDTO? GetProductById(int productId);
-    IEnumerable<ProductDTO> GetAllProducts();
+    IEnumerable<ProductDTO> GetAllProducts(bool isDeleted = false);
     IEnumerable<ProductDTO> GetProductsByCategoryId(int categoryId);
     IEnumerable<ProductDTO> GetProductsByPriceRange(decimal minPrice, decimal maxPrice);
     IEnumerable<ProductAttributeValueDTO> GetProductAttributeValues(int productId);

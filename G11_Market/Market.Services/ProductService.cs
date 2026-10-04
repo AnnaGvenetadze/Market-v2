@@ -163,6 +163,11 @@ public class ProductService : IProductService
         return details;
     }
 
+    public IEnumerable<ProductDTO> GetAllProducts(bool isDeleted = false)
+    {
+        return _unitOfWork.ProductRepository.GetAllProducts(isDeleted);
+    }
+
     public void AddProductAttributeValue(ProductAttributeValueDTO attributeValue)
     {
         ArgumentNullException.ThrowIfNull(attributeValue);

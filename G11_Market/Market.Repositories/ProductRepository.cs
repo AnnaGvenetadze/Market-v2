@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Market.DTO;
+using Market.Services.Interfaces;
 using Market.Services.Interfaces.Repositories;
 using System.Data;
 using System.Data.Common;
@@ -93,6 +94,11 @@ internal sealed class ProductRepository(DbConnection connection)
             return null;
 
         return new ProductDetailsDTO(product, category, attributes);
+    }
+
+    public IEnumerable<ProductDTO> GetAllProducts(bool isDeleted = false)
+    {
+        return Search(product => product.IsDeleted == isDeleted);
     }
 
     public void DeleteAttributeValue(int productId, int attributeId)

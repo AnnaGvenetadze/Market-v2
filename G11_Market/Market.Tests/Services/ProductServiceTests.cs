@@ -1,5 +1,6 @@
 ﻿using Market.DTO;
 using Market.Services;
+using Market.Services.Interfaces.Services;
 using Market.Tests.Helpers;
 using Microsoft.Data.SqlClient;
 using Serilog;
@@ -1174,5 +1175,193 @@ public sealed class ProductServiceTests : BaseRepositoryTests
             service.DeleteProductAttributeValue(
                 1,
                 int.MaxValue));
+    }
+
+    // =========================================================
+    // GetProductDetails
+    // =========================================================
+
+    [Test]
+    public void GetProductDetails_WhenProductExists_ShouldReturnCorrectDetails()
+    {
+        // Arrange
+        var service = new ProductService(UnitOfWork, Log.Logger);
+
+        // Act
+        var result = service.GetProductDetails(1);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.Product.Id, Is.EqualTo(1));
+            Assert.That(result.Product.ProductName,
+                Is.EqualTo("Samsung Monitor"));
+            Assert.That(result.Product.Price,
+                Is.EqualTo(1200m));
+            Assert.That(result.Product.IsDeleted, Is.False);
+
+            Assert.That(result.Category.Id, Is.EqualTo(1));
+            Assert.That(result.Category.CategoryName,
+                Is.EqualTo("Electronics"));
+
+            Assert.That(result.Attributes, Has.Count.EqualTo(1));
+        });
+
+        var attribute = result.Attributes.Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(attribute.AttributeId, Is.EqualTo(1));
+            Assert.That(attribute.AttributeName,
+                Is.EqualTo("Brand"));
+            Assert.That(attribute.AttributeType,
+                Is.EqualTo(1));
+
+            Assert.That(attribute.TextValue,
+                Is.EqualTo("Samsung"));
+
+            Assert.That(attribute.NumberValue, Is.Null);
+            Assert.That(attribute.DateValue, Is.Null);
+            Assert.That(attribute.BooleanValue, Is.Null);
+        });
+    }
+
+
+    [Test]
+    public void GetProductDetails_WhenProductDoesNotExist_ShouldReturnNull()
+    {
+        // Arrange
+        var service = new ProductService(UnitOfWork, Log.Logger);
+
+        // Act
+        var result = service.GetProductDetails(int.MaxValue);
+
+        // Assert
+        Assert.That(result, Is.Null);
+    }
+
+
+    [Test]
+    public void GetProductDetails_WhenProductIsDeleted_ShouldReturnDeletedProduct()
+    {
+        // Arrange
+        var service = new ProductService(UnitOfWork, Log.Logger);
+
+        UnitOfWork.ProductRepository.Delete(1);
+
+        // Act
+        var result = service.GetProductDetails(1);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.Product.Id, Is.EqualTo(1));
+            Assert.That(result.Product.IsDeleted, Is.True);
+            Assert.That(result.Category, Is.Not.Null);
+            Assert.That(result.Attributes, Is.Not.Null);
+        });
+    }
+
+
+    [Test]
+    public void GetProductDetails_WhenAttributeHasNoValue_ShouldReturnAttributeWithNullValues()
+    {
+        // Arrange
+        var service = new ProductService(UnitOfWork, Log.Logger);
+
+        UnitOfWork.ProductRepository
+            .DeleteAttributeValue(1, 1);
+
+        // Act
+        var result = service.GetProductDetails(1);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+
+        var attribute = result!.Attributes
+            .Single(x => x.AttributeId == 1);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(attribute.AttributeId, Is.EqualTo(1));
+            Assert.That(attribute.AttributeName,
+                Is.EqualTo("Brand"));
+
+            Assert.That(attribute.TextValue, Is.Null);
+            Assert.That(attribute.NumberValue, Is.Null);
+            Assert.That(attribute.DateValue, Is.Null);
+            Assert.That(attribute.BooleanValue, Is.Null);
+        });
+    }
+
+
+    [Test]
+    public void GetProductDetails_WhenAttributeIsDeleted_ShouldReturnProductWithoutDeletedAttribute()
+    {
+        // Arrange
+        var service = new ProductService(UnitOfWork, Log.Logger);
+
+        UnitOfWork.AttributeRepository.Delete(1);
+
+        // Act
+        var result = service.GetProductDetails(1);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+
+        Assert.That(
+            result!.Attributes.Any(x => x.AttributeId == 1),
+            Is.False);
+    }
+
+    [TestCase(0)]
+    [TestCase(-1)]
+    public void GetProductDetails_WhenProductIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
+        int productId)
+    {
+        // Arrange
+        var service = new ProductService(UnitOfWork, Log.Logger);
+
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            service.GetProductDetails(productId));
+    }
+
+    [Test]
+    public void GetAllProducts_WhenIsDeletedTrue_ShouldReturnOnlyDeletedProducts()
+    {
+        // Arrange
+        var service = new ProductService(UnitOfWork, Log.Logger);
+
+        service.DeleteProduct(1);
+
+        // Act
+        var products = service
+            .GetAllProducts(true)
+            .ToList();
+
+        // Assert
+        Assert.That(products, Is.Not.Empty);
+        Assert.That(products.All(product => product.IsDeleted), Is.True);
+    }
+
+    [Test]
+    public void GetAllProducts_WhenParameterIsNotPassed_ShouldReturnOnlyActiveProducts()
+    {
+        // Arrange
+        var service = new ProductService(UnitOfWork, Log.Logger);
+
+        // Act
+        var products = service
+            .GetAllProducts()
+            .ToList();
+
+        // Assert
+        Assert.That(products, Is.Not.Empty);
+        Assert.That(products.All(product => !product.IsDeleted), Is.True);
     }
 }
