@@ -10,12 +10,14 @@ public class ProductService : IProductService
 {
     private readonly ILogger _logger;
     private readonly IUnitOfWork _unitOfWork;
+
     public ProductService(IUnitOfWork unitOfWork, ILogger logger)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-    public ProductDTO CreateProduct(ProductDTO product, IEnumerable<ProductAttributeValueDTO>? attributeValues = null)
+
+    public int CreateProduct(ProductDTO product, IEnumerable<ProductAttributeValueDTO>? attributeValues = null)
     {
         ArgumentNullException.ThrowIfNull(product);
         if (product.CategoryId <= 0)
@@ -23,28 +25,35 @@ public class ProductService : IProductService
         ArgumentException.ThrowIfNullOrWhiteSpace(product.ProductName);
 
         var category = _unitOfWork.CategoryRepository.GetById(product.CategoryId);
-        if (category == null || category.IsDeleted)
+        if (category == null)
         {
-            _logger.Warning("Failed to create product: CategoryId {CategoryId} does not exist or is deleted", product.CategoryId);
+            _logger.Error("Failed to create product: CategoryId {CategoryId} does not exist", product.CategoryId);
             throw new InvalidOperationException($"Category with ID {product.CategoryId} does not exist.");
         }
 
-        int productId = _unitOfWork.ProductRepository.Insert(product);
-        if (attributeValues != null)
+        _unitOfWork.BeginTransaction();
+        int productId;
+        try
         {
-            foreach (var attribute in attributeValues)
+            productId = _unitOfWork.ProductRepository.Insert(product);
+            if (attributeValues != null)
             {
-                attribute.ProductId = productId;
-                _unitOfWork.ProductRepository.InsertAttributeValue(attribute);
+                foreach (var attribute in attributeValues)
+                {
+                    attribute.ProductId = productId;
+                    _unitOfWork.ProductRepository.InsertAttributeValue(attribute);
+                }
             }
+            _unitOfWork.Commit();
         }
-        var createdProduct = _unitOfWork.ProductRepository.GetById(productId);
-        if (createdProduct == null)
+        catch (Exception ex)
         {
-            _logger.Error("Product {ProductId} was inserted but could not be retrieved", productId);
-            throw new InvalidOperationException($"Product with ID {productId} was not found after creation.");
+            _unitOfWork.Rollback();
+            _logger.Error(ex, "Failed to create product {ProductName} in category {CategoryId}", product.ProductName, product.CategoryId);
+            throw;
         }
-        return createdProduct;
+
+        return productId;
     }
 
     public ProductDTO UpdateProduct(ProductDTO product, IEnumerable<ProductAttributeValueDTO>? attributeValues = null)

@@ -24,7 +24,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
         _entityPluralName = _entityName.ToPlural();
     }
 
-    public T GetById(object id)
+    public T? GetById(object id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
