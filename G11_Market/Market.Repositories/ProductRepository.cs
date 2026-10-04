@@ -96,11 +96,6 @@ internal sealed class ProductRepository(DbConnection connection)
         return new ProductDetailsDTO(product, category, attributes);
     }
 
-    public IEnumerable<ProductDTO> GetAllProducts(bool isDeleted = false)
-    {
-        return Search(product => product.IsDeleted == isDeleted);
-    }
-
     public void DeleteAttributeValue(int productId, int attributeId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId);

@@ -10,7 +10,6 @@ public interface IProductRepository : IBaseRepository<ProductDTO>
     // სერვისის ინტერფეისიდან გვინდა ჩანდეს?
     IEnumerable<ProductAttributeValueDTO> GetAttributeValues(int productId);
     ProductDetailsDTO? GetProductDetails(int productId);
-    IEnumerable<ProductDTO> GetAllProducts(bool isDeleted = false);
     void InsertAttributeValue(ProductAttributeValueDTO value);
     void UpdateAttributeValue(ProductAttributeValueDTO value);
     void DeleteAttributeValue(int productId, int attributeId);

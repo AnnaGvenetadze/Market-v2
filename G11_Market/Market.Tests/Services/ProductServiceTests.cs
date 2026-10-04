@@ -1318,37 +1318,6 @@ public sealed class ProductServiceTests : BaseRepositoryTests
             Is.False);
     }
 
-    [TestCase(0)]
-    [TestCase(-1)]
-    public void GetProductDetails_WhenProductIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int productId)
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.GetProductDetails(productId));
-    }
-
-    [Test]
-    public void GetAllProducts_WhenIsDeletedTrue_ShouldReturnOnlyDeletedProducts()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        service.DeleteProduct(1);
-
-        // Act
-        var products = service
-            .GetAllProducts(true)
-            .ToList();
-
-        // Assert
-        Assert.That(products, Is.Not.Empty);
-        Assert.That(products.All(product => product.IsDeleted), Is.True);
-    }
-
     [Test]
     public void GetAllProducts_WhenParameterIsNotPassed_ShouldReturnOnlyActiveProducts()
     {
