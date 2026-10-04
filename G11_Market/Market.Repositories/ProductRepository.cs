@@ -13,6 +13,7 @@ internal sealed class ProductRepository(DbConnection connection)
     public ProductDTO? GetByName(string productName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(productName);
+        productName = productName.Trim();
 
         return Search(product =>
                 product.ProductName == productName &&

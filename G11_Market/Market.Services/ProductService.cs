@@ -163,6 +163,13 @@ public class ProductService : IProductService
         return details;
     }
 
+    public ProductDTO? GetProductByName(string productName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(productName);
+
+        return _unitOfWork.ProductRepository.GetByName(productName);
+    }
+
     public void AddProductAttributeValue(ProductAttributeValueDTO attributeValue)
     {
         ArgumentNullException.ThrowIfNull(attributeValue);

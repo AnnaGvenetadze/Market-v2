@@ -1333,4 +1333,30 @@ public sealed class ProductServiceTests : BaseRepositoryTests
         Assert.That(products, Is.Not.Empty);
         Assert.That(products.All(product => !product.IsDeleted), Is.True);
     }
+
+    // =========================================================
+    // GetProductByName
+    // =========================================================
+
+    [Test]
+    public void GetProductByName_WhenProductExists_ShouldReturnProduct()
+    {
+        // Arrange
+        var service = new ProductService(UnitOfWork, Log.Logger);
+
+        // Act
+        var result = service.GetProductByName("Samsung Monitor");
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.Id, Is.EqualTo(1));
+            Assert.That(result.ProductName, Is.EqualTo("Samsung Monitor"));
+            Assert.That(result.CategoryId, Is.EqualTo(1));
+            Assert.That(result.Price, Is.EqualTo(1200m));
+            Assert.That(result.IsDeleted, Is.False);
+        });
+    }
 }
