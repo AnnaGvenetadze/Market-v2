@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Data;
 using Market.DTO;
 using Market.Services.Interfaces;
 using Market.Services.Interfaces.Services;
@@ -56,7 +57,7 @@ public class ProductService : IProductService
         return productId;
     }
 
-    public ProductDTO UpdateProduct(ProductDTO product, IEnumerable<ProductAttributeValueDTO>? attributeValues = null)
+    public int UpdateProduct(ProductDTO product, IEnumerable<ProductAttributeValueDTO>? attributeValues = null)
     {
         ArgumentNullException.ThrowIfNull(product);
         if (product.Id <= 0)
@@ -70,31 +71,42 @@ public class ProductService : IProductService
             _logger.Warning("Update failed: ProductId {ProductId} does not exist", product.Id);
             throw new InvalidOperationException($"Product with ID {product.Id} does not exist.");
         }
-
-        _unitOfWork.ProductRepository.Update(product);
-
-        if (attributeValues != null)
+        _unitOfWork.BeginTransaction();
+        try
         {
-            var existingAttributes = _unitOfWork.ProductRepository
-                .GetAttributeValues(product.Id).ToImmutableList();
+            _unitOfWork.ProductRepository.Update(product);
 
-            foreach (var attribute in attributeValues)
+            if (attributeValues != null)
             {
-                attribute.ProductId = product.Id;
-                if (existingAttributes.Exists(a => a.AttributeId == attribute.AttributeId))
+                var existingAttributes = _unitOfWork.ProductRepository
+                    .GetAttributeValues(product.Id)
+                    .ToImmutableList();
+
+                foreach (var attribute in attributeValues)
                 {
-                    _unitOfWork.ProductRepository.UpdateAttributeValue(attribute);
-                }
-                else
-                {
-                    _unitOfWork.ProductRepository.InsertAttributeValue(attribute);
+                    attribute.ProductId = product.Id;
+                    if (existingAttributes.Exists(a => a.AttributeId == attribute.AttributeId))
+                    {
+                        _unitOfWork.ProductRepository.UpdateAttributeValue(attribute);
+                    }
+                    else
+                    {
+                        _unitOfWork.ProductRepository.InsertAttributeValue(attribute);
+                    }
                 }
             }
-        }
 
-        return _unitOfWork.ProductRepository.GetById(product.Id)
-            ?? throw new InvalidOperationException($"Product with ID {product.Id} was not found after update.");
+            _unitOfWork.Commit();
+            return product.Id;
+        }
+        catch (Exception ex)
+        {
+            _unitOfWork.Rollback();
+            _logger.Error(ex, "Failed to update product {ProductId}", product.Id);
+            throw;
+        }
     }
+
 
     public void DeleteProduct(int productId)
     {

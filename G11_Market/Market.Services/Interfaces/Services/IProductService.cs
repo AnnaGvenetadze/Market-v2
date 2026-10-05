@@ -5,7 +5,7 @@ namespace Market.Services.Interfaces.Services;
 public interface IProductService
 {
     int CreateProduct(ProductDTO product, IEnumerable<ProductAttributeValueDTO>? attributeValues = null);
-    ProductDTO UpdateProduct(ProductDTO product, IEnumerable<ProductAttributeValueDTO>? attributeValues = null);
+    int UpdateProduct(ProductDTO product, IEnumerable<ProductAttributeValueDTO>? attributeValues = null);
     void DeleteProduct(int productId);
     void RestoreProduct(int productId);
     ProductDTO? GetProductById(int productId);
