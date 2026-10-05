@@ -460,29 +460,73 @@ public sealed class ProductRepositoryTests : BaseRepositoryTests
     public void UpdateAttributeValue_ShouldUpdateValue()
     {
         // Arrange
-        var value = new ProductAttributeValueDTO
+        // 1. Seed Category
+        var category = new CategoryDTO
         {
-            ProductId = 2,
-            AttributeId = 2,
+            CategoryName = "Test Category " + Guid.NewGuid(),
+            Description = "Category for attribute testing"
+        };
+        int categoryId = UnitOfWork.CategoryRepository.Insert(category);
+
+        // 2. Seed Attribute (AttributeType = 2 for Numeric)
+        var attribute = new AttributeDTO
+        {
+            AttributeName = "Test Weight " + Guid.NewGuid(),
+            AttributeType = 2 // 2 = Numeric
+        };
+        int attributeId = UnitOfWork.AttributeRepository.Insert(attribute);
+
+        // 3. Link Attribute to Category (Satisfies active category attribute assignment requirement)
+        var categoryAttribute = new CategoryAttributeDTO
+        {
+            CategoryId = categoryId,
+            AttributeId = attributeId,
+            OrderPosition = 1
+        };
+        UnitOfWork.CategoryRepository.AssignAttribute(categoryAttribute);
+
+        // 4. Seed Product linked to Category
+        var product = new ProductDTO
+        {
+            CategoryId = categoryId,
+            ProductName = "Test Product " + Guid.NewGuid(),
+            Price = 29.99m
+        };
+        int productId = UnitOfWork.ProductRepository.Insert(product);
+
+        // 5. Seed initial attribute value (Satisfies UPDATE existence requirement)
+        var initialValue = new ProductAttributeValueDTO
+        {
+            ProductId = productId,
+            AttributeId = attributeId,
+            NumberValue = 1.00m
+        };
+        UnitOfWork.ProductRepository.InsertAttributeValue(initialValue);
+
+        // DTO to update
+        var valueToUpdate = new ProductAttributeValueDTO
+        {
+            ProductId = productId,
+            AttributeId = attributeId,
             NumberValue = 3.75m
         };
 
         // Act
-        UnitOfWork.ProductRepository.UpdateAttributeValue(value);
+        UnitOfWork.ProductRepository.UpdateAttributeValue(valueToUpdate);
 
         // Assert
         var values = UnitOfWork.ProductRepository
-            .GetAttributeValues(2)
+            .GetAttributeValues(productId)
             .ToList();
 
         Assert.That(values, Has.Count.EqualTo(1));
 
-        var updatedValue = values.Single();
+        var updatedValue = values.Single(v => v.AttributeId == attributeId);
 
         Assert.Multiple(() =>
         {
-            Assert.That(updatedValue.ProductId, Is.EqualTo(2));
-            Assert.That(updatedValue.AttributeId, Is.EqualTo(2));
+            Assert.That(updatedValue.ProductId, Is.EqualTo(productId));
+            Assert.That(updatedValue.AttributeId, Is.EqualTo(attributeId));
             Assert.That(updatedValue.NumberValue, Is.EqualTo(3.75m));
             Assert.That(updatedValue.TextValue, Is.Null);
             Assert.That(updatedValue.DateValue, Is.Null);
