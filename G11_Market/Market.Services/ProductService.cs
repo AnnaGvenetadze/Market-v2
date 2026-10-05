@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Data;
 using Market.DTO;
 using Market.Services.Interfaces;
 using Market.Services.Interfaces.Services;
@@ -10,12 +11,14 @@ public class ProductService : IProductService
 {
     private readonly ILogger _logger;
     private readonly IUnitOfWork _unitOfWork;
+
     public ProductService(IUnitOfWork unitOfWork, ILogger logger)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-    public ProductDTO CreateProduct(ProductDTO product, IEnumerable<ProductAttributeValueDTO>? attributeValues = null)
+
+    public int CreateProduct(ProductDTO product, IEnumerable<ProductAttributeValueDTO>? attributeValues = null)
     {
         ArgumentNullException.ThrowIfNull(product);
         if (product.CategoryId <= 0)
@@ -23,31 +26,38 @@ public class ProductService : IProductService
         ArgumentException.ThrowIfNullOrWhiteSpace(product.ProductName);
 
         var category = _unitOfWork.CategoryRepository.GetById(product.CategoryId);
-        if (category == null || category.IsDeleted)
+        if (category == null)
         {
-            _logger.Warning("Failed to create product: CategoryId {CategoryId} does not exist or is deleted", product.CategoryId);
+            _logger.Error("Failed to create product: CategoryId {CategoryId} does not exist", product.CategoryId);
             throw new InvalidOperationException($"Category with ID {product.CategoryId} does not exist.");
         }
 
-        int productId = _unitOfWork.ProductRepository.Insert(product);
-        if (attributeValues != null)
+        _unitOfWork.BeginTransaction();
+        int productId;
+        try
         {
-            foreach (var attribute in attributeValues)
+            productId = _unitOfWork.ProductRepository.Insert(product);
+            if (attributeValues != null)
             {
-                attribute.ProductId = productId;
-                _unitOfWork.ProductRepository.InsertAttributeValue(attribute);
+                foreach (var attribute in attributeValues)
+                {
+                    attribute.ProductId = productId;
+                    _unitOfWork.ProductRepository.InsertAttributeValue(attribute);
+                }
             }
+            _unitOfWork.Commit();
         }
-        var createdProduct = _unitOfWork.ProductRepository.GetById(productId);
-        if (createdProduct == null)
+        catch (Exception ex)
         {
-            _logger.Error("Product {ProductId} was inserted but could not be retrieved", productId);
-            throw new InvalidOperationException($"Product with ID {productId} was not found after creation.");
+            _unitOfWork.Rollback();
+            _logger.Error(ex, "Failed to create product {ProductName} in category {CategoryId}", product.ProductName, product.CategoryId);
+            throw;
         }
-        return createdProduct;
+
+        return productId;
     }
 
-    public ProductDTO UpdateProduct(ProductDTO product, IEnumerable<ProductAttributeValueDTO>? attributeValues = null)
+    public int UpdateProduct(ProductDTO product, IEnumerable<ProductAttributeValueDTO>? attributeValues = null)
     {
         ArgumentNullException.ThrowIfNull(product);
         if (product.Id <= 0)
@@ -61,31 +71,42 @@ public class ProductService : IProductService
             _logger.Warning("Update failed: ProductId {ProductId} does not exist", product.Id);
             throw new InvalidOperationException($"Product with ID {product.Id} does not exist.");
         }
-
-        _unitOfWork.ProductRepository.Update(product);
-
-        if (attributeValues != null)
+        _unitOfWork.BeginTransaction();
+        try
         {
-            var existingAttributes = _unitOfWork.ProductRepository
-                .GetAttributeValues(product.Id).ToImmutableList();
+            _unitOfWork.ProductRepository.Update(product);
 
-            foreach (var attribute in attributeValues)
+            if (attributeValues != null)
             {
-                attribute.ProductId = product.Id;
-                if (existingAttributes.Exists(a => a.AttributeId == attribute.AttributeId))
+                var existingAttributes = _unitOfWork.ProductRepository
+                    .GetAttributeValues(product.Id)
+                    .ToImmutableList();
+
+                foreach (var attribute in attributeValues)
                 {
-                    _unitOfWork.ProductRepository.UpdateAttributeValue(attribute);
-                }
-                else
-                {
-                    _unitOfWork.ProductRepository.InsertAttributeValue(attribute);
+                    attribute.ProductId = product.Id;
+                    if (existingAttributes.Exists(a => a.AttributeId == attribute.AttributeId))
+                    {
+                        _unitOfWork.ProductRepository.UpdateAttributeValue(attribute);
+                    }
+                    else
+                    {
+                        _unitOfWork.ProductRepository.InsertAttributeValue(attribute);
+                    }
                 }
             }
-        }
 
-        return _unitOfWork.ProductRepository.GetById(product.Id)
-            ?? throw new InvalidOperationException($"Product with ID {product.Id} was not found after update.");
+            _unitOfWork.Commit();
+            return product.Id;
+        }
+        catch (Exception ex)
+        {
+            _unitOfWork.Rollback();
+            _logger.Error(ex, "Failed to update product {ProductId}", product.Id);
+            throw;
+        }
     }
+
 
     public void DeleteProduct(int productId)
     {

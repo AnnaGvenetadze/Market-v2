@@ -2,21 +2,7 @@
 
 public sealed class ProductDetailsDTO
 {
-    public ProductDTO Product { get; }
-    public CategoryDTO Category { get; }
-    public IReadOnlyList<ProductDetailAttributeDTO> Attributes { get; }
-
-    public ProductDetailsDTO(
-        ProductDTO product,
-        CategoryDTO category,
-        IReadOnlyList<ProductDetailAttributeDTO> attributes)
-    {
-        ArgumentNullException.ThrowIfNull(product);
-        ArgumentNullException.ThrowIfNull(category);
-        ArgumentNullException.ThrowIfNull(attributes);
-
-        Product = product;
-        Category = category;
-        Attributes = attributes;
-    }
+    public required ProductDTO Product { get; init; }
+    public required CategoryDTO Category { get; init; }
+    public required IReadOnlyList<ProductDetailAttributeDTO> Attributes { get; init; }
 }

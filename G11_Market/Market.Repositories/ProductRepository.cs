@@ -82,19 +82,29 @@ internal sealed class ProductRepository(DbConnection connection)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId);
 
+        var parameters = new DynamicParameters();
+        parameters.Add("ProductId", productId);
+
         using var multi = _connection.QueryMultiple(
-            "dbo.sp_GetProductDetails",
-            new { ProductId = productId },
+            "dbo.sp_GetProductDetailsById",
+            parameters,
             commandType: CommandType.StoredProcedure);
 
-        var product = multi.ReadFirstOrDefault<ProductDTO>();
-        var category = multi.ReadFirstOrDefault<CategoryDTO>();
-        var attributes = multi.Read<ProductDetailAttributeDTO>().ToList();
-
-        if (product is null || category is null)
+        var product = multi.ReadSingleOrDefault<ProductDTO>();
+        if (product is null)
             return null;
 
-        return new ProductDetailsDTO(product, category, attributes);
+        var category = multi.ReadSingleOrDefault<CategoryDTO>()
+            ?? throw new InvalidOperationException($"Data integrity error: Category missing for Product ID {productId}.");
+
+        var attributes = multi.Read<ProductDetailAttributeDTO>().ToList();
+
+        return new ProductDetailsDTO
+        {
+            Product = product,
+            Category = category,
+            Attributes = attributes
+        };
     }
 
     public void DeleteAttributeValue(int productId, int attributeId)

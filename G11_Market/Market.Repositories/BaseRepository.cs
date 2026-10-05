@@ -15,7 +15,6 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
     private bool _disposed = false;
     private readonly string _entityName;
     private readonly string _entityPluralName;
-    private static readonly bool TypeHasIsDeleted = CheckIfTypeHasIsDeleted();
 
     protected BaseRepository(DbConnection connection)
     {
@@ -24,7 +23,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
         _entityPluralName = _entityName.ToPlural();
     }
 
-    public T GetById(object id)
+    public T? GetById(object id)
     {
         ArgumentNullException.ThrowIfNull(id, nameof(id));
 
@@ -134,7 +133,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
                translator.ContainsProperty(expression, "IsDeleted");
 
         string sqlQuery;
-        if (TypeHasIsDeleted && !expressionHasIsDeleted)
+        if (CheckIfTypeHasIsDeleted() && !expressionHasIsDeleted)
         {
             sqlQuery = $"SELECT * FROM {_entityPluralName} WHERE IsDeleted = 0 AND {sql}";
         }

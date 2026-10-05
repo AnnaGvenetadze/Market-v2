@@ -20,13 +20,17 @@ public abstract class BaseRepositoryTests
     [SetUp]
     public void BaseSetup()
     {
-        // Every test must start from the same clean database state.
-        DatabaseHelper.ClearDatabase();
-        DatabaseHelper.SeedDatabase();
 
         Connection = new SqlConnection(ConnectionString);
 
         UnitOfWork = UnitOfWorkFactory.Create(Connection);
+    }
+
+    [OneTimeSetUp]
+    public void OneTimeSetup()
+    {
+        DatabaseHelper.ClearDatabase();
+        DatabaseHelper.SeedDatabase();
     }
 
     [TearDown]

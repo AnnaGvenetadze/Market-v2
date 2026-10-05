@@ -7,7 +7,6 @@ public interface IProductRepository : IBaseRepository<ProductDTO>
     ProductDTO? GetByName(string productName);
     IEnumerable<ProductDTO> GetByCategoryId(int categoryId);
     IEnumerable<ProductDTO> GetByPriceRange(decimal minPrice, decimal maxPrice);
-    // სერვისის ინტერფეისიდან გვინდა ჩანდეს?
     IEnumerable<ProductAttributeValueDTO> GetAttributeValues(int productId);
     ProductDetailsDTO? GetProductDetails(int productId);
     void InsertAttributeValue(ProductAttributeValueDTO value);

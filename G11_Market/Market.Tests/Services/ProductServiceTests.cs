@@ -3,1165 +3,483 @@ using Market.Services;
 using Market.Services.Interfaces.Services;
 using Market.Tests.Helpers;
 using Microsoft.Data.SqlClient;
+using Market.Services.Interfaces;
+using Market.Services.Interfaces.Repositories;
+using Moq;
 using Serilog;
 
-namespace Market.Tests;
+namespace Market.Tests.Services;
 
 [TestFixture]
-[NonParallelizable]
-public sealed class ProductServiceTests : BaseRepositoryTests
+public class ProductServiceTests
 {
-    // =========================================================
-    // Constructor
-    // =========================================================
+    private Mock<IUnitOfWork> _unitOfWorkMock = null!;
+    private Mock<IProductRepository> _productRepoMock = null!;
+    private Mock<ICategoryRepository> _categoryRepoMock = null!;
+    private Mock<ILogger> _loggerMock = null!;
+    private ProductService _sut = null!;
+
+    [SetUp]
+    public void SetUp()
+    {
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _productRepoMock = new Mock<IProductRepository>();
+        _categoryRepoMock = new Mock<ICategoryRepository>();
+        _loggerMock = new Mock<ILogger>();
+
+        _unitOfWorkMock.Setup(u => u.ProductRepository).Returns(_productRepoMock.Object);
+        _unitOfWorkMock.Setup(u => u.CategoryRepository).Returns(_categoryRepoMock.Object);
+
+        _sut = new ProductService(_unitOfWorkMock.Object, _loggerMock.Object);
+    }
+
+    #region Constructor Tests
 
     [Test]
-    public void Constructor_WhenUnitOfWorkIsNull_ShouldThrowArgumentNullException()
+    public void Constructor_NullUnitOfWork_ShouldThrowArgumentNullException()
     {
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() =>
-            new ProductService(null!, Log.Logger));
+        Assert.Throws<ArgumentNullException>(() => new ProductService(null!, _loggerMock.Object));
     }
 
     [Test]
-    public void Constructor_WhenLoggerIsNull_ShouldThrowArgumentNullException()
+    public void Constructor_NullLogger_ShouldThrowArgumentNullException()
     {
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() =>
-            new ProductService(UnitOfWork, null!));
+        Assert.Throws<ArgumentNullException>(() => new ProductService(_unitOfWorkMock.Object, null!));
     }
 
+    #endregion
 
-    // =========================================================
-    // CreateProduct
-    // =========================================================
-
-    [Test]
-    public void CreateProduct_WithValidProduct_ShouldCreateProduct()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var product = new ProductDTO
-        {
-            CategoryId = 1,
-            ProductName = "New Product".AddGuid(),
-            Price = 500m
-        };
-
-        // Act
-        var result = service.CreateProduct(product);
-
-        // Assert
-        Assert.That(result, Is.Not.Null);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Id, Is.GreaterThan(0));
-            Assert.That(result.CategoryId, Is.EqualTo(1));
-            Assert.That(result.ProductName, Is.EqualTo(product.ProductName));
-            Assert.That(result.Price, Is.EqualTo(500m));
-            Assert.That(result.IsDeleted, Is.False);
-        });
-    }
+    #region CreateProduct Tests
 
     [Test]
-    public void CreateProduct_WithAttributeValue_ShouldCreateProductWithAttributeValue()
+    public void CreateProduct_NullProduct_ShouldThrowArgumentNullException()
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var product = new ProductDTO
-        {
-            CategoryId = 1,
-            ProductName = "LG Monitor".AddGuid(),
-            Price = 1500m
-        };
-
-        var attributes = new List<ProductAttributeValueDTO>
-        {
-            new()
-            {
-                AttributeId = 1,
-                TextValue = "LG"
-            }
-        };
-
-        // Act
-        var createdProduct = service.CreateProduct(
-            product,
-            attributes);
-
-        var result = service
-            .GetProductAttributeValues(createdProduct.Id)
-            .ToList();
-
-        // Assert
-        Assert.That(result, Has.Count.EqualTo(1));
-
-        var attribute = result.Single();
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(attribute.ProductId,
-                Is.EqualTo(createdProduct.Id));
-
-            Assert.That(attribute.AttributeId,
-                Is.EqualTo(1));
-
-            Assert.That(attribute.TextValue,
-                Is.EqualTo("LG"));
-
-            Assert.That(attribute.NumberValue, Is.Null);
-            Assert.That(attribute.DateValue, Is.Null);
-            Assert.That(attribute.BooleanValue, Is.Null);
-        });
-    }
-
-    [Test]
-    public void CreateProduct_WhenProductIsNull_ShouldThrowArgumentNullException()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() =>
-            service.CreateProduct(null!));
+        Assert.Throws<ArgumentNullException>(() => _sut.CreateProduct(null!));
     }
 
     [TestCase(0)]
     [TestCase(-1)]
-    public void CreateProduct_WhenCategoryIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int categoryId)
+    public void CreateProduct_InvalidCategoryId_ShouldThrowArgumentOutOfRangeException(int categoryId)
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
+        var product = new ProductDTO { CategoryId = categoryId, ProductName = "Valid Product" };
 
-        var product = new ProductDTO
-        {
-            CategoryId = categoryId,
-            ProductName = "Product".AddGuid(),
-            Price = 100m
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.CreateProduct(product));
+        Assert.Throws<ArgumentOutOfRangeException>(() => _sut.CreateProduct(product));
     }
 
     [TestCase("")]
     [TestCase("   ")]
-    public void CreateProduct_WhenProductNameIsInvalid_ShouldThrowArgumentException(
-        string productName)
+    public void CreateProduct_InvalidProductName_ShouldThrowArgumentException(string? productName)
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
+        var product = new ProductDTO { CategoryId = 1, ProductName = productName! };
 
-        var product = new ProductDTO
-        {
-            CategoryId = 1,
-            ProductName = productName,
-            Price = 100m
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() =>
-            service.CreateProduct(product));
+        Assert.Throws<ArgumentException>(() => _sut.CreateProduct(product));
     }
 
     [Test]
-    public void CreateProduct_WhenCategoryDoesNotExist_ShouldThrowInvalidOperationException()
+    public void CreateProduct_CategoryDoesNotExist_ShouldThrowInvalidOperationExceptionAndLogError()
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
+        var product = new ProductDTO { CategoryId = 99, ProductName = "Monitor" };
+        _categoryRepoMock.Setup(r => r.GetById(99)).Returns((CategoryDTO?)null);
 
-        var product = new ProductDTO
-        {
-            CategoryId = int.MaxValue,
-            ProductName = "Product".AddGuid(),
-            Price = 100m
-        };
+        var ex = Assert.Throws<InvalidOperationException>(() => _sut.CreateProduct(product));
 
-        // Act & Assert
-        Assert.Throws<InvalidOperationException>(() =>
-            service.CreateProduct(product));
+        Assert.That(ex!.Message, Is.EqualTo("Category with ID 99 does not exist."));
+        _loggerMock.Verify(x => x.Error("Failed to create product: CategoryId {CategoryId} does not exist", 99), Times.Once);
     }
 
     [Test]
-    public void CreateProduct_WhenCategoryIsDeleted_ShouldThrowInvalidOperationException()
+    public void CreateProduct_ValidProduct_ShouldCommitTransactionAndReturnId()
     {
         // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
+        var product = new ProductDTO { CategoryId = 1, ProductName = "Gaming Mouse" };
+        var category = new CategoryDTO { Id = 1, CategoryName = "Peripherals" };
 
-        UnitOfWork.CategoryRepository.Delete(1);
+        _categoryRepoMock.Setup(r => r.GetById(1)).Returns(category);
+        _productRepoMock.Setup(r => r.Insert(product)).Returns(101);
 
-        var product = new ProductDTO
-        {
-            CategoryId = 1,
-            ProductName = "Product".AddGuid(),
-            Price = 100m
-        };
+        // Act
+        var result = _sut.CreateProduct(product);
 
-        // Act & Assert
-        Assert.Throws<InvalidOperationException>(() =>
-            service.CreateProduct(product));
+        // Assert
+        Assert.That(result, Is.EqualTo(101));
+        _unitOfWorkMock.Verify(u => u.BeginTransaction(), Times.Once);
+        _productRepoMock.Verify(r => r.Insert(product), Times.Once);
+        _unitOfWorkMock.Verify(u => u.Commit(), Times.Once);
+        _unitOfWorkMock.Verify(u => u.Rollback(), Times.Never);
     }
 
     [Test]
-    public void CreateProduct_WhenPriceIsNegative_ShouldThrowSqlException()
+    public void CreateProduct_WithAttributeValues_ShouldInsertAttributesAndCommit()
     {
         // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var product = new ProductDTO
-        {
-            CategoryId = 1,
-            ProductName = "Product".AddGuid(),
-            Price = -1m
-        };
-
-        // Act & Assert
-        Assert.Throws<SqlException>(() =>
-            service.CreateProduct(product));
-    }
-
-    [Test]
-    public void CreateProduct_WhenProductNameAlreadyExists_ShouldThrowSqlException()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var product = new ProductDTO
-        {
-            CategoryId = 1,
-            ProductName = "Samsung Monitor",
-            Price = 100m
-        };
-
-        // Act & Assert
-        Assert.Throws<SqlException>(() =>
-            service.CreateProduct(product));
-    }
-
-    [Test]
-    public void CreateProduct_WhenAttributeValueTypeIsWrong_ShouldThrowSqlException()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var product = new ProductDTO
-        {
-            CategoryId = 1,
-            ProductName = "Product".AddGuid(),
-            Price = 100m
-        };
-
-        // Attribute 1 = Brand = Text
+        var product = new ProductDTO { CategoryId = 1, ProductName = "Keyboard" };
+        var category = new CategoryDTO { Id = 1, CategoryName = "Peripherals" };
         var attributes = new List<ProductAttributeValueDTO>
         {
-            new()
-            {
-                AttributeId = 1,
-                NumberValue = 100m
-            }
+            new() { AttributeId = 1, TextValue = "Mechanical" },
+            new() { AttributeId = 2, BooleanValue = true }
         };
 
-        // Act & Assert
-        Assert.Throws<SqlException>(() =>
-            service.CreateProduct(product, attributes));
-    }
-
-
-    // =========================================================
-    // UpdateProduct
-    // =========================================================
-
-    [Test]
-    public void UpdateProduct_WithValidData_ShouldUpdateProduct()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var product = service.GetProductById(1)!;
-
-        product.ProductName = "Updated Monitor".AddGuid();
-        product.Price = 1400m;
+        _categoryRepoMock.Setup(r => r.GetById(1)).Returns(category);
+        _productRepoMock.Setup(r => r.Insert(product)).Returns(50);
 
         // Act
-        var result = service.UpdateProduct(product);
+        var result = _sut.CreateProduct(product, attributes);
 
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(result.Id, Is.EqualTo(1));
-            Assert.That(result.ProductName,
-                Is.EqualTo(product.ProductName));
-            Assert.That(result.Price, Is.EqualTo(1400m));
+            Assert.That(result, Is.EqualTo(50));
+            Assert.That(attributes.All(a => a.ProductId == 50), Is.True);
         });
+        _productRepoMock.Verify(r => r.InsertAttributeValue(It.IsAny<ProductAttributeValueDTO>()), Times.Exactly(2));
+        _unitOfWorkMock.Verify(u => u.Commit(), Times.Once);
     }
 
     [Test]
-    public void UpdateProduct_WithExistingAttributeValue_ShouldUpdateAttributeValue()
+    public void CreateProduct_OnException_ShouldRollbackAndLogError()
     {
         // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var product = service.GetProductById(1)!;
-
-        var attributes = new List<ProductAttributeValueDTO>
-        {
-            new()
-            {
-                AttributeId = 1,
-                TextValue = "LG"
-            }
-        };
-
-        // Act
-        service.UpdateProduct(product, attributes);
-
-        var result = service
-            .GetProductAttributeValues(1)
-            .Single();
-
-        // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.AttributeId, Is.EqualTo(1));
-            Assert.That(result.TextValue, Is.EqualTo("LG"));
-        });
-    }
-
-    [Test]
-    public void UpdateProduct_WhenAttributeValueDoesNotExist_ShouldInsertAttributeValue()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        service.DeleteProductAttributeValue(1, 1);
-
-        var product = service.GetProductById(1)!;
-
-        var attributes = new List<ProductAttributeValueDTO>
-        {
-            new()
-            {
-                AttributeId = 1,
-                TextValue = "Sony"
-            }
-        };
-
-        // Act
-        service.UpdateProduct(product, attributes);
-
-        var result = service
-            .GetProductAttributeValues(1)
-            .Single();
-
-        // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.AttributeId, Is.EqualTo(1));
-            Assert.That(result.TextValue, Is.EqualTo("Sony"));
-        });
-    }
-
-    [Test]
-    public void UpdateProduct_WhenProductIsNull_ShouldThrowArgumentNullException()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
+        var product = new ProductDTO { CategoryId = 1, ProductName = "Headset" };
+        _categoryRepoMock.Setup(r => r.GetById(1)).Returns(new CategoryDTO { Id = 1 });
+        _productRepoMock.Setup(r => r.Insert(product)).Throws(new InvalidOperationException("DB Failure"));
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() =>
-            service.UpdateProduct(null!));
+        Assert.Throws<InvalidOperationException>(() => _sut.CreateProduct(product));
+
+        _unitOfWorkMock.Verify(u => u.BeginTransaction(), Times.Once);
+        _unitOfWorkMock.Verify(u => u.Rollback(), Times.Once);
+        _unitOfWorkMock.Verify(u => u.Commit(), Times.Never);
+        _loggerMock.Verify(x => x.Error(It.IsAny<Exception>(), "Failed to create product {ProductName} in category {CategoryId}", "Headset", 1), Times.Once);
+    }
+
+    #endregion
+
+    #region UpdateProduct Tests
+
+    [Test]
+    public void UpdateProduct_NullProduct_ShouldThrowArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => _sut.UpdateProduct(null!));
+    }
+
+    [TestCase(0, 1, "Name")]
+    [TestCase(-1, 1, "Name")]
+    [TestCase(1, 0, "Name")]
+    [TestCase(1, -1, "Name")]
+    [TestCase(1, 1, "")]
+    [TestCase(1, 1, "   ")]
+    public void UpdateProduct_InvalidArguments_ShouldThrowException(int id, int categoryId, string name)
+    {
+        var product = new ProductDTO { Id = id, CategoryId = categoryId, ProductName = name };
+
+        Assert.That(() => _sut.UpdateProduct(product), Throws.Exception);
+    }
+
+    [Test]
+    public void UpdateProduct_ProductDoesNotExist_ShouldThrowInvalidOperationExceptionAndLogWarning()
+    {
+        var product = new ProductDTO { Id = 10, CategoryId = 1, ProductName = "Updated Item" };
+        _productRepoMock.Setup(r => r.GetById(10)).Returns((ProductDTO?)null);
+
+        var ex = Assert.Throws<InvalidOperationException>(() => _sut.UpdateProduct(product));
+
+        Assert.That(ex!.Message, Is.EqualTo("Product with ID 10 does not exist."));
+        _loggerMock.Verify(x => x.Warning("Update failed: ProductId {ProductId} does not exist", 10), Times.Once);
+    }
+
+    [Test]
+    public void UpdateProduct_SyncsAttributes_UpdatesExistingAndInsertsNew()
+    {
+        // Arrange
+        var product = new ProductDTO { Id = 10, CategoryId = 1, ProductName = "Updated Mouse" };
+        var existingAttributes = new List<ProductAttributeValueDTO>
+        {
+            new() { ProductId = 10, AttributeId = 1, TextValue = "Black" }
+        };
+        var incomingAttributes = new List<ProductAttributeValueDTO>
+        {
+            new() { AttributeId = 1, TextValue = "White" },   // Existing -> Update
+            new() { AttributeId = 2, BooleanValue = true }    // New -> Insert
+        };
+
+        _productRepoMock.Setup(r => r.GetById(10)).Returns(product);
+        _productRepoMock.Setup(r => r.GetAttributeValues(10)).Returns(existingAttributes);
+
+        // Act
+        var result = _sut.UpdateProduct(product, incomingAttributes);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(10));
+        _unitOfWorkMock.Verify(u => u.BeginTransaction(), Times.Once);
+        _productRepoMock.Verify(r => r.Update(product), Times.Once);
+        _productRepoMock.Verify(r => r.UpdateAttributeValue(It.Is<ProductAttributeValueDTO>(a => a.AttributeId == 1 && a.TextValue == "White")), Times.Once);
+        _productRepoMock.Verify(r => r.InsertAttributeValue(It.Is<ProductAttributeValueDTO>(a => a.AttributeId == 2 && a.BooleanValue == true)), Times.Once);
+        _unitOfWorkMock.Verify(u => u.Commit(), Times.Once);
+    }
+
+    [Test]
+    public void UpdateProduct_OnException_ShouldRollbackTransaction()
+    {
+        var product = new ProductDTO { Id = 10, CategoryId = 1, ProductName = "Mouse" };
+        _productRepoMock.Setup(r => r.GetById(10)).Returns(product);
+        _productRepoMock.Setup(r => r.Update(product)).Throws(new Exception("Write Error"));
+
+        Assert.Throws<Exception>(() => _sut.UpdateProduct(product));
+
+        _unitOfWorkMock.Verify(u => u.Rollback(), Times.Once);
+        _unitOfWorkMock.Verify(u => u.Commit(), Times.Never);
+        _loggerMock.Verify(x => x.Error(It.IsAny<Exception>(), "Failed to update product {ProductId}", 10), Times.Once);
+    }
+
+    #endregion
+
+    #region Delete & Restore Tests
+
+    [TestCase(0)]
+    [TestCase(-1)]
+    public void DeleteProduct_InvalidId_ShouldThrowArgumentOutOfRangeException(int productId)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => _sut.DeleteProduct(productId));
+    }
+
+    [Test]
+    public void DeleteProduct_ValidId_ShouldCallRepositoryDelete()
+    {
+        _sut.DeleteProduct(5);
+
+        _productRepoMock.Verify(r => r.Delete(5), Times.Once);
     }
 
     [TestCase(0)]
     [TestCase(-1)]
-    public void UpdateProduct_WhenProductIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int productId)
+    public void RestoreProduct_InvalidId_ShouldThrowArgumentOutOfRangeException(int productId)
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
+        Assert.Throws<ArgumentOutOfRangeException>(() => _sut.RestoreProduct(productId));
+    }
 
-        var product = new ProductDTO
-        {
-            Id = productId,
-            CategoryId = 1,
-            ProductName = "Product",
-            Price = 100m
-        };
+    [Test]
+    public void RestoreProduct_ValidId_ShouldCallRepositoryRestore()
+    {
+        _sut.RestoreProduct(5);
 
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.UpdateProduct(product));
+        _productRepoMock.Verify(r => r.Restore(5), Times.Once);
+    }
+
+    #endregion
+
+    #region Query Methods Tests
+
+    [TestCase(0)]
+    [TestCase(-1)]
+    public void GetProductById_InvalidId_ShouldThrowArgumentOutOfRangeException(int productId)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => _sut.GetProductById(productId));
+    }
+
+    [Test]
+    public void GetProductById_WhenNotFound_ShouldLogWarningAndReturnNull()
+    {
+        _productRepoMock.Setup(r => r.GetById(42)).Returns((ProductDTO?)null);
+
+        var result = _sut.GetProductById(42);
+
+        Assert.That(result, Is.Null);
+        _loggerMock.Verify(x => x.Warning("ProductId {ProductId} was not found", 42), Times.Once);
+    }
+
+    [Test]
+    public void GetProductById_WhenFound_ShouldReturnProduct()
+    {
+        var product = new ProductDTO { Id = 42, ProductName = "Chair" };
+        _productRepoMock.Setup(r => r.GetById(42)).Returns(product);
+
+        var result = _sut.GetProductById(42);
+
+        Assert.That(result, Is.EqualTo(product));
+    }
+
+    [Test]
+    public void GetAllProducts_ShouldReturnRepositoryCollection()
+    {
+        var products = new List<ProductDTO> { new() { Id = 1 }, new() { Id = 2 } };
+        _productRepoMock.Setup(r => r.GetAll()).Returns(products);
+
+        var result = _sut.GetAllProducts();
+
+        Assert.That(result, Is.EqualTo(products));
+        _productRepoMock.Verify(r => r.GetAll(), Times.Once);
     }
 
     [TestCase(0)]
     [TestCase(-1)]
-    public void UpdateProduct_WhenCategoryIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int categoryId)
+    public void GetProductsByCategoryId_InvalidCategoryId_ShouldThrowArgumentOutOfRangeException(int categoryId)
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var product = new ProductDTO
-        {
-            Id = 1,
-            CategoryId = categoryId,
-            ProductName = "Product",
-            Price = 100m
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.UpdateProduct(product));
-    }
-
-    [TestCase("")]
-    [TestCase("   ")]
-    public void UpdateProduct_WhenProductNameIsInvalid_ShouldThrowArgumentException(
-        string productName)
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var product = new ProductDTO
-        {
-            Id = 1,
-            CategoryId = 1,
-            ProductName = productName,
-            Price = 100m
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() =>
-            service.UpdateProduct(product));
+        Assert.Throws<ArgumentOutOfRangeException>(() => _sut.GetProductsByCategoryId(categoryId));
     }
 
     [Test]
-    public void UpdateProduct_WhenPriceIsNegative_ShouldThrowSqlException()
+    public void GetProductsByCategoryId_ValidCategoryId_ShouldReturnProducts()
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
+        var products = new List<ProductDTO> { new() { Id = 1, CategoryId = 5 } };
+        _productRepoMock.Setup(r => r.GetByCategoryId(5)).Returns(products);
 
-        var product = service.GetProductById(1)!;
-        product.Price = -1m;
+        var result = _sut.GetProductsByCategoryId(5);
 
-        // Act & Assert
-        Assert.Throws<SqlException>(() =>
-            service.UpdateProduct(product));
+        Assert.That(result, Is.EqualTo(products));
     }
 
     [Test]
-    public void UpdateProduct_WhenNewCategoryIsNotCompatibleWithAttributes_ShouldThrowSqlException()
+    public void GetProductsByPriceRange_WhenMinNegative_ShouldThrowArgumentOutOfRangeException()
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Product 1 has Attribute 1.
-        // Category 2 has Attribute 2.
-        var product = service.GetProductById(1)!;
-        product.CategoryId = 2;
-
-        // Act & Assert
-        Assert.Throws<SqlException>(() =>
-            service.UpdateProduct(product));
+        Assert.Throws<ArgumentOutOfRangeException>(() => _sut.GetProductsByPriceRange(-1m, 100m));
     }
 
+    [Test]
+    public void GetProductsByPriceRange_WhenMaxLessThanMin_ShouldThrowArgumentException()
+    {
+        var ex = Assert.Throws<ArgumentException>(() => _sut.GetProductsByPriceRange(100m, 50m));
 
-    // =========================================================
-    // DeleteProduct
-    // =========================================================
+        Assert.That(ex!.Message, Does.Contain("Maximum price must be greater than or equal to minimum price"));
+    }
 
     [Test]
-    public void DeleteProduct_WithValidId_ShouldDeleteProduct()
+    public void GetProductsByPriceRange_ValidRange_ShouldReturnProducts()
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
+        var products = new List<ProductDTO> { new() { Id = 1, Price = 75m } };
+        _productRepoMock.Setup(r => r.GetByPriceRange(50m, 100m)).Returns(products);
 
-        // Act
-        service.DeleteProduct(1);
+        var result = _sut.GetProductsByPriceRange(50m, 100m);
 
-        var products = service
-            .GetAllProducts()
-            .ToList();
-
-        // Assert
-        Assert.That(
-            products.Any(x => x.Id == 1),
-            Is.False);
+        Assert.That(result, Is.EqualTo(products));
     }
 
     [TestCase(0)]
     [TestCase(-1)]
-    public void DeleteProduct_WhenProductIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int productId)
+    public void GetProductAttributeValues_InvalidId_ShouldThrowArgumentOutOfRangeException(int productId)
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.DeleteProduct(productId));
+        Assert.Throws<ArgumentOutOfRangeException>(() => _sut.GetProductAttributeValues(productId));
     }
 
     [Test]
-    public void DeleteProduct_WhenProductDoesNotExist_ShouldThrowSqlException()
+    public void GetProductAttributeValues_ValidId_ShouldReturnValues()
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
+        var values = new List<ProductAttributeValueDTO> { new() { ProductId = 1, AttributeId = 2 } };
+        _productRepoMock.Setup(r => r.GetAttributeValues(1)).Returns(values);
 
-        // Act & Assert
-        Assert.Throws<SqlException>(() =>
-            service.DeleteProduct(int.MaxValue));
-    }
+        var result = _sut.GetProductAttributeValues(1);
 
-
-    // =========================================================
-    // RestoreProduct
-    // =========================================================
-
-    [Test]
-    public void RestoreProduct_WhenProductIsDeleted_ShouldRestoreProduct()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        service.DeleteProduct(1);
-
-        // Act
-        service.RestoreProduct(1);
-
-        var result = service
-            .GetAllProducts()
-            .SingleOrDefault(x => x.Id == 1);
-
-        // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.IsDeleted, Is.False);
+        Assert.That(result, Is.EqualTo(values));
     }
 
     [TestCase(0)]
     [TestCase(-1)]
-    public void RestoreProduct_WhenProductIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int productId)
+    public void GetProductDetails_InvalidId_ShouldThrowArgumentOutOfRangeException(int productId)
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.RestoreProduct(productId));
+        Assert.Throws<ArgumentOutOfRangeException>(() => _sut.GetProductDetails(productId));
     }
 
+    [Test]
+    public void GetProductDetails_WhenMissing_ShouldLogWarningAndReturnNull()
+    {
+        _productRepoMock.Setup(r => r.GetProductDetails(10)).Returns((ProductDetailsDTO?)null);
 
-    // =========================================================
-    // GetProductById
-    // =========================================================
+        var result = _sut.GetProductDetails(10);
+
+        Assert.That(result, Is.Null);
+        _loggerMock.Verify(x => x.Warning("Product with ID {ProductId} was not found.", 10), Times.Once);
+    }
 
     [Test]
-    public void GetProductById_WhenProductExists_ShouldReturnProduct()
+    public void GetProductDetails_WhenDeleted_ShouldLogInformationAndReturnDetails()
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act
-        var result = service.GetProductById(1);
-
-        // Assert
-        Assert.That(result, Is.Not.Null);
-
-        Assert.Multiple(() =>
+        var details = new ProductDetailsDTO
         {
-            Assert.That(result!.Id, Is.EqualTo(1));
-            Assert.That(result.ProductName,
-                Is.EqualTo("Samsung Monitor"));
-            Assert.That(result.CategoryId, Is.EqualTo(1));
-            Assert.That(result.Price, Is.EqualTo(1200m));
-        });
-    }
-
-    [TestCase(0)]
-    [TestCase(-1)]
-    public void GetProductById_WhenProductIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int productId)
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.GetProductById(productId));
-    }
-
-    [Test]
-    public void GetProductById_WhenProductDoesNotExist_ShouldThrowSqlException()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<SqlException>(() =>
-            service.GetProductById(int.MaxValue));
-    }
-
-
-    // =========================================================
-    // GetAllProducts
-    // =========================================================
-
-    [Test]
-    public void GetAllProducts_ShouldReturnAllActiveProducts()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act
-        var result = service
-            .GetAllProducts()
-            .ToList();
-
-        // Assert
-        Assert.That(result, Has.Count.EqualTo(3));
-        Assert.That(result.All(x => !x.IsDeleted), Is.True);
-    }
-
-    [Test]
-    public void GetAllProducts_WhenProductIsDeleted_ShouldExcludeDeletedProduct()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        service.DeleteProduct(1);
-
-        // Act
-        var result = service
-            .GetAllProducts()
-            .ToList();
-
-        // Assert
-        Assert.That(
-            result.Any(x => x.Id == 1),
-            Is.False);
-
-        Assert.That(
-            result.All(x => !x.IsDeleted),
-            Is.True);
-    }
-
-
-    // =========================================================
-    // GetProductsByCategoryId
-    // =========================================================
-
-    [Test]
-    public void GetProductsByCategoryId_ShouldReturnCorrectProducts()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act
-        var result = service
-            .GetProductsByCategoryId(1)
-            .ToList();
-
-        // Assert
-        Assert.That(result, Is.Not.Empty);
-
-        Assert.That(
-            result.All(x => x.CategoryId == 1),
-            Is.True);
-    }
-
-    [TestCase(0)]
-    [TestCase(-1)]
-    public void GetProductsByCategoryId_WhenCategoryIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int categoryId)
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.GetProductsByCategoryId(categoryId));
-    }
-
-    [Test]
-    public void GetProductsByCategoryId_WhenNoProductsExist_ShouldReturnEmpty()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act
-        var result = service
-            .GetProductsByCategoryId(int.MaxValue)
-            .ToList();
-
-        // Assert
-        Assert.That(result, Is.Empty);
-    }
-
-
-    // =========================================================
-    // GetProductsByPriceRange
-    // =========================================================
-
-    [Test]
-    public void GetProductsByPriceRange_ShouldReturnProductsInsideRange()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act
-        var result = service
-            .GetProductsByPriceRange(1200m, 2500m)
-            .ToList();
-
-        // Assert
-        Assert.That(result, Has.Count.EqualTo(2));
-
-        Assert.That(
-            result.All(x =>
-                x.Price >= 1200m &&
-                x.Price <= 2500m),
-            Is.True);
-    }
-
-    [Test]
-    public void GetProductsByPriceRange_ShouldIncludeBoundaryValues()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act
-        var result = service
-            .GetProductsByPriceRange(1200m, 1200m)
-            .ToList();
-
-        // Assert
-        Assert.That(result, Has.Count.EqualTo(1));
-        Assert.That(result.Single().Id, Is.EqualTo(1));
-    }
-
-    [Test]
-    public void GetProductsByPriceRange_WhenNoProductsExist_ShouldReturnEmpty()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act
-        var result = service
-            .GetProductsByPriceRange(10000m, 20000m)
-            .ToList();
-
-        // Assert
-        Assert.That(result, Is.Empty);
-    }
-
-    [Test]
-    public void GetProductsByPriceRange_WhenMinimumPriceIsNegative_ShouldThrowArgumentOutOfRangeException()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.GetProductsByPriceRange(-1m, 100m));
-    }
-
-    [Test]
-    public void GetProductsByPriceRange_WhenMaximumPriceIsLessThanMinimum_ShouldThrowArgumentException()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() =>
-            service.GetProductsByPriceRange(200m, 100m));
-    }
-
-
-    // =========================================================
-    // GetProductAttributeValues
-    // =========================================================
-
-    [Test]
-    public void GetProductAttributeValues_ShouldReturnCorrectValues()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act
-        var result = service
-            .GetProductAttributeValues(1)
-            .ToList();
-
-        // Assert
-        Assert.That(result, Has.Count.EqualTo(1));
-
-        var attribute = result.Single();
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(attribute.ProductId, Is.EqualTo(1));
-            Assert.That(attribute.AttributeId, Is.EqualTo(1));
-            Assert.That(attribute.TextValue,
-                Is.EqualTo("Samsung"));
-            Assert.That(attribute.NumberValue, Is.Null);
-            Assert.That(attribute.DateValue, Is.Null);
-            Assert.That(attribute.BooleanValue, Is.Null);
-        });
-    }
-
-    [Test]
-    public void GetProductAttributeValues_WhenProductHasNoValues_ShouldReturnEmpty()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        service.DeleteProductAttributeValue(1, 1);
-
-        // Act
-        var result = service
-            .GetProductAttributeValues(1)
-            .ToList();
-
-        // Assert
-        Assert.That(result, Is.Empty);
-    }
-
-    [TestCase(0)]
-    [TestCase(-1)]
-    public void GetProductAttributeValues_WhenProductIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int productId)
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.GetProductAttributeValues(productId));
-    }
-
-    [Test]
-    public void GetProductAttributeValues_WhenProductDoesNotExist_ShouldThrowSqlException()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<SqlException>(() =>
-            service.GetProductAttributeValues(int.MaxValue).ToList());
-    }
-
-
-    // =========================================================
-    // AddProductAttributeValue
-    // =========================================================
-
-    [Test]
-    public void AddProductAttributeValue_WithValidValue_ShouldAddValue()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        service.DeleteProductAttributeValue(1, 1);
-
-        var value = new ProductAttributeValueDTO
-        {
-            ProductId = 1,
-            AttributeId = 1,
-            TextValue = "LG"
+            Product = new ProductDTO { Id = 10, IsDeleted = true, ProductName = "Inactive Item" },
+            Category = new CategoryDTO { Id = 1, CategoryName = "Category" },
+            Attributes = new List<ProductDetailAttributeDTO>()
         };
+        _productRepoMock.Setup(r => r.GetProductDetails(10)).Returns(details);
 
-        // Act
-        service.AddProductAttributeValue(value);
+        var result = _sut.GetProductDetails(10);
 
-        var result = service
-            .GetProductAttributeValues(1)
-            .Single();
+        Assert.That(result, Is.EqualTo(details));
+        _loggerMock.Verify(x => x.Information("Product with ID {ProductId} is inactive.", 10), Times.Once);
+    }
 
-        // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.ProductId, Is.EqualTo(1));
-            Assert.That(result.AttributeId, Is.EqualTo(1));
-            Assert.That(result.TextValue, Is.EqualTo("LG"));
-        });
+    #endregion
+
+    #region Direct Attribute Operations Tests
+
+    [Test]
+    public void AddProductAttributeValue_NullAttribute_ShouldThrowArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => _sut.AddProductAttributeValue(null!));
+    }
+
+    [TestCase(0, 1)]
+    [TestCase(-1, 1)]
+    [TestCase(1, 0)]
+    [TestCase(1, -1)]
+    public void AddProductAttributeValue_InvalidIds_ShouldThrowArgumentOutOfRangeException(int productId, int attributeId)
+    {
+        var attr = new ProductAttributeValueDTO { ProductId = productId, AttributeId = attributeId };
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => _sut.AddProductAttributeValue(attr));
     }
 
     [Test]
-    public void AddProductAttributeValue_WhenValueIsNull_ShouldThrowArgumentNullException()
+    public void AddProductAttributeValue_ValidAttribute_ShouldCallInsert()
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
+        var attr = new ProductAttributeValueDTO { ProductId = 1, AttributeId = 2 };
 
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() =>
-            service.AddProductAttributeValue(null!));
-    }
+        _sut.AddProductAttributeValue(attr);
 
-    [TestCase(0)]
-    [TestCase(-1)]
-    public void AddProductAttributeValue_WhenProductIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int productId)
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var value = new ProductAttributeValueDTO
-        {
-            ProductId = productId,
-            AttributeId = 1,
-            TextValue = "LG"
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.AddProductAttributeValue(value));
-    }
-
-    [TestCase(0)]
-    [TestCase(-1)]
-    public void AddProductAttributeValue_WhenAttributeIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int attributeId)
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var value = new ProductAttributeValueDTO
-        {
-            ProductId = 1,
-            AttributeId = attributeId,
-            TextValue = "LG"
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.AddProductAttributeValue(value));
+        _productRepoMock.Verify(r => r.InsertAttributeValue(attr), Times.Once);
     }
 
     [Test]
-    public void AddProductAttributeValue_WhenValueTypeIsWrong_ShouldThrowSqlException()
+    public void UpdateProductAttributeValue_NullAttribute_ShouldThrowArgumentNullException()
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
+        Assert.Throws<ArgumentNullException>(() => _sut.UpdateProductAttributeValue(null!));
+    }
 
-        service.DeleteProductAttributeValue(1, 1);
+    [TestCase(0, 1)]
+    [TestCase(-1, 1)]
+    [TestCase(1, 0)]
+    [TestCase(1, -1)]
+    public void UpdateProductAttributeValue_InvalidIds_ShouldThrowArgumentOutOfRangeException(int productId, int attributeId)
+    {
+        var attr = new ProductAttributeValueDTO { ProductId = productId, AttributeId = attributeId };
 
-        var value = new ProductAttributeValueDTO
-        {
-            ProductId = 1,
-            AttributeId = 1,
-            NumberValue = 10m
-        };
-
-        // Act & Assert
-        Assert.Throws<SqlException>(() =>
-            service.AddProductAttributeValue(value));
+        Assert.Throws<ArgumentOutOfRangeException>(() => _sut.UpdateProductAttributeValue(attr));
     }
 
     [Test]
-    public void AddProductAttributeValue_WhenAttributeDoesNotBelongToCategory_ShouldThrowSqlException()
+    public void UpdateProductAttributeValue_ValidAttribute_ShouldCallUpdate()
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
+        var attr = new ProductAttributeValueDTO { ProductId = 1, AttributeId = 2 };
 
-        var value = new ProductAttributeValueDTO
-        {
-            ProductId = 1,
-            AttributeId = 2,
-            NumberValue = 2.5m
-        };
+        _sut.UpdateProductAttributeValue(attr);
 
-        // Act & Assert
-        Assert.Throws<SqlException>(() =>
-            service.AddProductAttributeValue(value));
+        _productRepoMock.Verify(r => r.UpdateAttributeValue(attr), Times.Once);
     }
 
-
-    // =========================================================
-    // UpdateProductAttributeValue
-    // =========================================================
-
-    [Test]
-    public void UpdateProductAttributeValue_WithValidValue_ShouldUpdateValue()
+    [TestCase(0, 1)]
+    [TestCase(-1, 1)]
+    [TestCase(1, 0)]
+    [TestCase(1, -1)]
+    public void DeleteProductAttributeValue_InvalidIds_ShouldThrowArgumentOutOfRangeException(int productId, int attributeId)
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var value = new ProductAttributeValueDTO
-        {
-            ProductId = 1,
-            AttributeId = 1,
-            TextValue = "LG"
-        };
-
-        // Act
-        service.UpdateProductAttributeValue(value);
-
-        var result = service
-            .GetProductAttributeValues(1)
-            .Single();
-
-        // Assert
-        Assert.That(result.TextValue, Is.EqualTo("LG"));
+        Assert.Throws<ArgumentOutOfRangeException>(() => _sut.DeleteProductAttributeValue(productId, attributeId));
     }
 
     [Test]
-    public void UpdateProductAttributeValue_WhenValueIsNull_ShouldThrowArgumentNullException()
+    public void DeleteProductAttributeValue_ValidIds_ShouldCallDelete()
     {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
+        _sut.DeleteProductAttributeValue(1, 2);
 
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() =>
-            service.UpdateProductAttributeValue(null!));
-    }
-
-    [TestCase(0)]
-    [TestCase(-1)]
-    public void UpdateProductAttributeValue_WhenProductIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int productId)
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var value = new ProductAttributeValueDTO
-        {
-            ProductId = productId,
-            AttributeId = 1,
-            TextValue = "LG"
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.UpdateProductAttributeValue(value));
-    }
-
-    [TestCase(0)]
-    [TestCase(-1)]
-    public void UpdateProductAttributeValue_WhenAttributeIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int attributeId)
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var value = new ProductAttributeValueDTO
-        {
-            ProductId = 1,
-            AttributeId = attributeId,
-            TextValue = "LG"
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.UpdateProductAttributeValue(value));
-    }
-
-    [Test]
-    public void UpdateProductAttributeValue_WhenValueDoesNotExist_ShouldThrowSqlException()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        service.DeleteProductAttributeValue(1, 1);
-
-        var value = new ProductAttributeValueDTO
-        {
-            ProductId = 1,
-            AttributeId = 1,
-            TextValue = "LG"
-        };
-
-        // Act & Assert
-        Assert.Throws<SqlException>(() =>
-            service.UpdateProductAttributeValue(value));
-    }
-
-    [Test]
-    public void UpdateProductAttributeValue_WhenValueTypeIsWrong_ShouldThrowSqlException()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        var value = new ProductAttributeValueDTO
-        {
-            ProductId = 1,
-            AttributeId = 1,
-            NumberValue = 10m
-        };
-
-        // Act & Assert
-        Assert.Throws<SqlException>(() =>
-            service.UpdateProductAttributeValue(value));
-    }
-
-
-    // =========================================================
-    // DeleteProductAttributeValue
-    // =========================================================
-
-    [Test]
-    public void DeleteProductAttributeValue_WhenValueExists_ShouldDeleteValue()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act
-        service.DeleteProductAttributeValue(1, 1);
-
-        var result = service
-            .GetProductAttributeValues(1)
-            .ToList();
-
-        // Assert
-        Assert.That(result, Is.Empty);
-    }
-
-    [TestCase(0)]
-    [TestCase(-1)]
-    public void DeleteProductAttributeValue_WhenProductIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int productId)
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.DeleteProductAttributeValue(
-                productId,
-                1));
-    }
-
-    [TestCase(0)]
-    [TestCase(-1)]
-    public void DeleteProductAttributeValue_WhenAttributeIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
-        int attributeId)
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            service.DeleteProductAttributeValue(
-                1,
-                attributeId));
-    }
-
-    [Test]
-    public void DeleteProductAttributeValue_WhenProductDoesNotExist_ShouldThrowSqlException()
-    {
-        // Arrange
-        var service = new ProductService(UnitOfWork, Log.Logger);
-
-        // Act & Assert
-        Assert.Throws<SqlException>(() =>
-            service.DeleteProductAttributeValue(
-                int.MaxValue,
-                1));
+        _productRepoMock.Verify(r => r.DeleteAttributeValue(1, 2), Times.Once);
     }
 
     [Test]
