@@ -1,14 +1,14 @@
 ﻿CREATE PROCEDURE dbo.sp_GetIncomeByDateRange
-    @DateFrom DATETIME,
-    @DateTo DATETIME
+    @DateFrom DATETIME2,
+    @DateTo DATETIME2
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    IF @DateFrom > @DateTo
+    IF @DateFrom >= @DateTo
     BEGIN
         RAISERROR(
-            N'DateFrom cannot be greater than DateTo.',
+            N'DateFrom must be earlier than DateTo.',
             16,
             1
         );
@@ -19,7 +19,7 @@ BEGIN
         COALESCE(
             SUM(
                 si.Quantity * si.UnitPrice
-                - si.DiscountAmount
+                - ISNULL(si.DiscountAmount, 0)
             ),
             0
         )
