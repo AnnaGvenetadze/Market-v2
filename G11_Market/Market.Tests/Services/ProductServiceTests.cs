@@ -30,8 +30,6 @@ public class ProductServiceTests
         _sut = new ProductService(_unitOfWorkMock.Object, _loggerMock.Object);
     }
 
-    #region Constructor Tests
-
     [Test]
     public void Constructor_NullUnitOfWork_ShouldThrowArgumentNullException()
     {
@@ -43,10 +41,6 @@ public class ProductServiceTests
     {
         Assert.Throws<ArgumentNullException>(() => new ProductService(_unitOfWorkMock.Object, null!));
     }
-
-    #endregion
-
-    #region CreateProduct Tests
 
     [Test]
     public void CreateProduct_NullProduct_ShouldThrowArgumentNullException()
@@ -150,10 +144,6 @@ public class ProductServiceTests
         _loggerMock.Verify(x => x.Error(It.IsAny<Exception>(), "Failed to create product {ProductName} in category {CategoryId}", "Headset", 1), Times.Once);
     }
 
-    #endregion
-
-    #region UpdateProduct Tests
-
     [Test]
     public void UpdateProduct_NullProduct_ShouldThrowArgumentNullException()
     {
@@ -229,10 +219,6 @@ public class ProductServiceTests
         _loggerMock.Verify(x => x.Error(It.IsAny<Exception>(), "Failed to update product {ProductId}", 10), Times.Once);
     }
 
-    #endregion
-
-    #region Delete & Restore Tests
-
     [TestCase(0)]
     [TestCase(-1)]
     public void DeleteProduct_InvalidId_ShouldThrowArgumentOutOfRangeException(int productId)
@@ -262,10 +248,6 @@ public class ProductServiceTests
 
         _productRepoMock.Verify(r => r.Restore(5), Times.Once);
     }
-
-    #endregion
-
-    #region Query Methods Tests
 
     [TestCase(0)]
     [TestCase(-1)]
@@ -404,10 +386,6 @@ public class ProductServiceTests
         _loggerMock.Verify(x => x.Information("Product with ID {ProductId} is inactive.", 10), Times.Once);
     }
 
-    #endregion
-
-    #region Direct Attribute Operations Tests
-
     [Test]
     public void AddProductAttributeValue_NullAttribute_ShouldThrowArgumentNullException()
     {
@@ -478,6 +456,4 @@ public class ProductServiceTests
 
         _productRepoMock.Verify(r => r.DeleteAttributeValue(1, 2), Times.Once);
     }
-
-    #endregion
 }
