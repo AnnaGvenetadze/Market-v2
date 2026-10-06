@@ -34,10 +34,12 @@ internal sealed class SaleRepository(DbConnection connection)
         return Search(s => s.CreatedDate >= dateFrom && s.CreatedDate <= dateTo);
     }
 
-    public void CompleteSale(int saleId)
+    public void CompleteSale(int saleId, int employeeId)
     {
         if (saleId <= 0)
             throw new ArgumentOutOfRangeException(nameof(saleId));
+        if (employeeId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(employeeId));
 
         _connection.Execute(
             "sp_CompleteSale",

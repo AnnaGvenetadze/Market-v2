@@ -65,7 +65,7 @@ public class SaleService : ISaleService
             throw new InvalidOperationException($"Sale with ID {saleId} does not exist.");
         }
 
-        _unitOfWork.SaleRepository.CompleteSale(saleId/*, employeeId*/);
+        //_unitOfWork.SaleRepository.CompleteSale(saleId, employeeId);
     }
 
 
