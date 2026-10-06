@@ -172,5 +172,6 @@
     <Build Include="dbo\Stored Procedures\sp_RestoreRole.sql" />
     <Build Include="dbo\Stored Procedures\sp_RefillStock.sql" />
     <Build Include="dbo\Stored Procedures\sp_AdjustStock.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CompleteSale.sql" />
   </ItemGroup>
 </Project>
