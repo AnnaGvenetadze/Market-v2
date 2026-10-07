@@ -7,12 +7,17 @@ using System.Data.Common;
 
 namespace Market.Repositories;
 
-internal sealed class SaleRepository(DbConnection connection) 
+internal sealed class SaleRepository(DbConnection connection)
     : BaseRepository<SaleDTO>(connection), ISaleRepository
 {
-    public IEnumerable<SaleDTO> GetSalesByEmployee(int employeeId) => Search(s => s.CreatedEmployeeId == employeeId);
-    public IEnumerable<SaleDTO> GetCompletedSales()
-        => Search(s => s.Status == SaleStatus.Completed);
+    public IEnumerable<SaleDTO> GetSalesByEmployee(int employeeId)
+    {
+        if (employeeId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(employeeId));
+
+        return Search(s => s.CreatedEmployeeId == employeeId);
+    }
+
     public IEnumerable<SaleDTO> GetSalesByStatus(SaleStatus status)
     {
         if (!Enum.IsDefined(status))
@@ -21,28 +26,60 @@ internal sealed class SaleRepository(DbConnection connection)
         return Search(s => s.Status == status);
     }
 
-    public IEnumerable<SaleDTO> GetSalesByDateRange(
-        DateTime dateFrom,
-        DateTime dateTo)
+    public IEnumerable<SaleDTO> GetSalesByDateRange(DateTime dateFrom, DateTime dateTo)
     {
         if (dateFrom > dateTo)
-            throw new ArgumentException(
-                "DateFrom cannot be greater than DateTo.");
+            throw new ArgumentException("DateFrom cannot be greater than DateTo.");
 
-        return Search(s =>
-            s.CreatedDate >= dateFrom &&
-            s.CreatedDate <= dateTo);
+        return Search(s => s.CreatedDate >= dateFrom && s.CreatedDate <= dateTo);
     }
 
-    public void CancelSale(int id, int employeeId, string cancelReason)
+    public void CompleteSale(int saleId, int employeeId)
     {
+        if (saleId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(saleId));
+        if (employeeId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(employeeId));
+
+        _connection.Execute(
+            "sp_CompleteSale",
+            new
+            {
+                SaleId = saleId
+            },
+            commandType: CommandType.StoredProcedure);
+    }
+
+    public void CancelSale(int saleId, int employeeId, string cancelReason)
+    {
+        if (saleId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(saleId));
+        if (employeeId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(employeeId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(cancelReason);
+
         _connection.Execute(
             "sp_CancelSale",
             new
             {
-                Id = id,
+                Id = saleId,
                 EmployeeId = employeeId,
                 CancelReason = cancelReason
+            },
+            commandType: CommandType.StoredProcedure);
+    }
+
+    public decimal GetIncomeByDateRange(DateTime dateFrom, DateTime dateTo)
+    {
+        if (dateFrom > dateTo)
+            throw new ArgumentException("DateFrom cannot be greater than DateTo.");
+
+        return _connection.QuerySingle<decimal>(
+            "sp_GetIncomeByDateRange",
+            new
+            {
+                DateFrom = dateFrom,
+                DateTo = dateTo
             },
             commandType: CommandType.StoredProcedure);
     }

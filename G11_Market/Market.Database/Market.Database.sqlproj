@@ -165,9 +165,15 @@
     <Build Include="dbo\Stored Procedures\sp_RestoreAttribute.sql" />
     <Build Include="dbo\Stored Procedures\sp_RestoreCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_RestoreCategoryAttribute.sql" />
-    <Build Include="sp_RestoreProduct.sql" />
-    <Build Include="sp_RestoreEmployee.sql" />
-    <Build Include="sp_RestoreRole.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetProductDetails.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RestoreEmployee.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RestoreProduct.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RestoreRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RefillStock.sql" />
+    <Build Include="dbo\Stored Procedures\sp_AdjustStock.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CompleteSale.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetIncomeByDateRange.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RefreshToken.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetRolesByAccountId.sql" />
   </ItemGroup>
 </Project>

@@ -10,10 +10,20 @@ internal sealed class SaleItemRepository(DbConnection connection)
     : BaseRepository<SaleItemDTO>(connection), ISaleItemRepository
 {
     public IEnumerable<SaleItemDTO> GetBySaleId(int saleId)
-        => Search(item => item.SaleId == saleId);
+    {
+        if (saleId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(saleId));
+
+        return Search(item => item.SaleId == saleId);
+    }
 
     public void UpdateQuantity(int saleItemId, int quantity)
     {
+        if (saleItemId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(saleItemId));
+        if (quantity <= 0)
+            throw new ArgumentOutOfRangeException(nameof(quantity));
+
         _connection.Execute(
             "sp_UpdateSaleItemQuantity",
             new

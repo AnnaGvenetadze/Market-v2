@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Market.DTO;
+using Market.Services.Interfaces;
 using Market.Services.Interfaces.Repositories;
 using System.Data;
 using System.Data.Common;
@@ -12,6 +13,7 @@ internal sealed class ProductRepository(DbConnection connection)
     public ProductDTO? GetByName(string productName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(productName);
+        productName = productName.Trim();
 
         return Search(product =>
                 product.ProductName == productName &&
