@@ -137,7 +137,6 @@
     <Build Include="dbo\Stored Procedures\sp_GetOutOfStockProducts.sql" />
     <Build Include="dbo\Stored Procedures\sp_ActivateCategory.sql" />
     <Build Include="dbo\Stored Procedures\sp_AssignEmployeeRole.sql" />
-    <Build Include="dbo\Stored Procedures\sp_GetAllInventoryManagers.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetAttributeById.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetStockByProductId.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetStockMovementsByProductId.sql" />
@@ -174,5 +173,7 @@
     <Build Include="dbo\Stored Procedures\sp_AdjustStock.sql" />
     <Build Include="dbo\Stored Procedures\sp_CompleteSale.sql" />
     <Build Include="dbo\Stored Procedures\sp_GetIncomeByDateRange.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RefreshToken.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetRolesByAccountId.sql" />
   </ItemGroup>
 </Project>

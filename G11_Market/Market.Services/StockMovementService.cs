@@ -1,6 +1,7 @@
 ﻿using Market.DTO;
 using Market.Services.Interfaces;
 using Serilog;
+using Market.Services.Interfaces.Services;
 
 namespace Market.Services;
 
@@ -8,14 +9,17 @@ public class StockMovementService : IStockMovementService
 {
     private readonly ILogger _logger;
     private readonly IUnitOfWork _unitOfWork;
+    //private readonly ICurrentUserContext _currentUserContext;
 
 
-    public StockMovementService(IUnitOfWork unitOfWork, ILogger logger)
+    public StockMovementService(IUnitOfWork unitOfWork, ILogger logger)//, ICurrentUserContext currentUserContext)
     {
         _unitOfWork = unitOfWork
             ?? throw new ArgumentNullException(nameof(unitOfWork));
         _logger = logger
             ?? throw new ArgumentNullException(nameof(logger));
+        //_currentUserContext = currentUserContext
+            //?? throw new ArgumentNullException(nameof(currentUserContext));
     }
 
 
@@ -30,7 +34,7 @@ public class StockMovementService : IStockMovementService
     }
 
 
-    public IEnumerable<StockMovementDTO> GetByDateRange(DateTime from,DateTime to)
+    public IEnumerable<StockMovementDTO> GetByDateRange(DateTime from, DateTime to)
     {
         if (from > to)
             throw new ArgumentException("From date cannot be greater than to date.");
@@ -60,50 +64,50 @@ public class StockMovementService : IStockMovementService
     }
 
 
-    public void Refill(int productId,int quantity,int employeeId)
+    public void Refill(int productId, int quantity)
     {
         if (productId <= 0)
             throw new ArgumentOutOfRangeException(nameof(productId));
         if (quantity <= 0)
             throw new ArgumentOutOfRangeException(nameof(quantity));
-        if (employeeId <= 0)
-            throw new ArgumentOutOfRangeException(nameof(employeeId));
 
         var product = _unitOfWork.ProductRepository.GetById(productId);
 
-        if (product == null || product.IsDeleted)
+        if (product == null)
         {
             _logger.Warning(
-                "Refill failed: ProductId {ProductId} does not exist or is deleted",
+                "Refill failed: ProductId {ProductId} does not exist",
                 productId);
 
             throw new InvalidOperationException($"Product with ID {productId} does not exist.");
         }
 
-        _unitOfWork.StockMovementRepository.Refill(productId,quantity,employeeId);
+        //var employeeId = _currentUserContext.EmployeeId;
+
+        //_unitOfWork.StockMovementRepository.Refill(productId, quantity, employeeId);
     }
 
 
-    public void Adjust(int productId,int quantityDifference,int employeeId,string? reason)
+    public void Adjust(int productId, int quantityDifference, string? reason)
     {
         if (productId <= 0)
             throw new ArgumentOutOfRangeException(nameof(productId));
         if (quantityDifference == 0)
-            throw new ArgumentOutOfRangeException(nameof(quantityDifference),"Quantity difference cannot be zero.");
-        if (employeeId <= 0)
-            throw new ArgumentOutOfRangeException(nameof(employeeId));
+            throw new ArgumentOutOfRangeException(nameof(quantityDifference), "Quantity difference cannot be zero.");
 
         var product = _unitOfWork.ProductRepository.GetById(productId);
 
-        if (product == null || product.IsDeleted)
+        if (product == null)
         {
             _logger.Warning(
-                "Stock adjustment failed: ProductId {ProductId} does not exist or is deleted",
+                "Stock adjustment failed: ProductId {ProductId} does not exist",
                 productId);
 
             throw new InvalidOperationException($"Product with ID {productId} does not exist.");
         }
 
-        _unitOfWork.StockMovementRepository.Adjust(productId, quantityDifference, employeeId, reason);
+        //var employeeId = _currentUserContext.EmployeeId;
+
+        //_unitOfWork.StockMovementRepository.Adjust(productId, quantityDifference, employeeId, reason);
     }
 }

@@ -10,4 +10,8 @@ public interface IAccountRepository : IBaseRepository<AccountDTO>
         int failedLoginAttempts,
         DateTime? lastLoginAtUtc,
         DateTime? lockoutEndUtc);
+
+    Task<IReadOnlyList<RoleDTO>> GetRolesByAccountIdAsync(
+        int accountId,
+        CancellationToken cancellationToken = default);
 }

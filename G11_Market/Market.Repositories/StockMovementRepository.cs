@@ -11,75 +11,78 @@ internal sealed class StockMovementRepository(DbConnection connection)
 {
     public IEnumerable<StockMovementDTO> GetByProductId(int productId)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId);
+        if (productId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(productId));
 
-        return Search(movement => movement.ProductId == productId);
+        return Search(x => x.ProductId == productId)
+            .OrderByDescending(x => x.CreatedDate);
     }
-
-
-    public IEnumerable<StockMovementDTO> GetByEmployeeId(int employeeId)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(employeeId);
-
-        return Search(movement => movement.ChangedByEmployeeId == employeeId);
-    }
-
 
     public IEnumerable<StockMovementDTO> GetByDateRange(DateTime from, DateTime to)
     {
         if (from > to)
-            throw new ArgumentException("From date cannot be greater than to date.");
+            throw new ArgumentException("From date must be less than or equal to To date.");
 
-        return Search(movement =>
-            movement.CreatedDate >= from && movement.CreatedDate <= to);
+        return Search(x => x.CreatedDate >= from && x.CreatedDate <= to)
+            .OrderByDescending(x => x.CreatedDate);
     }
 
+    public IEnumerable<StockMovementDTO> GetByEmployeeId(int employeeId)
+    {
+        if (employeeId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(employeeId));
+
+        return Search(x => x.ChangedByEmployeeId == employeeId)
+            .OrderByDescending(x => x.CreatedDate);
+    }
 
     public IEnumerable<StockDTO> GetOutOfStockProducts()
     {
-        return _connection.Query<StockDTO>(
+        return connection.Query<StockDTO>(
             "dbo.sp_GetOutOfStockProducts",
             commandType: CommandType.StoredProcedure);
     }
 
-
     public void Refill(int productId, int quantity, int employeeId)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(employeeId);
+        if (productId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(productId));
+        if (quantity <= 0)
+            throw new ArgumentOutOfRangeException(nameof(quantity));
+        if (employeeId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(employeeId));
 
-        var parameters = new DynamicParameters();
-        parameters.Add("ProductId", productId);
-        parameters.Add("Quantity", quantity);
-        parameters.Add("EmployeeId", employeeId);
-
-        _connection.Execute(
+        connection.Execute(
             "dbo.sp_RefillStock",
-            parameters,
+            new
+            {
+                ProductId = productId,
+                Quantity = quantity,
+                ChangedByEmployeeId = employeeId
+            },
             commandType: CommandType.StoredProcedure);
     }
 
-
     public void Adjust(int productId, int quantityDifference, int employeeId, string? reason)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId);
+        if (productId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(productId));
         if (quantityDifference == 0)
-            throw new ArgumentException("Quantity difference cannot be zero.", nameof(quantityDifference));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(employeeId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(reason);
-        
-        reason = reason.Trim();
-        var parameters = new DynamicParameters();
+            throw new ArgumentOutOfRangeException(nameof(quantityDifference));
+        if (employeeId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(employeeId));
+        if (string.IsNullOrWhiteSpace(reason))
+            throw new ArgumentException("Reason is required.", nameof(reason));
 
-        parameters.Add("ProductId", productId);
-        parameters.Add("QuantityDifference", quantityDifference);
-        parameters.Add("EmployeeId", employeeId);
-        parameters.Add("Reason", reason);
-
-        _connection.Execute(
+        connection.Execute(
             "dbo.sp_AdjustStock",
-            parameters,
+            new
+            {
+                ProductId = productId,
+                QuantityDifference = quantityDifference,
+                ChangedByEmployeeId = employeeId,
+                Reason = reason.Trim()
+            },
             commandType: CommandType.StoredProcedure);
     }
 }

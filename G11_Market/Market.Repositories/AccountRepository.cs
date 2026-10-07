@@ -16,6 +16,7 @@ internal sealed class AccountRepository(DbConnection connection)
             .FirstOrDefault();
     }
 
+
     public void UpdateLoginAttempts(
         int accountId,
         int failedLoginAttempts,
@@ -44,5 +45,24 @@ internal sealed class AccountRepository(DbConnection connection)
                 LockoutEndUtc = lockoutEndUtc
             },
             commandType: CommandType.StoredProcedure);
+    }
+
+
+    public async Task<IReadOnlyList<RoleDTO>> GetRolesByAccountIdAsync(
+        int accountId,
+        CancellationToken cancellationToken = default)
+    {
+        if (accountId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(accountId));
+
+        var command = new CommandDefinition(
+            commandText: "dbo.sp_GetRolesByAccountId",
+            parameters: new { AccountId = accountId },
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: cancellationToken);
+
+        var roles = await _connection.QueryAsync<RoleDTO>(command);
+
+        return roles.ToList();
     }
 }

@@ -8,7 +8,10 @@
     [LastLoginAtUtc]      DATETIME2 (7)  NULL,
     [FailedLoginAttempts] INT            CONSTRAINT [DF_Accounts_FailedLoginAttempts] DEFAULT ((0)) NOT NULL,
     [LockoutEndUtc]       DATETIME2 (7)  NULL,
-    [IsActive]            BIT            NOT NULL,
+    [IsActive]            BIT            NOT NULL, 
+    Token NVARCHAR(500) NULL,
+    TokenExpiration DATETIME2 NULL,
+
     PRIMARY KEY CLUSTERED ([Id] ASC),
     UNIQUE NONCLUSTERED ([Username] ASC)
 );
