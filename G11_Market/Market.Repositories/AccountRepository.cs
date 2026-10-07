@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using System.Data.Common;
+using Dapper;
 using Market.DTO;
 using Market.Repositories;
 using Market.Services.Interfaces.Repositories;
-using Dapper;
 
 internal sealed class AccountRepository(DbConnection connection)
     : BaseRepository<AccountDTO>(connection), IAccountRepository
@@ -93,8 +93,6 @@ internal sealed class AccountRepository(DbConnection connection)
             commandType: CommandType.StoredProcedure);
         return Task.CompletedTask;
     }
-}
-
 
     public async Task<IReadOnlyList<RoleDTO>> GetRolesByAccountIdAsync(
         int accountId,
@@ -113,4 +111,6 @@ internal sealed class AccountRepository(DbConnection connection)
 
         return roles.ToList();
     }
+
 }
+
