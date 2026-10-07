@@ -7,7 +7,6 @@ public interface IEmployeeService
     EmployeeDTO CreateEmployee(CreateEmployeeDTO dto);
     void UpdateEmployee(EmployeeDTO dto);
     void UpdateAccount(AccountDTO dto);
-    // optional
     void ResetPassword(int employeeId, string newPassword);
     void ChangeRole(int employeeId, int roleId);
     void DeactivateEmployee(int employeeId);

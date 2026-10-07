@@ -112,5 +112,26 @@ internal sealed class AccountRepository(DbConnection connection)
         return roles.ToList();
     }
 
+    public void ResetPassword(int accountId, string newPasswordHash)
+    {
+        if (accountId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(accountId));
+
+        ArgumentException.ThrowIfNullOrWhiteSpace(newPasswordHash);
+
+        int rowsAffected = _connection.Execute(
+            "sp_ResetAccountPassword",
+            new
+            {
+                AccountId = accountId,
+                PasswordHash = newPasswordHash
+            },
+            commandType: CommandType.StoredProcedure);
+
+        if (rowsAffected == 0)
+        {
+            throw new KeyNotFoundException($"Account with ID {accountId} was not found or is deleted.");
+        }
+    }
 }
 

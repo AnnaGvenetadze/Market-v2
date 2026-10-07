@@ -13,4 +13,5 @@ public interface IAccountRepository : IBaseRepository<AccountDTO>
     public Task RecordFailedLoginAsync(int accountId, DateTime failedAttemptTime, int maxFailedAttempts, TimeSpan lockoutDuration, CancellationToken cancellationToken = default);
     public Task RecordSuccessfulLoginAsync(int accountId, DateTime successfulAttemptTime, string? newPasswordHash, CancellationToken cancellationToken = default);
     public Task RefreshTokenAsync(int accountId, byte[] tokenHash, DateTime expiredAt, CancellationToken cancellationToken = default);
+    public void ResetPassword(int accountId, string newPasswordHash);
 }

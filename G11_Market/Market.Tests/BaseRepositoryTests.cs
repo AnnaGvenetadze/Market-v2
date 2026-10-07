@@ -22,7 +22,7 @@ public abstract class BaseRepositoryTests
     {
 
         Connection = new SqlConnection(ConnectionString);
-
+        Connection.Open();
         UnitOfWork = UnitOfWorkFactory.Create(Connection);
     }
 
