@@ -9,17 +9,17 @@ public class StockMovementService : IStockMovementService
 {
     private readonly ILogger _logger;
     private readonly IUnitOfWork _unitOfWork;
-    //private readonly ICurrentUserContext _currentUserContext;
+    private readonly ICurrentUserContext _currentUserContext;
 
 
-    public StockMovementService(IUnitOfWork unitOfWork, ILogger logger)//, ICurrentUserContext currentUserContext)
+    public StockMovementService(IUnitOfWork unitOfWork, ILogger logger, ICurrentUserContext currentUserContext)
     {
         _unitOfWork = unitOfWork
             ?? throw new ArgumentNullException(nameof(unitOfWork));
         _logger = logger
             ?? throw new ArgumentNullException(nameof(logger));
-        //_currentUserContext = currentUserContext
-            //?? throw new ArgumentNullException(nameof(currentUserContext));
+        _currentUserContext = currentUserContext
+            ?? throw new ArgumentNullException(nameof(currentUserContext));
     }
 
 
@@ -82,9 +82,9 @@ public class StockMovementService : IStockMovementService
             throw new InvalidOperationException($"Product with ID {productId} does not exist.");
         }
 
-        //var employeeId = _currentUserContext.EmployeeId;
+        var employeeId = _currentUserContext.EmployeeId;
 
-        //_unitOfWork.StockMovementRepository.Refill(productId, quantity, employeeId);
+        _unitOfWork.StockMovementRepository.Refill(productId, quantity, employeeId);
     }
 
 
@@ -106,8 +106,8 @@ public class StockMovementService : IStockMovementService
             throw new InvalidOperationException($"Product with ID {productId} does not exist.");
         }
 
-        //var employeeId = _currentUserContext.EmployeeId;
+        var employeeId = _currentUserContext.EmployeeId;
 
-        //_unitOfWork.StockMovementRepository.Adjust(productId, quantityDifference, employeeId, reason);
+        _unitOfWork.StockMovementRepository.Adjust(productId, quantityDifference, employeeId, reason);
     }
 }
