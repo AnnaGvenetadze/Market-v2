@@ -18,6 +18,7 @@ internal sealed class StockMovementRepository(DbConnection connection)
             .OrderByDescending(x => x.CreatedDate);
     }
 
+
     public IEnumerable<StockMovementDTO> GetByDateRange(DateTime from, DateTime to)
     {
         if (from > to)
@@ -26,6 +27,7 @@ internal sealed class StockMovementRepository(DbConnection connection)
         return Search(x => x.CreatedDate >= from && x.CreatedDate <= to)
             .OrderByDescending(x => x.CreatedDate);
     }
+
 
     public IEnumerable<StockMovementDTO> GetByEmployeeId(int employeeId)
     {
@@ -36,12 +38,14 @@ internal sealed class StockMovementRepository(DbConnection connection)
             .OrderByDescending(x => x.CreatedDate);
     }
 
+
     public IEnumerable<StockDTO> GetOutOfStockProducts()
     {
-        return connection.Query<StockDTO>(
+        return _connection.Query<StockDTO>(
             "dbo.sp_GetOutOfStockProducts",
             commandType: CommandType.StoredProcedure);
     }
+
 
     public void Refill(int productId, int quantity, int employeeId)
     {
@@ -52,16 +56,17 @@ internal sealed class StockMovementRepository(DbConnection connection)
         if (employeeId <= 0)
             throw new ArgumentOutOfRangeException(nameof(employeeId));
 
-        connection.Execute(
+        _connection.Execute(
             "dbo.sp_RefillStock",
             new
             {
                 ProductId = productId,
                 Quantity = quantity,
-                ChangedByEmployeeId = employeeId
+                EmployeeId = employeeId
             },
             commandType: CommandType.StoredProcedure);
     }
+
 
     public void Adjust(int productId, int quantityDifference, int employeeId, string? reason)
     {
@@ -71,17 +76,17 @@ internal sealed class StockMovementRepository(DbConnection connection)
             throw new ArgumentOutOfRangeException(nameof(quantityDifference));
         if (employeeId <= 0)
             throw new ArgumentOutOfRangeException(nameof(employeeId));
-        if (string.IsNullOrWhiteSpace(reason))
-            throw new ArgumentException("Reason is required.", nameof(reason));
 
-        connection.Execute(
+        ArgumentException.ThrowIfNullOrWhiteSpace(reason);
+
+        _connection.Execute(
             "dbo.sp_AdjustStock",
             new
             {
                 ProductId = productId,
                 QuantityDifference = quantityDifference,
-                ChangedByEmployeeId = employeeId,
-                Reason = reason.Trim()
+                EmployeeId = employeeId,
+                Reason = reason
             },
             commandType: CommandType.StoredProcedure);
     }

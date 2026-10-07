@@ -1,333 +1,313 @@
-﻿//using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 
-//namespace Market.Tests;
+namespace Market.Tests;
 
-//public sealed class StockMovementRepositoryTests : BaseRepositoryTests
-//{
-//    [Test]
-//    public void GetByProductId_ShouldReturnOnlyProductMovements()
-//    {
-//        // Arrange
-//        const int productId = 1;
+public sealed class StockMovementRepositoryTests : BaseRepositoryTests
+{
+    [Test]
+    public void GetByProductId_ShouldReturnOnlyProductMovements()
+    {
+        // Arrange
+        const int productId = 1;
 
-//        // Act
-//        var movements = UnitOfWork.StockMovementRepository
-//            .GetByProductId(productId)
-//            .ToList();
+        // Act
+        var movements = UnitOfWork.StockMovementRepository
+            .GetByProductId(productId)
+            .ToList();
 
-//        // Assert
-//        Assert.That(movements, Is.Not.Empty);
+        // Assert
+        Assert.That(movements, Is.Not.Empty);
 
-//        Assert.That(
-//            movements.All(movement => movement.ProductId == productId),
-//            Is.True);
-//    }
+        Assert.That(
+            movements.All(movement => movement.ProductId == productId),
+            Is.True);
+    }
 
-//    [Test]
-//    public void GetByProductId_WhenProductIdIsZero_ShouldThrowArgumentOutOfRangeException()
-//    {
-//        // Arrange
-//        const int productId = 0;
+    [Test]
+    public void GetByProductId_WhenProductIdIsZero_ShouldThrowArgumentOutOfRangeException()
+    {
+        // Arrange
+        const int productId = 0;
 
-//        // Act & Assert
-//        Assert.Throws<ArgumentOutOfRangeException>(() =>
-//            UnitOfWork.StockMovementRepository
-//                .GetByProductId(productId)
-//                .ToList());
-//    }
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            UnitOfWork.StockMovementRepository
+                .GetByProductId(productId)
+                .ToList());
+    }
 
-//    [Test]
-//    public void GetByEmployeeId_ShouldReturnOnlyEmployeeMovements()
-//    {
-//        // Arrange
-//        const int employeeId = 2;
+    [Test]
+    public void GetByEmployeeId_ShouldReturnOnlyEmployeeMovements()
+    {
+        // Arrange
+        const int employeeId = 2;
 
-//        // Act
-//        var movements = UnitOfWork.StockMovementRepository
-//            .GetByEmployeeId(employeeId)
-//            .ToList();
+        // Act
+        var movements = UnitOfWork.StockMovementRepository
+            .GetByEmployeeId(employeeId)
+            .ToList();
 
-//        // Assert
-//        Assert.That(movements, Is.Not.Empty);
+        // Assert
+        Assert.That(movements, Is.Not.Empty);
 
-//        Assert.That(
-//            movements.All(movement =>
-//                movement.ChangedByEmployeeId == employeeId),
-//            Is.True);
-//    }
+        Assert.That(
+            movements.All(movement =>
+                movement.ChangedByEmployeeId == employeeId),
+            Is.True);
+    }
 
-//    [Test]
-//    public void GetByEmployeeId_WhenEmployeeIdIsZero_ShouldThrowArgumentOutOfRangeException()
-//    {
-//        // Arrange
-//        const int employeeId = 0;
+    [Test]
+    public void GetByEmployeeId_WhenEmployeeIdIsZero_ShouldThrowArgumentOutOfRangeException()
+    {
+        // Arrange
+        const int employeeId = 0;
 
-//        // Act & Assert
-//        Assert.Throws<ArgumentOutOfRangeException>(() =>
-//            UnitOfWork.StockMovementRepository
-//                .GetByEmployeeId(employeeId)
-//                .ToList());
-//    }
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            UnitOfWork.StockMovementRepository
+                .GetByEmployeeId(employeeId)
+                .ToList());
+    }
 
-//    [Test]
-//    public void GetByDateRange_ShouldReturnMovementsInsideRange()
-//    {
-//        // Arrange
-//        var from = DateTime.UtcNow.AddDays(-1);
-//        var to = DateTime.UtcNow.AddDays(1);
+    [Test]
+    public void GetByDateRange_ShouldReturnMovementsInsideRange()
+    {
+        // Arrange
+        var from = DateTime.UtcNow.AddDays(-1);
+        var to = DateTime.UtcNow.AddDays(1);
 
-//        // Act
-//        var movements = UnitOfWork.StockMovementRepository
-//            .GetByDateRange(from, to)
-//            .ToList();
+        // Act
+        var movements = UnitOfWork.StockMovementRepository
+            .GetByDateRange(from, to)
+            .ToList();
 
-//        // Assert
-//        Assert.That(movements, Is.Not.Empty);
+        // Assert
+        Assert.That(movements, Is.Not.Empty);
 
-//        Assert.That(
-//            movements.All(movement =>
-//                movement.CreatedDate >= from &&
-//                movement.CreatedDate <= to),
-//            Is.True);
-//    }
+        Assert.That(
+            movements.All(movement =>
+                movement.CreatedDate >= from &&
+                movement.CreatedDate <= to),
+            Is.True);
+    }
 
-//    [Test]
-//    public void GetByDateRange_WhenRangeInvalid_ShouldThrowArgumentException()
-//    {
-//        // Arrange
-//        var from = DateTime.UtcNow;
-//        var to = from.AddDays(-1);
+    [Test]
+    public void GetByDateRange_WhenRangeInvalid_ShouldThrowArgumentException()
+    {
+        // Arrange
+        var from = DateTime.UtcNow;
+        var to = from.AddDays(-1);
 
-//        // Act & Assert
-//        Assert.Throws<ArgumentException>(() =>
-//            UnitOfWork.StockMovementRepository
-//                .GetByDateRange(from, to)
-//                .ToList());
-//    }
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() =>
+            UnitOfWork.StockMovementRepository
+                .GetByDateRange(from, to)
+                .ToList());
+    }
 
-//    [Test]
-//    public void GetByDateRange_WhenNoMovementsExist_ShouldReturnEmpty()
-//    {
-//        // Arrange
-//        var from = DateTime.UtcNow.AddYears(-10);
-//        var to = DateTime.UtcNow.AddYears(-9);
+    [Test]
+    public void GetByDateRange_WhenNoMovementsExist_ShouldReturnEmpty()
+    {
+        // Arrange
+        var from = DateTime.UtcNow.AddYears(-10);
+        var to = DateTime.UtcNow.AddYears(-9);
 
-//        // Act
-//        var movements = UnitOfWork.StockMovementRepository
-//            .GetByDateRange(from, to)
-//            .ToList();
+        // Act
+        var movements = UnitOfWork.StockMovementRepository
+            .GetByDateRange(from, to)
+            .ToList();
 
-//        // Assert
-//        Assert.That(movements, Is.Empty);
-//    }
+        // Assert
+        Assert.That(movements, Is.Empty);
+    }
 
-//    [Test]
-//    public void Refill_ShouldCreateRefillMovement()
-//    {
-//        // Arrange
-//        const int productId = 1;
-//        const int quantity = 5;
-//        const int employeeId = 2;
+    [Test]
+    public void Refill_WhenQuantityIsZero_ShouldThrowArgumentOutOfRangeException()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            UnitOfWork.StockMovementRepository.Refill(
+                1,
+                0,
+                2));
+    }
 
-//        var before = UnitOfWork.StockMovementRepository
-//            .GetByProductId(productId)
-//            .OrderBy(movement => movement.Id)
-//            .Last();
+    [Test]
+    public void Refill_WhenProductIdIsZero_ShouldThrowArgumentOutOfRangeException()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            UnitOfWork.StockMovementRepository.Refill(
+                0,
+                5,
+                2));
+    }
 
-//        var expectedQuantityBefore =
-//            before.QuantityBefore + before.QuantityChange;
+    [Test]
+    public void Refill_WhenEmployeeIdIsZero_ShouldThrowArgumentOutOfRangeException()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            UnitOfWork.StockMovementRepository.Refill(
+                1,
+                5,
+                0));
+    }
 
-//        // Act
-//        UnitOfWork.StockMovementRepository.Refill(
-//            productId,
-//            quantity,
-//            employeeId);
+    [Test]
+    public void Refill_WhenProductDoesNotExist_ShouldThrowSqlException()
+    {
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.StockMovementRepository.Refill(
+                int.MaxValue,
+                5,
+                2));
+    }
 
-//        // Assert
-//        var movement = UnitOfWork.StockMovementRepository
-//            .GetByProductId(productId)
-//            .OrderBy(movement => movement.Id)
-//            .Last();
 
-//        Assert.Multiple(() =>
-//        {
-//            Assert.That(movement.ProductId, Is.EqualTo(productId));
-//            Assert.That(movement.MovementType, Is.EqualTo(1));
-//            Assert.That(movement.QuantityChange, Is.EqualTo(quantity));
-//            Assert.That(
-//                movement.QuantityBefore,
-//                Is.EqualTo(expectedQuantityBefore));
-//            Assert.That(
-//                movement.ChangedByEmployeeId,
-//                Is.EqualTo(employeeId));
-//            Assert.That(movement.SaleItemId, Is.Null);
-//        });
-//    }
 
-//    [Test]
-//    public void Refill_WhenQuantityIsZero_ShouldThrowArgumentOutOfRangeException()
-//    {
-//        Assert.Throws<ArgumentOutOfRangeException>(() =>
-//            UnitOfWork.StockMovementRepository.Refill(
-//                1,
-//                0,
-//                2));
-//    }
 
-//    [Test]
-//    public void Refill_WhenProductIdIsZero_ShouldThrowArgumentOutOfRangeException()
-//    {
-//        Assert.Throws<ArgumentOutOfRangeException>(() =>
-//            UnitOfWork.StockMovementRepository.Refill(
-//                0,
-//                5,
-//                2));
-//    }
+    [Test]
+    public void Adjust_WhenReasonIsWhitespace_ShouldThrowArgumentException()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            UnitOfWork.StockMovementRepository.Adjust(
+                1,
+                -1,
+                2,
+                "   "));
+    }
 
-//    [Test]
-//    public void Refill_WhenEmployeeIdIsZero_ShouldThrowArgumentOutOfRangeException()
-//    {
-//        Assert.Throws<ArgumentOutOfRangeException>(() =>
-//            UnitOfWork.StockMovementRepository.Refill(
-//                1,
-//                5,
-//                0));
-//    }
+    [Test]
+    public void Adjust_WhenProductDoesNotExist_ShouldThrowSqlException()
+    {
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.StockMovementRepository.Adjust(
+                int.MaxValue,
+                1,
+                2,
+                "Adjustment"));
+    }
 
-//    [Test]
-//    public void Refill_WhenProductDoesNotExist_ShouldThrowSqlException()
-//    {
-//        Assert.Throws<SqlException>(() =>
-//            UnitOfWork.StockMovementRepository.Refill(
-//                int.MaxValue,
-//                5,
-//                2));
-//    }
+    [Test]
+    public void GetOutOfStockProducts_ShouldNotReturnProductsWithPositiveStock()
+    {
+        // Act
+        var products = UnitOfWork.StockMovementRepository
+            .GetOutOfStockProducts()
+            .ToList();
 
-//    [Test]
-//    public void Adjust_WithNegativeDifference_ShouldDecreaseStock()
-//    {
-//        // Arrange
-//        const int productId = 1;
-//        const int quantityDifference = -3;
-//        const int employeeId = 2;
-//        const string reason = "Damaged items";
+        // Assert
+        Assert.That(
+            products.Any(product => product.ProductId == 1),
+            Is.False);
+    }
 
-//        var before = UnitOfWork.StockMovementRepository
-//            .GetByProductId(productId)
-//            .OrderBy(movement => movement.Id)
-//            .Last();
+    [Test]
+    public void Adjust_WithNegativeDifference_ShouldDecreaseStock()
+    {
+        // Arrange
+        const int productId = 1;
+        const int employeeId = 2;
+        const int quantityDifference = -3;
 
-//        var expectedQuantityBefore =
-//            before.QuantityBefore + before.QuantityChange;
+        var quantityBefore = UnitOfWork.StockMovementRepository
+            .GetByProductId(productId)
+            .Sum(x => x.QuantityChange);
 
-//        // Act
-//        UnitOfWork.StockMovementRepository.Adjust(
-//            productId,
-//            quantityDifference,
-//            employeeId,
-//            reason);
+        // Act
+        UnitOfWork.StockMovementRepository.Adjust(
+            productId,
+            quantityDifference,
+            employeeId,
+            "Damaged products");
 
-//        // Assert
-//        var movement = UnitOfWork.StockMovementRepository
-//            .GetByProductId(productId)
-//            .OrderBy(movement => movement.Id)
-//            .Last();
+        // Assert
+        var quantityAfter = UnitOfWork.StockMovementRepository
+            .GetByProductId(productId)
+            .Sum(x => x.QuantityChange);
 
-//        Assert.Multiple(() =>
-//        {
-//            Assert.That(movement.ProductId, Is.EqualTo(productId));
-//            Assert.That(movement.MovementType, Is.EqualTo(2));
-//            Assert.That(
-//                movement.QuantityBefore,
-//                Is.EqualTo(expectedQuantityBefore));
-//            Assert.That(
-//                movement.QuantityChange,
-//                Is.EqualTo(quantityDifference));
-//            Assert.That(
-//                movement.ChangedByEmployeeId,
-//                Is.EqualTo(employeeId));
-//            Assert.That(movement.Reason, Is.EqualTo(reason));
-//            Assert.That(movement.SaleItemId, Is.Null);
-//        });
-//    }
+        Assert.That(
+            quantityAfter,
+            Is.EqualTo(quantityBefore + quantityDifference));
+    }
 
-//    [Test]
-//    public void Adjust_WithPositiveDifference_ShouldIncreaseStock()
-//    {
-//        // Arrange
-//        const int productId = 1;
-//        const int quantityDifference = 4;
-//        const int employeeId = 2;
-//        const string reason = "Inventory correction";
+    [Test]
+    public void Adjust_WithPositiveDifference_ShouldIncreaseStock()
+    {
+        // Arrange
+        const int productId = 1;
+        const int employeeId = 2;
+        const int quantityDifference = 5;
 
-//        // Act
-//        UnitOfWork.StockMovementRepository.Adjust(
-//            productId,
-//            quantityDifference,
-//            employeeId,
-//            reason);
+        var quantityBefore = UnitOfWork.StockMovementRepository
+            .GetByProductId(productId)
+            .Sum(x => x.QuantityChange);
 
-//        // Assert
-//        var movement = UnitOfWork.StockMovementRepository
-//            .GetByProductId(productId)
-//            .OrderBy(movement => movement.Id)
-//            .Last();
+        // Act
+        UnitOfWork.StockMovementRepository.Adjust(
+            productId,
+            quantityDifference,
+            employeeId,
+            "Stock correction");
 
-//        Assert.Multiple(() =>
-//        {
-//            Assert.That(movement.MovementType, Is.EqualTo(2));
-//            Assert.That(
-//                movement.QuantityChange,
-//                Is.EqualTo(quantityDifference));
-//            Assert.That(movement.Reason, Is.EqualTo(reason));
-//        });
-//    }
+        // Assert
+        var quantityAfter = UnitOfWork.StockMovementRepository
+            .GetByProductId(productId)
+            .Sum(x => x.QuantityChange);
 
-//    [Test]
-//    public void Adjust_WhenDifferenceIsZero_ShouldThrowArgumentException()
-//    {
-//        Assert.Throws<ArgumentException>(() =>
-//            UnitOfWork.StockMovementRepository.Adjust(
-//                1,
-//                0,
-//                2,
-//                "Adjustment"));
-//    }
+        Assert.That(
+            quantityAfter,
+            Is.EqualTo(quantityBefore + quantityDifference));
+    }
 
-//    [Test]
-//    public void Adjust_WhenReasonIsWhitespace_ShouldThrowArgumentException()
-//    {
-//        Assert.Throws<ArgumentException>(() =>
-//            UnitOfWork.StockMovementRepository.Adjust(
-//                1,
-//                -1,
-//                2,
-//                "   "));
-//    }
+    [Test]
+    public void Refill_ShouldCreateRefillMovement()
+    {
+        // Arrange
+        const int productId = 1;
+        const int employeeId = 2;
+        const int quantity = 10;
 
-//    [Test]
-//    public void Adjust_WhenProductDoesNotExist_ShouldThrowSqlException()
-//    {
-//        Assert.Throws<SqlException>(() =>
-//            UnitOfWork.StockMovementRepository.Adjust(
-//                int.MaxValue,
-//                1,
-//                2,
-//                "Adjustment"));
-//    }
+        var existingMovementIds = UnitOfWork.StockMovementRepository
+            .GetByProductId(productId)
+            .Select(x => x.Id)
+            .ToHashSet();
 
-//    [Test]
-//    public void GetOutOfStockProducts_ShouldNotReturnProductsWithPositiveStock()
-//    {
-//        // Act
-//        var products = UnitOfWork.StockMovementRepository
-//            .GetOutOfStockProducts()
-//            .ToList();
+        // Act
+        UnitOfWork.StockMovementRepository.Refill(
+            productId,
+            quantity,
+            employeeId);
 
-//        // Assert
-//        Assert.That(
-//            products.Any(product => product.ProductId == 1),
-//            Is.False);
-//    }
-//}
+        // Assert
+        var newMovement = UnitOfWork.StockMovementRepository
+            .GetByProductId(productId)
+            .Single(x => !existingMovementIds.Contains(x.Id));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(newMovement.ProductId, Is.EqualTo(productId));
+            Assert.That(newMovement.QuantityChange, Is.EqualTo(quantity));
+            Assert.That(newMovement.ChangedByEmployeeId, Is.EqualTo(employeeId));
+            Assert.That(newMovement.MovementType, Is.EqualTo(1));
+        });
+    }
+
+    [Test]
+    public void Adjust_WhenDifferenceIsZero_ShouldThrowArgumentOutOfRangeException()
+    {
+        // Arrange
+        const int productId = 1;
+        const int employeeId = 1;
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            UnitOfWork.StockMovementRepository.Adjust(
+                productId,
+                0,
+                employeeId,
+                "Test adjustment"));
+
+        Assert.That(
+            exception.ParamName,
+            Is.EqualTo("quantityDifference"));
+    }
+}
