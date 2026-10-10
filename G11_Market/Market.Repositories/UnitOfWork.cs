@@ -3,7 +3,6 @@ using Market.Services.Interfaces;
 using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
- 
 
 internal sealed class UnitOfWork : IUnitOfWork, IDisposable
 {
@@ -21,20 +20,20 @@ internal sealed class UnitOfWork : IUnitOfWork, IDisposable
     private readonly Lazy<RoleRepository> _roleRepository;
     private readonly Lazy<AccountRepository> _accountRepository;
     private readonly Lazy<AttributeRepository> _attributeRepository;
-    
+
     public UnitOfWork(DbConnection connection)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
-        _categoryRepository = new Lazy<CategoryRepository>(() => new CategoryRepository(_connection));
-        _employeeRepository = new Lazy<EmployeeRepository>(() => new EmployeeRepository(_connection));
-        _productRepository = new Lazy<ProductRepository>(() => new ProductRepository(_connection));
-        _saleRepository = new Lazy<SaleRepository>(() => new SaleRepository(_connection));
-        _saleItemRepository = new Lazy<SaleItemRepository>(() => new SaleItemRepository(_connection));
-        _roleRepository = new Lazy<RoleRepository>(() => new RoleRepository(_connection));
-        _accountRepository = new Lazy<AccountRepository>(() => new AccountRepository(_connection));
-        _attributeRepository = new Lazy<AttributeRepository>(() => new AttributeRepository(_connection));
-        _stockMovementRepository = new Lazy<StockMovementRepository>(() => new StockMovementRepository(_connection));
+        _categoryRepository = new Lazy<CategoryRepository>(() => new CategoryRepository(_connection, () => _transaction));
+        _employeeRepository = new Lazy<EmployeeRepository>(() => new EmployeeRepository(_connection, () => _transaction));
+        _productRepository = new Lazy<ProductRepository>(() => new ProductRepository(_connection, () => _transaction));
+        _saleRepository = new Lazy<SaleRepository>(() => new SaleRepository(_connection, () => _transaction));
+        _saleItemRepository = new Lazy<SaleItemRepository>(() => new SaleItemRepository(_connection, () => _transaction));
+        _roleRepository = new Lazy<RoleRepository>(() => new RoleRepository(_connection, () => _transaction));
+        _accountRepository = new Lazy<AccountRepository>(() => new AccountRepository(_connection, () => _transaction));
+        _attributeRepository = new Lazy<AttributeRepository>(() => new AttributeRepository(_connection, () => _transaction));
+        _stockMovementRepository = new Lazy<StockMovementRepository>(() => new StockMovementRepository(_connection, () => _transaction));
 
         _disposed = false;
     }
@@ -68,7 +67,6 @@ internal sealed class UnitOfWork : IUnitOfWork, IDisposable
 
     public IStockMovementRepository StockMovementRepository
          => GetRepository(_stockMovementRepository);
-
 
     public void BeginTransaction()
     {

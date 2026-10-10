@@ -12,13 +12,15 @@ namespace Market.Repositories;
 internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
 {
     protected readonly DbConnection _connection;
+    protected readonly Func<DbTransaction?> _transaction;
     private bool _disposed = false;
     private readonly string _entityName;
     private readonly string _entityPluralName;
 
-    protected BaseRepository(DbConnection connection)
+    protected BaseRepository(DbConnection connection, Func<DbTransaction?> transaction)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
+        _transaction = transaction ?? throw new ArgumentNullException(nameof(transaction));
         _entityName = typeof(T).Name[..^3]; // removing "DTO" suffix
         _entityPluralName = _entityName.ToPlural();
     }
@@ -30,6 +32,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
         return _connection.QueryFirstOrDefault<T>(
             $"sp_Get{_entityName}ById",
             new { Id = id },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -37,6 +40,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
     {
         return _connection.Query<T>(
             $"sp_GetAll{_entityPluralName}",
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -81,6 +85,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
         _connection.Execute(
             $"sp_Insert{_entityName}",
             parameters,
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
 
         return parameters.Get<int>("Id");
@@ -103,6 +108,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
         _connection.Execute(
             $"sp_Update{_entityName}",
             parameters,
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -113,6 +119,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
         _connection.Execute(
             $"sp_Delete{_entityName}",
             new { Id = id },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -122,6 +129,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
         _connection.Execute(
             $"sp_Restore{_entityName}",
             new { Id = id },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -143,7 +151,7 @@ internal abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
         }
 
 
-        return _connection.Query<T>(sqlQuery, parameters);
+        return _connection.Query<T>(sqlQuery, parameters, transaction: _transaction());
     }
 
     private static bool CheckIfTypeHasIsDeleted()

@@ -6,7 +6,7 @@ using System.Data.Common;
 
 namespace Market.Repositories;
 
-internal sealed class EmployeeRepository(DbConnection connection) : BaseRepository<EmployeeDTO>(connection), IEmployeeRepository
+internal sealed class EmployeeRepository(DbConnection connection, Func<DbTransaction?> transaction) : BaseRepository<EmployeeDTO>(connection, transaction), IEmployeeRepository
 {
     public EmployeeDTO? GetByAccountId(int accountId)
     {
@@ -32,6 +32,7 @@ internal sealed class EmployeeRepository(DbConnection connection) : BaseReposito
         return _connection.Query<RoleDTO>(
             "sp_GetEmployeeRolesByEmployeeId",
             new { EmployeeId = employeeId },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -50,6 +51,7 @@ internal sealed class EmployeeRepository(DbConnection connection) : BaseReposito
                 employeeRole.EmployeeId,
                 employeeRole.RoleId
             },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -68,6 +70,7 @@ internal sealed class EmployeeRepository(DbConnection connection) : BaseReposito
                 EmployeeId = employeeRole.EmployeeId,
                 RoleId = employeeRole.RoleId
             },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 }

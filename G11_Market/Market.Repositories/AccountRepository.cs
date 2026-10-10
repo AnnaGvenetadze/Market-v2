@@ -5,8 +5,8 @@ using Market.DTO;
 using Market.Repositories;
 using Market.Services.Interfaces.Repositories;
 
-internal sealed class AccountRepository(DbConnection connection)
-    : BaseRepository<AccountDTO>(connection), IAccountRepository
+internal sealed class AccountRepository(DbConnection connection, Func<DbTransaction?> transaction)
+    : BaseRepository<AccountDTO>(connection, transaction), IAccountRepository
 {
     public AccountDTO? GetByUsername(string username)
     {
@@ -44,6 +44,7 @@ internal sealed class AccountRepository(DbConnection connection)
                 LastLoginAtUtc = lastLoginAtUtc,
                 LockoutEndUtc = lockoutEndUtc
             },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -90,6 +91,7 @@ internal sealed class AccountRepository(DbConnection connection)
                 Token = tokenHash,
                 TokenExpiration = expiredAt
             },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
         return Task.CompletedTask;
     }
@@ -105,6 +107,7 @@ internal sealed class AccountRepository(DbConnection connection)
             commandText: "dbo.sp_GetRolesByAccountId",
             parameters: new { AccountId = accountId },
             commandType: CommandType.StoredProcedure,
+            transaction: _transaction(),
             cancellationToken: cancellationToken);
 
         var roles = await _connection.QueryAsync<RoleDTO>(command);
@@ -126,6 +129,7 @@ internal sealed class AccountRepository(DbConnection connection)
                 AccountId = accountId,
                 PasswordHash = newPasswordHash
             },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
 
         if (rowsAffected == 0)

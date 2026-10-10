@@ -1,14 +1,12 @@
-﻿using Dapper;
-using Market.DTO;
-using Market.Services.Interfaces;
-using Market.Services.Interfaces.Repositories;
-using System.Data;
+﻿using System.Data;
 using System.Data.Common;
+using Dapper;
+using Market.DTO;
+using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-internal sealed class ProductRepository(DbConnection connection)
-    : BaseRepository<ProductDTO>(connection), IProductRepository
+internal sealed class ProductRepository(DbConnection connection, Func<DbTransaction?> transaction) : BaseRepository<ProductDTO>(connection, transaction), IProductRepository
 {
     public ProductDTO? GetByName(string productName)
     {
@@ -52,6 +50,7 @@ internal sealed class ProductRepository(DbConnection connection)
         _connection.Execute(
             "dbo.sp_InsertProductAttributeValue",
             value,
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -62,6 +61,7 @@ internal sealed class ProductRepository(DbConnection connection)
         _connection.Execute(
             "dbo.sp_UpdateProductAttributeValue",
             value,
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -75,6 +75,7 @@ internal sealed class ProductRepository(DbConnection connection)
         return _connection.Query<ProductAttributeValueDTO>(
             "dbo.sp_GetProductAttributeValuesByProductId",
             parameters,
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -88,6 +89,7 @@ internal sealed class ProductRepository(DbConnection connection)
         using var multi = _connection.QueryMultiple(
             "dbo.sp_GetProductDetailsById",
             parameters,
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
 
         var product = multi.ReadSingleOrDefault<ProductDTO>();
@@ -119,6 +121,7 @@ internal sealed class ProductRepository(DbConnection connection)
         _connection.Execute(
             "dbo.sp_DeleteProductAttributeValue",
             parameters,
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 }

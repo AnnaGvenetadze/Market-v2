@@ -7,8 +7,7 @@ using System.Data.Common;
 
 namespace Market.Repositories;
 
-internal sealed class SaleRepository(DbConnection connection)
-    : BaseRepository<SaleDTO>(connection), ISaleRepository
+internal sealed class SaleRepository(DbConnection connection, Func<DbTransaction?> transaction) : BaseRepository<SaleDTO>(connection, transaction), ISaleRepository
 {
     public IEnumerable<SaleDTO> GetSalesByEmployee(int employeeId)
     {
@@ -47,6 +46,7 @@ internal sealed class SaleRepository(DbConnection connection)
             {
                 SaleId = saleId
             },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -66,6 +66,7 @@ internal sealed class SaleRepository(DbConnection connection)
                 EmployeeId = employeeId,
                 CancelReason = cancelReason
             },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -81,6 +82,7 @@ internal sealed class SaleRepository(DbConnection connection)
                 DateFrom = dateFrom,
                 DateTo = dateTo
             },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 }

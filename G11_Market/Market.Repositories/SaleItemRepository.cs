@@ -6,8 +6,7 @@ using System.Data.Common;
 
 namespace Market.Repositories;
 
-internal sealed class SaleItemRepository(DbConnection connection)
-    : BaseRepository<SaleItemDTO>(connection), ISaleItemRepository
+internal sealed class SaleItemRepository(DbConnection connection, Func<DbTransaction?> transaction) : BaseRepository<SaleItemDTO>(connection, transaction), ISaleItemRepository
 {
     public IEnumerable<SaleItemDTO> GetBySaleId(int saleId)
     {
@@ -31,6 +30,7 @@ internal sealed class SaleItemRepository(DbConnection connection)
                 Id = saleItemId,
                 Quantity = quantity
             },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 }

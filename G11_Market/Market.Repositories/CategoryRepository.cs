@@ -6,8 +6,8 @@ using Market.Services.Interfaces.Repositories;
 
 namespace Market.Repositories;
 
-internal sealed class CategoryRepository(DbConnection connection)
-    : BaseRepository<CategoryDTO>(connection), ICategoryRepository
+internal sealed class CategoryRepository(DbConnection connection, Func<DbTransaction?> transaction)
+    : BaseRepository<CategoryDTO>(connection, transaction), ICategoryRepository
 {
     public CategoryDTO? GetByName(string categoryName)
     {
@@ -45,10 +45,11 @@ internal sealed class CategoryRepository(DbConnection connection)
             "sp_AssignCategoryAttribute",
             new
             {
-                CategoryId = categoryAttribute.CategoryId, 
+                CategoryId = categoryAttribute.CategoryId,
                 AttributeId = categoryAttribute.AttributeId,
                 OrderPosition = categoryAttribute.OrderPosition
             },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -58,9 +59,10 @@ internal sealed class CategoryRepository(DbConnection connection)
             "sp_UnassignCategoryAttribute",
             new
             {
-                CategoryId = categoryAttribute.CategoryId, 
+                CategoryId = categoryAttribute.CategoryId,
                 AttributeId = categoryAttribute.AttributeId
             },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 }

@@ -6,8 +6,7 @@ using System.Data.Common;
 
 namespace Market.Repositories;
 
-internal sealed class StockMovementRepository(DbConnection connection)
-    : BaseRepository<StockMovementDTO>(connection), IStockMovementRepository
+internal sealed class StockMovementRepository(DbConnection connection, Func<DbTransaction?> transaction) : BaseRepository<StockMovementDTO>(connection, transaction), IStockMovementRepository
 {
     public IEnumerable<StockMovementDTO> GetByProductId(int productId)
     {
@@ -43,6 +42,7 @@ internal sealed class StockMovementRepository(DbConnection connection)
     {
         return _connection.Query<StockDTO>(
             "dbo.sp_GetOutOfStockProducts",
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -64,6 +64,7 @@ internal sealed class StockMovementRepository(DbConnection connection)
                 Quantity = quantity,
                 EmployeeId = employeeId
             },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 
@@ -88,6 +89,7 @@ internal sealed class StockMovementRepository(DbConnection connection)
                 EmployeeId = employeeId,
                 Reason = reason
             },
+            transaction: _transaction(),
             commandType: CommandType.StoredProcedure);
     }
 }
