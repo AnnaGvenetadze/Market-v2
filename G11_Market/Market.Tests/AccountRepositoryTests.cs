@@ -1009,4 +1009,64 @@ public class AccountRepositoryTests : BaseRepositoryTests
         Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await UnitOfWork.AccountRepository.GetRolesByRefreshTokenAsync(refreshToken));
     }
+
+    [Test]
+    public async Task HasRoleAsync_WhenRoleExists_ShouldReturnTrue()
+    {
+        // Arrange
+        var roles = new List<RoleDTO>
+        {
+            new() { Id = 1, Name = "Administrator" },
+            new() { Id = 2, Name = "User" }
+        };
+
+        // Act
+        var result = await UnitOfWork.AccountRepository.HasRoleAsync(roles, "administrator");
+
+        // Assert
+        Assert.That(result, Is.True);
+    }
+
+
+    [Test]
+    public async Task HasRoleAsync_WhenRoleDoesNotExist_ShouldReturnFalse()
+    {
+        // Arrange
+        var roles = new List<RoleDTO>
+        {
+            new() { Id = 1, Name = "User" }
+        };
+
+        // Act
+        var result = await UnitOfWork.AccountRepository.HasRoleAsync(roles, "Administrator");
+
+        // Assert
+        Assert.That(result, Is.False);
+    }
+
+
+    [Test]
+    public void HasRoleAsync_WhenRolesIsNull_ShouldThrowArgumentNullException()
+    {
+        // Act & Assert
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await UnitOfWork.AccountRepository.HasRoleAsync(null!, "Administrator"));
+    }
+
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("   ")]
+    public void HasRoleAsync_WhenRoleNameIsInvalid_ShouldThrowArgumentException(string? roleName)
+    {
+        // Arrange
+        var roles = new List<RoleDTO>
+        {
+            new() { Id = 1, Name = "User" }
+        };
+
+        // Act & Assert
+        Assert.ThrowsAsync<ArgumentException>(async () =>
+            await UnitOfWork.AccountRepository.HasRoleAsync(roles, roleName!));
+    }
 }
