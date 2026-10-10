@@ -1,20 +1,20 @@
 ﻿CREATE PROCEDURE dbo.sp_RefreshToken
-    @AccountId INT,
-    @Token NVARCHAR(500),
+    @Id INT,
+    @Token VARBINARY(32),
     @TokenExpiration DATETIME2
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    IF @AccountId <= 0
+    IF @Id <= 0
     BEGIN
         RAISERROR('Invalid AccountId.', 16, 1);
         RETURN;
     END;
 
-    IF @Token IS NULL OR LTRIM(RTRIM(@Token)) = ''
+    IF @Token IS NULL OR DATALENGTH(@Token) <> 32
     BEGIN
-        RAISERROR('Token cannot be null or empty.', 16, 1);
+        RAISERROR('Token hash must contain exactly 32 bytes.', 16, 1);
         RETURN;
     END;
 
@@ -28,7 +28,7 @@ BEGIN
     (
         SELECT 1
         FROM dbo.Accounts
-        WHERE Id = @AccountId
+        WHERE Id = @Id
           AND IsDeleted = 0
           AND IsActive = 1
     )
@@ -42,8 +42,7 @@ BEGIN
         Token = @Token,
         TokenExpiration = @TokenExpiration,
         UpdateDate = SYSUTCDATETIME()
-    WHERE Id = @AccountId
+    WHERE Id = @Id
       AND IsDeleted = 0
       AND IsActive = 1;
-END;
-GO
+END; 

@@ -12,7 +12,9 @@ internal sealed class AccountRepository(DbConnection connection, Func<DbTransact
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(username);
 
-        return Search(a => a.Username == username.Trim())
+        username = username.Trim();
+
+        return Search(a => a.Username == username)
             .FirstOrDefault();
     }
 
@@ -39,7 +41,7 @@ internal sealed class AccountRepository(DbConnection connection, Func<DbTransact
             "sp_UpdateAccountLoginAttempts",
             new
             {
-                AccountId = accountId,
+                Id = accountId,
                 FailedLoginAttempts = failedLoginAttempts,
                 LastLoginAtUtc = lastLoginAtUtc,
                 LockoutEndUtc = lockoutEndUtc
@@ -80,14 +82,17 @@ internal sealed class AccountRepository(DbConnection connection, Func<DbTransact
     {
         if (accountId <= 0)
             throw new ArgumentOutOfRangeException(nameof(accountId));
-        if (tokenHash == null || tokenHash.Length == 0)
-            throw new ArgumentException("Token hash cannot be null or empty.", nameof(tokenHash));
+        ArgumentNullException.ThrowIfNull(tokenHash);
+        if (tokenHash.Length != 32)
+            throw new ArgumentException(
+                "Token hash must contain exactly 32 bytes.", nameof(tokenHash));
         cancellationToken.ThrowIfCancellationRequested();
+
         _connection.Execute(
             "sp_RefreshToken",
             new
             {
-                AccountId = accountId,
+                Id = accountId,
                 Token = tokenHash,
                 TokenExpiration = expiredAt
             },

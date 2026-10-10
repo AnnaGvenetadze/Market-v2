@@ -1,439 +1,1053 @@
-﻿//using Market.DTO;
-//using Market.Services.Interfaces.Repositories;
-//using Market.Tests.Helpers;
-//using Microsoft.Data.SqlClient;
-
-//namespace Market.Tests;
-
-//public class EmployeeRepositoryTests : BaseRepositoryTests
-//{
-//    private SqlConnection _connection;
-//    private IEmployeeRepository _employeeRepository;
-//    private IAccountRepository _accountRepository;
-//    private int _accountId;
-
-//    [SetUp]
-//    public void Setup()
-//    {
-//        _connection = new SqlConnection(ConnectionString);
-//        _employeeRepository = UnitOfWork.EmployeeRepository;
-//        _accountRepository = UnitOfWork.AccountRepository;
-//        var account = new AccountDTO
-//        {
-//            Username = "User".AddGuid(),
-//            PasswordHash = "Password123",
-//            Email = "Email".AddGuid() + "@gmail.com",
-//            AccountType = 1,
-//            FirstName = "Luka",
-//            LastName = "Mania"
-//        };
-//        _accountId = UnitOfWork.AccountRepository.Insert(account);
-//    }
-
-
-//    [Test]
-//    public void InsertTest_ShouldInsertValidData()
-//    {
-//        // Arrange
-//        var employee = new EmployeeDTO
-//        {
-//            AccountId = _accountId,
-//            FirstName = "Luka",
-//            LastName = "Mania",
-//            PhoneNumber = "568".AddGuid(),
-//            ContactEmail = "luka".AddGuid() + "@gmail.com",
-//            EmployeeCode = "EMP".AddGuid(),
-//            HireDate = DateTime.Today,
-//            IsDeleted = false
-//        };
-
-//        // Act
-//        var insertedId = UnitOfWork.EmployeeRepository.Insert(employee);
-//        var insertedEmployee = UnitOfWork.EmployeeRepository.GetById(insertedId);
-
-//        // Assert
-//        Assert.That(insertedEmployee, Is.Not.Null);
-//        Assert.That(insertedEmployee.Id, Is.EqualTo(insertedId));
-//        Assert.That(insertedEmployee.FirstName, Is.EqualTo("Luka"));
-//        Assert.That(insertedEmployee.EmployeeCode, Is.EqualTo(employee.EmployeeCode));
-//    }
-
-
-//    [Test]
-//    public void UpdateTest_ShouldUpdateValidData()
-//    {
-//        // Arrange
-//        var employee = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            firstName: "Luka",
-//            lastName: "Mania",
-//            employeeCode: "EMP2".AddGuid());
-
-//        var insertedId = UnitOfWork.EmployeeRepository.Insert(employee);
-
-//        var employeeToUpdate = UnitOfWork.EmployeeRepository.GetById(insertedId);
-//        employeeToUpdate!.LastName = "NotMania";
-//        employeeToUpdate.UpdateDate = DateTime.Now;
-
-//        // Act
-//        UnitOfWork.EmployeeRepository.Update(employeeToUpdate);
-
-//        var updatedEmployee = UnitOfWork.EmployeeRepository.GetById(insertedId);
-
-//        // Assert
-//        Assert.That(updatedEmployee, Is.Not.Null);
-//        Assert.That(updatedEmployee.LastName, Is.EqualTo("NotMania"));
-//    }
-
-
-//    [Test]
-//    public void DeleteTest_ShouldDeleteValidData()
-//    {
-//        // Arrange
-//        var employee = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            firstName: "Deleted",
-//            lastName: "Account",
-//            employeeCode: "EMP3".AddGuid());
-
-//        var insertedId = UnitOfWork.EmployeeRepository.Insert(employee);
-
-//        // Act
-//        UnitOfWork.EmployeeRepository.Delete(insertedId);
-
-//        // Assert
-//        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.GetById(insertedId));
-//    }
-
-
-//    [Test]
-//    public void InsertTest_ShouldNotInsertInvalidAccountId()
-//    {
-//        // Arrange
-//        var employee = new EmployeeDTO
-//        {
-//            AccountId = -9,
-//            FirstName = "Wrong",
-//            LastName = "Account",
-//            EmployeeCode = "EMP4".AddGuid(),
-//            HireDate = DateTime.Today
-//        };
-
-//        // Act & Assert
-//        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.Insert(employee));
-//    }
-
-
-//    [Test]
-//    public void InsertTest_ShouldNotInsertInvalidManagerId()
-//    {
-//        // Arrange
-//        var employee = new EmployeeDTO
-//        {
-//            AccountId = _accountId,
-//            ManagerEmployeeId = -9,
-//            FirstName = "Wrong",
-//            LastName = "Manager",
-//            EmployeeCode = "EMP5".AddGuid(),
-//            HireDate = DateTime.Today
-//        };
-
-//        // Act & Assert
-//        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.Insert(employee));
-//    }
+﻿using Market.DTO;
+using Market.Tests.Helpers;
+using Microsoft.Data.SqlClient;
+using NUnit.Framework;
+
+namespace Market.Tests;
+
+[TestFixture]
+public class EmployeeRepositoryTests : BaseRepositoryTests
+{
+    private int CreateAccount(bool isActive = true)
+    {
+        var account = new AccountDTO
+        {
+            Username = "User".AddGuid(),
+            PasswordHash = "HashedPassword123!",
+            IsActive = isActive
+        };
+
+        return UnitOfWork.AccountRepository.Insert(account);
+    }
+
+
+    private static EmployeeDTO CreateValidEmployee(
+        int accountId,
+        int? managerEmployeeId = null) => new()
+        {
+            AccountId = accountId,
+            ManagerEmployeeId = managerEmployeeId,
+            FirstName = "John",
+            LastName = "Doe",
+            EmployeeCode = "EMP".AddGuid(),
+            Email = $"user_{Guid.NewGuid():N}@test.com",
+            PhoneNumber = TestDataHelper.CreatePhoneNumber(),
+            HireDate = DateTime.UtcNow.Date
+        };
+
+
+    private int CreateEmployee(int? managerEmployeeId = null)
+    {
+        var accountId = CreateAccount();
+        var employee = CreateValidEmployee(accountId, managerEmployeeId);
+
+        return UnitOfWork.EmployeeRepository.Insert(employee);
+    }
+
+
+    [Test]
+    public void Insert_ShouldInsertValidEmployee()
+    {
+        // Arrange
+        var accountId = CreateAccount();
+        var employee = CreateValidEmployee(accountId);
+
+        // Act
+        var id = UnitOfWork.EmployeeRepository.Insert(employee);
+        var result = UnitOfWork.EmployeeRepository.GetById(id);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(id, Is.GreaterThan(0));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Id, Is.EqualTo(id));
+            Assert.That(result.AccountId, Is.EqualTo(accountId));
+            Assert.That(result.FirstName, Is.EqualTo(employee.FirstName));
+            Assert.That(result.LastName, Is.EqualTo(employee.LastName));
+            Assert.That(result.EmployeeCode, Is.EqualTo(employee.EmployeeCode));
+            Assert.That(result.Email, Is.EqualTo(employee.Email));
+            Assert.That(result.PhoneNumber, Is.EqualTo(employee.PhoneNumber));
+            Assert.That(result.IsDeleted, Is.False);
+            Assert.That(result.CreateDate, Is.Not.EqualTo(default(DateTime)));
+        });
+    }
+
+
+    [Test]
+    public void Insert_WithValidManager_ShouldAssignManager()
+    {
+        // Arrange
+        var managerId = CreateEmployee();
+        var accountId = CreateAccount();
+
+        var employee = CreateValidEmployee(
+            accountId,
+            managerId);
+
+        // Act
+        var id = UnitOfWork.EmployeeRepository.Insert(employee);
+        var result = UnitOfWork.EmployeeRepository.GetById(id);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.ManagerEmployeeId, Is.EqualTo(managerId));
+    }
+
+
+    [Test]
+    public void Insert_WhenAccountDoesNotExist_ShouldThrowSqlException()
+    {
+        // Arrange
+        var employee = CreateValidEmployee(int.MaxValue);
 
-
-//    [Test]
-//    public void InsertTest_ShouldNotInsertDuplicateEmployeeCode()
-//    {
-//        // Arrange
-//        var sharedCode = "samecode".AddGuid();
-
-//        var emp1 = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            employeeCode: sharedCode);
-
-//        UnitOfWork.EmployeeRepository.Insert(emp1);
-
-//        var emp2 = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            employeeCode: sharedCode);
-
-//        // Act & Assert
-//        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.Insert(emp2));
-//    }
-
-
-//    [Test]
-//    public void InsertTest_ShouldNotInsertDuplicateContactEmail()
-//    {
-//        // Arrange
-//        var sharedEmail = "shared".AddGuid() + "@gmail.com";
-
-//        var emp1 = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            contactEmail: sharedEmail);
-
-//        UnitOfWork.EmployeeRepository.Insert(emp1);
-
-//        var emp2 = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            contactEmail: sharedEmail);
-
-//        // Act & Assert
-//        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.Insert(emp2));
-//    }
-
-
-//    [Test]
-//    public void InsertTest_ShouldNotInsertDuplicatePhoneNumber()
-//    {
-//        // Arrange
-//        var sharedPhone = "568".AddGuid();
-
-//        var emp1 = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            phoneNumber: sharedPhone);
-
-//        UnitOfWork.EmployeeRepository.Insert(emp1);
-
-//        var emp2 = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            phoneNumber: sharedPhone);
-
-//        // Act & Assert
-//        Assert.Throws<SqlException>(() => UnitOfWork.EmployeeRepository.Insert(emp2));
-//    }
-
-
-//    [Test]
-//    public void GetByEmployeeCode_ShouldReturnCorrectEmployee()
-//    {
-//        // Arrange
-//        var targetCode = "code".AddGuid();
-
-//        var employee = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            firstName: "Target",
-//            lastName: "Employee",
-//            employeeCode: targetCode);
-
-//        UnitOfWork.EmployeeRepository.Insert(employee);
-
-//        // Act
-//        var result = UnitOfWork.EmployeeRepository.GetByEmployeeCode(targetCode);
-
-//        // Assert
-//        Assert.That(result, Is.Not.Null);
-//        Assert.That(result!.EmployeeCode, Is.EqualTo(targetCode));
-//    }
-
-
-//    [Test]
-//    public void GetByEmployeeCode_WhenNotFound_ShouldReturnNull()
-//    {
-//        // Act
-//        var result = UnitOfWork.EmployeeRepository.GetByEmployeeCode("QWERTY");
-
-//        // Assert
-//        Assert.That(result, Is.Null);
-//    }
-
-
-//    [Test]
-//    public void GetByAccountId_ShouldReturnCorrectEmployee()
-//    {
-//        // Arrange
-//        var employee = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            firstName: "Account",
-//            lastName: "Owner",
-//            employeeCode: "EMP6".AddGuid());
-
-//        UnitOfWork.EmployeeRepository.Insert(employee);
-
-//        // Act
-//        var result = UnitOfWork.EmployeeRepository.GetByAccountId(_accountId);
-
-//        // Assert
-//        Assert.That(result, Is.Not.Null);
-//        Assert.That(result!.AccountId, Is.EqualTo(_accountId));
-//    }
-
-
-//    [Test]
-//    public void GetByAccountId_WhenNotFound_ShouldReturnNull()
-//    {
-//        // Act
-//        var result = UnitOfWork.EmployeeRepository.GetByAccountId(-99);
-
-//        // Assert
-//        Assert.That(result, Is.Null);
-//    }
-
-
-//    [Test]
-//    public void GetSubordinates_ShouldReturnReports()
-//    {
-//        // Arrange
-//        var manager = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            firstName: "The",
-//            lastName: "Boss",
-//            employeeCode: "MGR1".AddGuid());
-
-//        var managerId = UnitOfWork.EmployeeRepository.Insert(manager);
-
-//        var sub1 = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            firstName: "Sub",
-//            lastName: "One",
-//            employeeCode: "SUB1".AddGuid(),
-//            managerEmployeeId: managerId);
-
-//        var sub2 = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            firstName: "Sub",
-//            lastName: "Two",
-//            employeeCode: "SUB2".AddGuid(),
-//            managerEmployeeId: managerId);
-
-//        var outsideEmp = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            firstName: "Other",
-//            lastName: "Emp",
-//            employeeCode: "SUB3".AddGuid());
-
-//        var id1 = UnitOfWork.EmployeeRepository.Insert(sub1);
-//        var id2 = UnitOfWork.EmployeeRepository.Insert(sub2);
-//        UnitOfWork.EmployeeRepository.Insert(outsideEmp);
-
-//        // Act
-//        var subordinates = UnitOfWork.EmployeeRepository.GetSubordinates(managerId).ToList();
-
-//        // Assert
-//        Assert.That(subordinates.Count, Is.EqualTo(2));
-//        Assert.That(subordinates.Any(x => x.Id == id1), Is.True);
-//        Assert.That(subordinates.Any(x => x.Id == id2), Is.True);
-//        Assert.That(subordinates.All(x => x.ManagerEmployeeId == managerId), Is.True);
-//    }
-
-
-//    [Test]
-//    public void GetAllActive_ShouldExcludeDeletedEmployees()
-//    {
-//        // Arrange
-//        var activeEmp = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            firstName: "Active",
-//            lastName: "User",
-//            employeeCode: "ACT1".AddGuid());
-
-//        var deletedEmp = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            firstName: "Deleted",
-//            lastName: "User",
-//            employeeCode: "DEL1".AddGuid());
-
-//        var activeId = UnitOfWork.EmployeeRepository.Insert(activeEmp);
-//        var deletedId = UnitOfWork.EmployeeRepository.Insert(deletedEmp);
-
-//        UnitOfWork.EmployeeRepository.Delete(deletedId);
-
-//        // Act
-//        var activeList = UnitOfWork.EmployeeRepository.GetAllActive().ToList();
-
-//        // Assert
-//        Assert.That(activeList.Any(x => x.Id == activeId), Is.True);
-//        Assert.That(activeList.Any(x => x.Id == deletedId), Is.False);
-//        Assert.That(activeList.All(x => !x.IsDeleted), Is.True);
-//    }
-
-
-//    [Test]
-//    public void GetById_WhenIdIsNull_ShouldThrowException()
-//    {
-//        // Act & Assert
-//        Assert.Throws<ArgumentNullException>(() => UnitOfWork.EmployeeRepository.GetById(null!));
-//    }
-
-
-//    [Test]
-//    public void Update_WhenEntityIsNull_ShouldThrowException()
-//    {
-//        // Act & Assert
-//        Assert.Throws<ArgumentNullException>(() => UnitOfWork.EmployeeRepository.Update(null!));
-//    }
-
-
-//    [Test]
-//    public void Delete_WhenIdIsNull_ShouldThrowException()
-//    {
-//        // Act & Assert
-//        Assert.Throws<ArgumentNullException>(() => UnitOfWork.EmployeeRepository.Delete(null!));
-//    }
-
-
-//    [Test]
-//    public void GetAll_ShouldReturnAllInsertedRecords()
-//    {
-//        // Arrange
-//        var emp1 = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            firstName: "All1",
-//            lastName: "User",
-//            employeeCode: "ALL1".AddGuid());
-
-//        var emp2 = EmployeeTestDataFactory.CreateEmployee(
-//            accountId: _accountId,
-//            firstName: "All2",
-//            lastName: "User",
-//            employeeCode: "ALL2".AddGuid());
-
-//        UnitOfWork.EmployeeRepository.Insert(emp1);
-//        UnitOfWork.EmployeeRepository.Insert(emp2);
-
-//        // Act
-//        var allEmployees = UnitOfWork.EmployeeRepository.GetAll().ToList();
-
-//        // Assert
-//        Assert.That(allEmployees.Count, Is.AtLeast(2));
-//    }
-
-//[Test]
-//public void Restore_ShouldRestoreDeletedEmployee()
-//{
-//    // Arrange
-//    UnitOfWork.EmployeeRepository.Delete(DeleteTestId);
-
-//    // Act
-//    UnitOfWork.EmployeeRepository.Restore(DeleteTestId);
-
-//    // Assert
-//    var employee = UnitOfWork.EmployeeRepository.GetById(DeleteTestId);
-
-//    Assert.That(employee, Is.Not.Null);
-//    Assert.That(employee!.IsDeleted, Is.False);
-//}
-
-//[Test]
-//public void Restore_WhenEmployeeDoesNotExist_ShouldThrow()
-//{
-//    Assert.Throws<SqlException>(() =>
-//        UnitOfWork.EmployeeRepository.Restore(int.MaxValue));
-//}
-
-//[Test]
-//public void Restore_WhenEmployeeIsNotDeleted_ShouldThrow()
-//{
-//    Assert.Throws<SqlException>(() =>
-//        UnitOfWork.EmployeeRepository.Restore(1));
-//}
-
-
-//    [TearDown]
-//    public void TearDown()
-//    {
-//        _connection.Dispose();
-//    }
-//}
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Insert(employee));
+    }
+
+
+    [Test]
+    public void Insert_WhenAccountIsInactive_ShouldThrowSqlException()
+    {
+        // Arrange
+        var accountId = CreateAccount(false);
+        var employee = CreateValidEmployee(accountId);
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Insert(employee));
+    }
+
+
+    [Test]
+    public void Insert_WhenAccountIsDeleted_ShouldThrowSqlException()
+    {
+        // Arrange
+        var accountId = CreateAccount();
+        var employee = CreateValidEmployee(accountId);
+
+        UnitOfWork.AccountRepository.Delete(accountId);
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Insert(employee));
+    }
+
+
+    [Test]
+    public void Insert_WhenAccountAlreadyAssigned_ShouldThrowSqlException()
+    {
+        // Arrange
+        var accountId = CreateAccount();
+
+        var first = CreateValidEmployee(accountId);
+        var second = CreateValidEmployee(accountId);
+
+        UnitOfWork.EmployeeRepository.Insert(first);
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Insert(second));
+    }
+
+
+    [Test]
+    public void Insert_WhenManagerDoesNotExist_ShouldThrowSqlException()
+    {
+        // Arrange
+        var accountId = CreateAccount();
+        var employee = CreateValidEmployee(accountId, int.MaxValue);
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Insert(employee));
+    }
+
+
+    [Test]
+    public void Insert_WhenEmployeeCodeAlreadyExists_ShouldThrowSqlException()
+    {
+        // Arrange
+        var first = CreateValidEmployee(CreateAccount());
+        var second = CreateValidEmployee(CreateAccount());
+
+        second.EmployeeCode = first.EmployeeCode;
+
+        UnitOfWork.EmployeeRepository.Insert(first);
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Insert(second));
+    }
+
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("   ")]
+    public void Insert_WhenFirstNameIsInvalid_ShouldThrowSqlException(
+        string? firstName)
+    {
+        // Arrange
+        var employee = CreateValidEmployee(CreateAccount());
+        employee.FirstName = firstName!;
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Insert(employee));
+    }
+
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("   ")]
+    public void Insert_WhenLastNameIsInvalid_ShouldThrowSqlException(
+        string? lastName)
+    {
+        // Arrange
+        var employee = CreateValidEmployee(CreateAccount());
+        employee.LastName = lastName!;
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Insert(employee));
+    }
+
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("   ")]
+    public void Insert_WhenPhoneNumberIsInvalid_ShouldThrowSqlException(
+        string? phoneNumber)
+    {
+        // Arrange
+        var employee = CreateValidEmployee(CreateAccount());
+        employee.PhoneNumber = phoneNumber!;
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Insert(employee));
+    }
+
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("invalid-email")]
+    public void Insert_WhenEmailIsInvalid_ShouldThrowSqlException(
+        string? email)
+    {
+        // Arrange
+        var employee = CreateValidEmployee(CreateAccount());
+        employee.Email = email!;
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Insert(employee));
+    }
+
+
+    [Test]
+    public void Insert_WhenHireDateIsInFuture_ShouldThrowSqlException()
+    {
+        // Arrange
+        var employee = CreateValidEmployee(CreateAccount());
+        employee.HireDate = DateTime.UtcNow.AddDays(2);
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Insert(employee));
+    }
+
+
+    [Test]
+    public void Insert_WhenEmployeeIsNull_ShouldThrowArgumentNullException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            UnitOfWork.EmployeeRepository.Insert(null!));
+    }
+
+
+    [Test]
+    public void Update_ShouldUpdateEmployee()
+    {
+        // Arrange
+        var id = CreateEmployee();
+        var employee = UnitOfWork.EmployeeRepository.GetById(id)!;
+
+        employee.FirstName = "UpdatedJohn";
+        employee.LastName = "UpdatedDoe";
+        employee.PhoneNumber = "555123456";
+        employee.Email = $"updated_{Guid.NewGuid():N}@test.com";
+
+        // Act
+        UnitOfWork.EmployeeRepository.Update(employee);
+        var result = UnitOfWork.EmployeeRepository.GetById(id);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.FirstName, Is.EqualTo("UpdatedJohn"));
+            Assert.That(result.LastName, Is.EqualTo("UpdatedDoe"));
+            Assert.That(result.PhoneNumber, Is.EqualTo("555123456"));
+            Assert.That(result.Email, Is.EqualTo(employee.Email));
+            Assert.That(result.UpdateDate, Is.Not.Null);
+        });
+    }
+
+
+    [Test]
+    public void Update_WithValidManager_ShouldUpdateManager()
+    {
+        // Arrange
+        var employeeId = CreateEmployee();
+        var managerId = CreateEmployee();
+
+        var employee = UnitOfWork.EmployeeRepository
+            .GetById(employeeId)!;
+
+        employee.ManagerEmployeeId = managerId;
+
+        // Act
+        UnitOfWork.EmployeeRepository.Update(employee);
+        var result = UnitOfWork.EmployeeRepository.GetById(employeeId);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.ManagerEmployeeId, Is.EqualTo(managerId));
+    }
+
+
+    [Test]
+    public void Update_WhenEmployeeDoesNotExist_ShouldThrowSqlException()
+    {
+        // Arrange
+        var employee = CreateValidEmployee(CreateAccount());
+        employee.Id = int.MaxValue;
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Update(employee));
+    }
+
+
+    [Test]
+    public void Update_WhenEmployeeIsDeleted_ShouldThrowSqlException()
+    {
+        // Arrange
+        var id = CreateEmployee();
+        var employee = UnitOfWork.EmployeeRepository.GetById(id)!;
+
+        UnitOfWork.EmployeeRepository.Delete(id);
+
+        employee.FirstName = "UpdatedJohn";
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Update(employee));
+    }
+
+
+    [Test]
+    public void Update_WhenEmployeeCodeAlreadyExists_ShouldThrowSqlException()
+    {
+        // Arrange
+        var firstId = CreateEmployee();
+        var secondId = CreateEmployee();
+
+        var first = UnitOfWork.EmployeeRepository.GetById(firstId)!;
+        var second = UnitOfWork.EmployeeRepository.GetById(secondId)!;
+
+        second.EmployeeCode = first.EmployeeCode;
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Update(second));
+    }
+
+
+    [Test]
+    public void Update_WhenEmailAlreadyExists_ShouldThrowSqlException()
+    {
+        // Arrange
+        var firstId = CreateEmployee();
+        var secondId = CreateEmployee();
+
+        var first = UnitOfWork.EmployeeRepository.GetById(firstId)!;
+        var second = UnitOfWork.EmployeeRepository.GetById(secondId)!;
+
+        second.Email = first.Email;
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Update(second));
+    }
+
+
+    [Test]
+    public void Update_WhenEmployeeIsOwnManager_ShouldThrowSqlException()
+    {
+        // Arrange
+        var id = CreateEmployee();
+        var employee = UnitOfWork.EmployeeRepository.GetById(id)!;
+
+        employee.ManagerEmployeeId = id;
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Update(employee));
+    }
+
+
+    [Test]
+    public void Update_WhenPhoneNumberContainsInvalidCharacters_ShouldThrowSqlException()
+    {
+        // Arrange
+        var id = CreateEmployee();
+        var employee = UnitOfWork.EmployeeRepository.GetById(id)!;
+
+        employee.PhoneNumber = "555ABC123";
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Update(employee));
+    }
+
+
+    [Test]
+    public void Update_WhenEmployeeIsNull_ShouldThrowArgumentNullException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            UnitOfWork.EmployeeRepository.Update(null!));
+    }
+
+
+    [Test]
+    public void Delete_ShouldSoftDeleteEmployee()
+    {
+        // Arrange
+        var id = CreateEmployee();
+
+        // Act
+        UnitOfWork.EmployeeRepository.Delete(id);
+
+        var result = UnitOfWork.EmployeeRepository.GetById(id);
+
+        // Assert
+        Assert.That(result, Is.Null);
+    }
+
+
+    [Test]
+    public void Delete_ShouldNotDeleteAssociatedAccount()
+    {
+        // Arrange
+        var id = CreateEmployee();
+
+        var employee = UnitOfWork.EmployeeRepository.GetById(id)!;
+        var accountId = employee.AccountId;
+
+        // Act
+        UnitOfWork.EmployeeRepository.Delete(id);
+
+        var account = UnitOfWork.AccountRepository.GetById(accountId);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(account, Is.Not.Null);
+            Assert.That(account!.IsDeleted, Is.False);
+        });
+    }
+
+
+    [Test]
+    public void Delete_WhenEmployeeDoesNotExist_ShouldThrowSqlException()
+    {
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Delete(int.MaxValue));
+    }
+
+
+    [Test]
+    public void Delete_WhenAlreadyDeleted_ShouldThrowSqlException()
+    {
+        // Arrange
+        var id = CreateEmployee();
+
+        UnitOfWork.EmployeeRepository.Delete(id);
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Delete(id));
+    }
+
+
+    [Test]
+    public void Delete_WhenIdIsNull_ShouldThrowArgumentNullException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            UnitOfWork.EmployeeRepository.Delete(null!));
+    }
+
+
+    [Test]
+    public void Restore_ShouldRestoreDeletedEmployeeAndAccount()
+    {
+        // Arrange
+        var id = CreateEmployee();
+        var employee = UnitOfWork.EmployeeRepository.GetById(id)!;
+        var accountId = employee.AccountId;
+
+        UnitOfWork.EmployeeRepository.Delete(id);
+        UnitOfWork.AccountRepository.Delete(accountId);
+
+        // Act
+        UnitOfWork.EmployeeRepository.Restore(id);
+
+        var restoredEmployee = UnitOfWork.EmployeeRepository.GetById(id);
+        var restoredAccount = UnitOfWork.AccountRepository.GetById(accountId);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(restoredEmployee, Is.Not.Null);
+            Assert.That(restoredEmployee!.IsDeleted, Is.False);
+            Assert.That(restoredAccount, Is.Not.Null);
+            Assert.That(restoredAccount!.IsDeleted, Is.False);
+        });
+    }
+
+
+    [Test]
+    public void Restore_WhenEmployeeDoesNotExist_ShouldThrowSqlException()
+    {
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.Restore(int.MaxValue));
+    }
+
+
+    [Test]
+    public void Restore_WhenIdIsNull_ShouldThrowArgumentNullException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            UnitOfWork.EmployeeRepository.Restore(null!));
+    }
+
+
+    [Test]
+    public void GetById_ShouldReturnCorrectEmployee()
+    {
+        // Arrange
+        var id = CreateEmployee();
+
+        // Act
+        var result = UnitOfWork.EmployeeRepository.GetById(id);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Id, Is.EqualTo(id));
+            Assert.That(result.FirstName, Is.EqualTo("John"));
+            Assert.That(result.LastName, Is.EqualTo("Doe"));
+        });
+    }
+
+
+    [Test]
+    public void GetById_WhenEmployeeDoesNotExist_ShouldReturnNull()
+    {
+        // Act
+        var result = UnitOfWork.EmployeeRepository.GetById(int.MaxValue);
+
+        // Assert
+        Assert.That(result, Is.Null);
+    }
+
+
+    [Test]
+    public void GetById_WhenEmployeeIsDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        var id = CreateEmployee();
+
+        UnitOfWork.EmployeeRepository.Delete(id);
+
+        // Act
+        var result = UnitOfWork.EmployeeRepository.GetById(id);
+
+        // Assert
+        Assert.That(result, Is.Null);
+    }
+
+
+    [Test]
+    public void GetAll_ShouldReturnActiveEmployees()
+    {
+        // Arrange
+        var firstId = CreateEmployee();
+        var secondId = CreateEmployee();
+
+        UnitOfWork.EmployeeRepository.Delete(secondId);
+
+        // Act
+        var results = UnitOfWork.EmployeeRepository.GetAll().ToList();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Any(e => e.Id == firstId), Is.True);
+            Assert.That(results.Any(e => e.Id == secondId), Is.False);
+            Assert.That(results.All(e => !e.IsDeleted), Is.True);
+        });
+    }
+
+
+    [Test]
+    public void GetByAccountId_ShouldReturnCorrectEmployee()
+    {
+        // Arrange
+        var accountId = CreateAccount();
+        var employee = CreateValidEmployee(accountId);
+        var id = UnitOfWork.EmployeeRepository.Insert(employee);
+
+        // Act
+        var result = UnitOfWork.EmployeeRepository
+            .GetByAccountId(accountId);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Id, Is.EqualTo(id));
+            Assert.That(result.AccountId, Is.EqualTo(accountId));
+        });
+    }
+
+
+    [Test]
+    public void GetByAccountId_WhenEmployeeDoesNotExist_ShouldReturnNull()
+    {
+        // Arrange
+        var accountId = CreateAccount();
+
+        // Act
+        var result = UnitOfWork.EmployeeRepository
+            .GetByAccountId(accountId);
+
+        // Assert
+        Assert.That(result, Is.Null);
+    }
+
+
+    [Test]
+    public void GetByAccountId_WhenEmployeeIsDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        var accountId = CreateAccount();
+        var employee = CreateValidEmployee(accountId);
+        var id = UnitOfWork.EmployeeRepository.Insert(employee);
+
+        UnitOfWork.EmployeeRepository.Delete(id);
+
+        // Act
+        var result = UnitOfWork.EmployeeRepository
+            .GetByAccountId(accountId);
+
+        // Assert
+        Assert.That(result, Is.Null);
+    }
+
+
+    [TestCase(0)]
+    [TestCase(-1)]
+    public void GetByAccountId_WhenIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
+        int accountId)
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            UnitOfWork.EmployeeRepository.GetByAccountId(accountId));
+    }
+
+
+    [Test]
+    public void GetSubordinates_ShouldReturnOnlyManagerEmployees()
+    {
+        // Arrange
+        var managerId = CreateEmployee();
+
+        var firstId = CreateEmployee(managerId);
+        var secondId = CreateEmployee(managerId);
+        var unrelatedId = CreateEmployee();
+
+        // Act
+        var results = UnitOfWork.EmployeeRepository
+            .GetSubordinates(managerId)
+            .ToList();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Any(e => e.Id == firstId), Is.True);
+            Assert.That(results.Any(e => e.Id == secondId), Is.True);
+            Assert.That(results.Any(e => e.Id == unrelatedId), Is.False);
+            Assert.That(results.All(e => e.ManagerEmployeeId == managerId), Is.True);
+        });
+    }
+
+
+    [Test]
+    public void GetSubordinates_WhenManagerHasNoEmployees_ShouldReturnEmpty()
+    {
+        // Arrange
+        var managerId = CreateEmployee();
+
+        // Act
+        var results = UnitOfWork.EmployeeRepository
+            .GetSubordinates(managerId);
+
+        // Assert
+        Assert.That(results, Is.Empty);
+    }
+
+
+    [Test]
+    public void GetSubordinates_WhenEmployeeIsDeleted_ShouldExcludeDeletedEmployee()
+    {
+        // Arrange
+        var managerId = CreateEmployee();
+
+        var activeId = CreateEmployee(managerId);
+        var deletedId = CreateEmployee(managerId);
+
+        UnitOfWork.EmployeeRepository.Delete(deletedId);
+
+        // Act
+        var results = UnitOfWork.EmployeeRepository
+            .GetSubordinates(managerId)
+            .ToList();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Any(e => e.Id == activeId), Is.True);
+            Assert.That(results.Any(e => e.Id == deletedId), Is.False);
+        });
+    }
+
+
+    [TestCase(0)]
+    [TestCase(-1)]
+    public void GetSubordinates_WhenManagerIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
+        int managerEmployeeId)
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            UnitOfWork.EmployeeRepository.GetSubordinates(managerEmployeeId));
+    }
+
+
+    [Test]
+    public void GetRoles_ShouldReturnAssignedRoles()
+    {
+        // Arrange
+        var employeeId = CreateEmployee();
+        var role = UnitOfWork.RoleRepository.GetByName("Cashier");
+
+        Assert.That(role, Is.Not.Null);
+
+        UnitOfWork.EmployeeRepository.AssignRole(new EmployeeRoleDTO
+        {
+            EmployeeId = employeeId,
+            RoleId = role!.Id
+        });
+
+        // Act
+        var results = UnitOfWork.EmployeeRepository
+            .GetRoles(employeeId)
+            .ToList();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Count, Is.EqualTo(1));
+            Assert.That(results[0].Id, Is.EqualTo(role.Id));
+            Assert.That(results[0].Name, Is.EqualTo(role.Name));
+        });
+    }
+
+
+    [Test]
+    public void GetRoles_WhenEmployeeHasNoRoles_ShouldReturnEmpty()
+    {
+        // Arrange
+        var employeeId = CreateEmployee();
+
+        // Act
+        var results = UnitOfWork.EmployeeRepository
+            .GetRoles(employeeId);
+
+        // Assert
+        Assert.That(results, Is.Empty);
+    }
+
+
+    [TestCase(0)]
+    [TestCase(-1)]
+    public void GetRoles_WhenEmployeeIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
+        int employeeId)
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            UnitOfWork.EmployeeRepository.GetRoles(employeeId));
+    }
+
+
+    [Test]
+    public void AssignRole_ShouldAssignRoleToEmployee()
+    {
+        // Arrange
+        var employeeId = CreateEmployee();
+        var role = UnitOfWork.RoleRepository.GetByName("Administrator");
+
+        Assert.That(role, Is.Not.Null);
+
+        var employeeRole = new EmployeeRoleDTO
+        {
+            EmployeeId = employeeId,
+            RoleId = role!.Id
+        };
+
+        // Act
+        UnitOfWork.EmployeeRepository.AssignRole(employeeRole);
+
+        var results = UnitOfWork.EmployeeRepository
+            .GetRoles(employeeId)
+            .ToList();
+
+        // Assert
+        Assert.That(results.Any(r => r.Id == role.Id), Is.True);
+    }
+
+
+    [Test]
+    public void AssignRole_WhenAlreadyAssigned_ShouldThrowSqlException()
+    {
+        // Arrange
+        var employeeId = CreateEmployee();
+        var role = UnitOfWork.RoleRepository.GetByName("Cashier");
+
+        Assert.That(role, Is.Not.Null);
+
+        var employeeRole = new EmployeeRoleDTO
+        {
+            EmployeeId = employeeId,
+            RoleId = role!.Id
+        };
+
+        UnitOfWork.EmployeeRepository.AssignRole(employeeRole);
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.AssignRole(employeeRole));
+    }
+
+
+    [Test]
+    public void AssignRole_WhenEmployeeDoesNotExist_ShouldThrowSqlException()
+    {
+        // Arrange
+        var role = UnitOfWork.RoleRepository.GetByName("Cashier");
+
+        Assert.That(role, Is.Not.Null);
+
+        var employeeRole = new EmployeeRoleDTO
+        {
+            EmployeeId = int.MaxValue,
+            RoleId = role!.Id
+        };
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.AssignRole(employeeRole));
+    }
+
+
+    [Test]
+    public void AssignRole_WhenRoleDoesNotExist_ShouldThrowSqlException()
+    {
+        // Arrange
+        var employeeId = CreateEmployee();
+
+        var employeeRole = new EmployeeRoleDTO
+        {
+            EmployeeId = employeeId,
+            RoleId = int.MaxValue
+        };
+
+        // Act & Assert
+        Assert.Throws<SqlException>(() =>
+            UnitOfWork.EmployeeRepository.AssignRole(employeeRole));
+    }
+
+
+    [Test]
+    public void AssignRole_WhenEmployeeRoleIsNull_ShouldThrowArgumentNullException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            UnitOfWork.EmployeeRepository.AssignRole(null!));
+    }
+
+
+    [TestCase(0, 1)]
+    [TestCase(-1, 1)]
+    [TestCase(1, 0)]
+    [TestCase(1, -1)]
+    public void AssignRole_WhenIdsAreInvalid_ShouldThrowArgumentOutOfRangeException(
+        int employeeId,
+        int roleId)
+    {
+        // Arrange
+        var employeeRole = new EmployeeRoleDTO
+        {
+            EmployeeId = employeeId,
+            RoleId = roleId
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            UnitOfWork.EmployeeRepository.AssignRole(employeeRole));
+    }
+
+
+    [Test]
+    public void UnassignRole_ShouldRemoveAssignedRole()
+    {
+        // Arrange
+        var employeeId = CreateEmployee();
+        var role = UnitOfWork.RoleRepository.GetByName("Cashier");
+
+        Assert.That(role, Is.Not.Null);
+
+        var employeeRole = new EmployeeRoleDTO
+        {
+            EmployeeId = employeeId,
+            RoleId = role!.Id
+        };
+
+        UnitOfWork.EmployeeRepository.AssignRole(employeeRole);
+
+        // Act
+        UnitOfWork.EmployeeRepository.UnassignRole(employeeRole);
+
+        var results = UnitOfWork.EmployeeRepository
+            .GetRoles(employeeId)
+            .ToList();
+
+        // Assert
+        Assert.That(results.Any(r => r.Id == role.Id), Is.False);
+    }
+
+
+    [Test]
+    public void UnassignRole_ShouldNotRemoveOtherRoles()
+    {
+        // Arrange
+        var employeeId = CreateEmployee();
+
+        var firstRole = UnitOfWork.RoleRepository.GetByName("Cashier");
+        var secondRole = UnitOfWork.RoleRepository.GetByName("Administrator");
+
+        Assert.That(firstRole, Is.Not.Null);
+        Assert.That(secondRole, Is.Not.Null);
+
+        var firstEmployeeRole = new EmployeeRoleDTO
+        {
+            EmployeeId = employeeId,
+            RoleId = firstRole!.Id
+        };
+
+        var secondEmployeeRole = new EmployeeRoleDTO
+        {
+            EmployeeId = employeeId,
+            RoleId = secondRole!.Id
+        };
+
+        UnitOfWork.EmployeeRepository.AssignRole(firstEmployeeRole);
+        UnitOfWork.EmployeeRepository.AssignRole(secondEmployeeRole);
+
+        // Act
+        UnitOfWork.EmployeeRepository.UnassignRole(firstEmployeeRole);
+
+        var results = UnitOfWork.EmployeeRepository
+            .GetRoles(employeeId)
+            .ToList();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Any(r => r.Id == firstRole.Id), Is.False);
+            Assert.That(results.Any(r => r.Id == secondRole.Id), Is.True);
+            Assert.That(results.Count, Is.EqualTo(1));
+        });
+    }
+
+
+    [Test]
+    public void UnassignRole_WhenRoleIsNotAssigned_ShouldNotThrow()
+    {
+        // Arrange
+        var employeeId = CreateEmployee();
+        var role = UnitOfWork.RoleRepository.GetByName("Cashier");
+
+        Assert.That(role, Is.Not.Null);
+
+        var employeeRole = new EmployeeRoleDTO
+        {
+            EmployeeId = employeeId,
+            RoleId = role!.Id
+        };
+
+        // Act & Assert
+        Assert.DoesNotThrow(() =>
+            UnitOfWork.EmployeeRepository.UnassignRole(employeeRole));
+    }
+
+
+    [Test]
+    public void UnassignRole_WhenEmployeeRoleIsNull_ShouldThrowArgumentNullException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            UnitOfWork.EmployeeRepository.UnassignRole(null!));
+    }
+
+
+    [TestCase(0, 1)]
+    [TestCase(-1, 1)]
+    [TestCase(1, 0)]
+    [TestCase(1, -1)]
+    public void UnassignRole_WhenIdsAreInvalid_ShouldThrowArgumentOutOfRangeException(
+        int employeeId,
+        int roleId)
+    {
+        // Arrange
+        var employeeRole = new EmployeeRoleDTO
+        {
+            EmployeeId = employeeId,
+            RoleId = roleId
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            UnitOfWork.EmployeeRepository.UnassignRole(employeeRole));
+    }
+}

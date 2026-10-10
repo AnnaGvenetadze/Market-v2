@@ -6,7 +6,8 @@ using System.Data.Common;
 
 namespace Market.Repositories;
 
-internal sealed class EmployeeRepository(DbConnection connection, Func<DbTransaction?> transaction) : BaseRepository<EmployeeDTO>(connection, transaction), IEmployeeRepository
+internal sealed class EmployeeRepository(DbConnection connection, Func<DbTransaction?> transaction)
+    : BaseRepository<EmployeeDTO>(connection, transaction), IEmployeeRepository
 {
     public EmployeeDTO? GetByAccountId(int accountId)
     {

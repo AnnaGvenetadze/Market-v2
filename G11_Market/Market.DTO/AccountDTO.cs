@@ -27,7 +27,7 @@ public sealed class AccountDTO
 
     [IgnoreOnInsert]
     [IgnoreOnUpdate]
-    public string? Token { get; set; }
+    public byte[]? Token { get; set; }
 
     [IgnoreOnInsert]
     [IgnoreOnUpdate]
