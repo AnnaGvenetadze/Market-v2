@@ -24,22 +24,32 @@ public class EmployeeService : IEmployeeService
             throw new ArgumentOutOfRangeException(nameof(employeeId));
         if (roleId <= 0)
             throw new ArgumentOutOfRangeException(nameof(roleId));
-
         var currentRoles = _unitOfWork.EmployeeRepository.GetRoles(employeeId);
-        foreach (var role in currentRoles)
+        _unitOfWork.BeginTransaction();
+        try
         {
-            _unitOfWork.EmployeeRepository.UnassignRole(new EmployeeRoleDTO
+            foreach (var role in currentRoles)
+            {
+                _unitOfWork.EmployeeRepository.UnassignRole(new EmployeeRoleDTO
+                {
+                    EmployeeId = employeeId,
+                    RoleId = role.Id
+                });
+            }
+            _unitOfWork.EmployeeRepository.AssignRole(new EmployeeRoleDTO
             {
                 EmployeeId = employeeId,
-                RoleId = role.Id
+                RoleId = roleId
             });
-        }
+            _unitOfWork.Commit();
 
-        _unitOfWork.EmployeeRepository.AssignRole(new EmployeeRoleDTO
+        }
+        catch
         {
-            EmployeeId = employeeId,
-            RoleId = roleId
-        });
+            _unitOfWork.Rollback();
+            throw;
+
+        }
     }
 
     public EmployeeDTO CreateEmployee(CreateEmployeeDTO dto)
