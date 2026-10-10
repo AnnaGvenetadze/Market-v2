@@ -120,6 +120,18 @@ internal sealed class AccountRepository(DbConnection connection, Func<DbTransact
         return roles.ToList();
     }
 
+    public async Task<IReadOnlyList<RoleDTO>> GetRolesByRefreshTokenAsync(RefreshTokenDTO refreshToken, CancellationToken cancellationToken = default)
+    {
+        if (refreshToken is null)
+            throw new ArgumentNullException(nameof(refreshToken));
+        if (refreshToken.AccountId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(refreshToken.AccountId));
+        var account = GetById(refreshToken.AccountId);
+        if (account is null)
+            throw new InvalidOperationException($"Account with ID {refreshToken.AccountId} not found.");
+        return await GetRolesByAccountIdAsync(refreshToken.AccountId, cancellationToken);
+    }
+
     public void ResetPassword(int accountId, string newPasswordHash)
     {
         if (accountId <= 0)

@@ -925,4 +925,88 @@ public class AccountRepositoryTests : BaseRepositoryTests
                 int.MaxValue,
                 "NewHashedPassword123!"));
     }
+
+    [Test]
+    public async Task GetRolesByRefreshTokenAsync_ShouldReturnAssignedRoles()
+    {
+        // Arrange
+        var account = CreateValidAccount();
+        var accountId = UnitOfWork.AccountRepository.Insert(account);
+
+        var role = UnitOfWork.RoleRepository.GetByName("Administrator");
+        Assert.That(role, Is.Not.Null);
+
+        var employee = new EmployeeDTO
+        {
+            AccountId = accountId,
+            FirstName = "Jane",
+            LastName = "Doe",
+            EmployeeCode = "EMP".AddGuid(),
+            Email = $"u_{Guid.NewGuid():N}@test.com",
+            PhoneNumber = "555987654",
+            HireDate = DateTime.UtcNow.Date
+        };
+
+        var employeeId = UnitOfWork.EmployeeRepository.Insert(employee);
+
+        UnitOfWork.EmployeeRepository.AssignRole(new EmployeeRoleDTO
+        {
+            EmployeeId = employeeId,
+            RoleId = role!.Id
+        });
+
+        var refreshToken = new RefreshTokenDTO
+        {
+            AccountId = accountId
+        };
+
+        // Act
+        var result = await UnitOfWork.AccountRepository
+            .GetRolesByRefreshTokenAsync(refreshToken);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result.Any(r => r.Id == role.Id), Is.True);
+        });
+    }
+
+    [Test]
+    public void GetRolesByRefreshTokenAsync_WhenRefreshTokenIsNull_ShouldThrowArgumentNullException()
+    {
+        // Act And Assert
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await UnitOfWork.AccountRepository.GetRolesByRefreshTokenAsync(null!));
+    }
+
+    [TestCase(0)]
+    [TestCase(-1)]
+    public void GetRolesByRefreshTokenAsync_WhenAccountIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
+        int accountId)
+    {
+        // Arrange
+        var refreshToken = new RefreshTokenDTO
+        {
+            AccountId = accountId
+        };
+
+        // Act And Assert
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
+            await UnitOfWork.AccountRepository.GetRolesByRefreshTokenAsync(refreshToken));
+    }
+
+    [Test]
+    public void GetRolesByRefreshTokenAsync_WhenAccountDoesNotExist_ShouldThrowInvalidOperationException()
+    {
+        // Arrange
+        var refreshToken = new RefreshTokenDTO
+        {
+            AccountId = int.MaxValue
+        };
+
+        // Act And Assert
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await UnitOfWork.AccountRepository.GetRolesByRefreshTokenAsync(refreshToken));
+    }
 }

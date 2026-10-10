@@ -48,7 +48,6 @@ public class EmployeeService : IEmployeeService
         {
             _unitOfWork.Rollback();
             throw;
-
         }
     }
 
