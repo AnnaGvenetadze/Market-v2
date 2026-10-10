@@ -23,7 +23,13 @@ public sealed class AccountDTO
     public DateTime? LastLoginAtUtc { get; set; }
     public int FailedLoginAttempts { get; set; }
     public DateTime? LockoutEndUtc { get; set; }
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
+
+    [IgnoreOnInsert]
+    [IgnoreOnUpdate]
     public string? Token { get; set; }
+
+    [IgnoreOnInsert]
+    [IgnoreOnUpdate]
     public DateTime? TokenExpiration { get; set; }
 }

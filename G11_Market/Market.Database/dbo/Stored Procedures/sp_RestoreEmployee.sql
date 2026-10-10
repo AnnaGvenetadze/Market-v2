@@ -3,11 +3,21 @@
 AS
 BEGIN
     SET NOCOUNT ON;
-    UPDATE dbo.Employees
-    SET IsDeleted = 0, UpdateDate = GETUTCDATE()
-    WHERE Id = @Id AND IsDeleted = 1;
+    
+    IF @Id IS NULL 
+        THROW 50035, 'Employee ID is required.', 1;
 
-    IF @@ROWCOUNT = 0
-        RAISERROR('Employee with Id %d was not found or is not deleted.', 16, 1, @Id);
+    DECLARE @AccountId INT;
+    SELECT @AccountId = AccountId FROM dbo.Employees WHERE Id = @Id;
+
+    IF @AccountId IS NULL 
+        THROW 50036, 'Employee not found.', 1;
+
+    UPDATE dbo.Employees 
+    SET IsDeleted = 0, UpdateDate = GETUTCDATE() 
+    WHERE Id = @Id;
+
+    UPDATE dbo.Accounts 
+    SET IsDeleted = 0, UpdateDate = GETUTCDATE() 
+    WHERE Id = @AccountId;
 END;
-GO

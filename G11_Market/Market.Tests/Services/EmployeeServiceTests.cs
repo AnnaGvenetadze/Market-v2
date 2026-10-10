@@ -1,6 +1,7 @@
 ﻿using Market.DTO;
-using Market.Services.Interfaces.Services;
+using Market.Services;
 using Market.Tests.Helpers;
+using Microsoft.Data.SqlClient;
 using NUnit.Framework;
 using Serilog;
 
@@ -10,7 +11,7 @@ namespace Market.Tests;
 public class EmployeeServiceTests : BaseRepositoryTests
 {
     private EmployeeService _employeeService = null!;
-    private const int DefaultRoleId = 1; // Assumes seeded or existing valid role ID in test DB
+    private const int DefaultRoleId = 1;
 
     [SetUp]
     public void SetUp()
@@ -25,10 +26,9 @@ public class EmployeeServiceTests : BaseRepositoryTests
         LastName = "Last_".AddGuid(),
         Username = $"user_{Guid.NewGuid()}@market.com",
         Password = "Password123!",
+        PhoneNumber = $"555-{Random.Shared.Next(1000, 9999)}",
         RoleId = roleId
     };
-
-    #region Constructor Tests
 
     [Test]
     public void Constructor_NullUnitOfWork_ShouldThrowArgumentNullException()
@@ -42,10 +42,6 @@ public class EmployeeServiceTests : BaseRepositoryTests
     {
         Assert.Throws<ArgumentNullException>(() => new EmployeeService(UnitOfWork, null!));
     }
-
-    #endregion
-
-    #region CreateEmployee Tests
 
     [Test]
     public void CreateEmployee_ValidDto_ShouldCreateEmployeeAndAccountAndAssignRole()
@@ -78,7 +74,7 @@ public class EmployeeServiceTests : BaseRepositoryTests
         var dto = CreateValidEmployeeDto();
         dto.FirstName = invalidName!;
 
-        Assert.Throws<ArgumentException>(() => _employeeService.CreateEmployee(dto));
+        Assert.Catch<ArgumentException>(() => _employeeService.CreateEmployee(dto));
     }
 
     [TestCase(null)]
@@ -89,7 +85,18 @@ public class EmployeeServiceTests : BaseRepositoryTests
         var dto = CreateValidEmployeeDto();
         dto.LastName = invalidName!;
 
-        Assert.Throws<ArgumentException>(() => _employeeService.CreateEmployee(dto));
+        Assert.Catch<ArgumentException>(() => _employeeService.CreateEmployee(dto));
+    }
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("   ")]
+    public void CreateEmployee_InvalidPhoneNumber_ShouldThrowArgumentException(string? invalidPhone)
+    {
+        var dto = CreateValidEmployeeDto();
+        dto.PhoneNumber = invalidPhone!;
+
+        Assert.Catch<ArgumentException>(() => _employeeService.CreateEmployee(dto));
     }
 
     [TestCase(0)]
@@ -100,10 +107,6 @@ public class EmployeeServiceTests : BaseRepositoryTests
 
         Assert.Throws<ArgumentOutOfRangeException>(() => _employeeService.CreateEmployee(dto));
     }
-
-    #endregion
-
-    #region GetById & GetAll Tests
 
     [Test]
     public void GetById_WhenExists_ShouldReturnEmployee()
@@ -145,10 +148,6 @@ public class EmployeeServiceTests : BaseRepositoryTests
         Assert.That(allEmployees.Any(e => e.Id == created.Id), Is.True);
     }
 
-    #endregion
-
-    #region ChangeRole Tests
-
     [Test]
     public void ChangeRole_ValidInput_ShouldReassignRole()
     {
@@ -162,6 +161,12 @@ public class EmployeeServiceTests : BaseRepositoryTests
         Assert.That(roles.First().Id, Is.EqualTo(newRoleId));
     }
 
+    [Test]
+    public void ChangeRole_NonExistingEmployee_ShouldThrowSqlException()
+    {
+        Assert.Throws<SqlException>(() => _employeeService.ChangeRole(int.MaxValue, 1));
+    }
+
     [TestCase(0, 1)]
     [TestCase(-1, 1)]
     [TestCase(1, 0)]
@@ -170,10 +175,6 @@ public class EmployeeServiceTests : BaseRepositoryTests
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => _employeeService.ChangeRole(employeeId, roleId));
     }
-
-    #endregion
-
-    #region Deactivate & Reactivate Tests
 
     [Test]
     public void DeactivateEmployee_ValidId_ShouldSoftDeleteEmployeeAndAccount()
@@ -190,7 +191,7 @@ public class EmployeeServiceTests : BaseRepositoryTests
     }
 
     [Test]
-    public void DeactivateEmployee_NonExistingEmployee_ShouldThrowKeyNotFoundException()
+    public void DeactivateEmployee_NonExistingEmployee_ShouldThrowSqlException()
     {
         Assert.Throws<KeyNotFoundException>(() => _employeeService.DeactivateEmployee(int.MaxValue));
     }
@@ -232,10 +233,6 @@ public class EmployeeServiceTests : BaseRepositoryTests
         Assert.Throws<ArgumentOutOfRangeException>(() => _employeeService.ReactivateEmployee(invalidId));
     }
 
-    #endregion
-
-    #region ResetPassword Tests
-
     [Test]
     public void ResetPassword_ValidInput_ShouldUpdateAccountPasswordHash()
     {
@@ -262,7 +259,7 @@ public class EmployeeServiceTests : BaseRepositoryTests
     {
         var created = _employeeService.CreateEmployee(CreateValidEmployeeDto());
 
-        Assert.Throws<ArgumentException>(() => _employeeService.ResetPassword(created.Id, invalidPassword!));
+        Assert.Catch<ArgumentException>(() => _employeeService.ResetPassword(created.Id, invalidPassword!));
     }
 
     [TestCase(0)]
@@ -271,10 +268,6 @@ public class EmployeeServiceTests : BaseRepositoryTests
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => _employeeService.ResetPassword(invalidId, "ValidPass123!"));
     }
-
-    #endregion
-
-    #region UpdateEmployee Tests
 
     [Test]
     public void UpdateEmployee_ValidData_ShouldModifyEmployee()
@@ -297,6 +290,36 @@ public class EmployeeServiceTests : BaseRepositoryTests
         Assert.Throws<ArgumentNullException>(() => _employeeService.UpdateEmployee(null!));
     }
 
+    [TestCase(0)]
+    [TestCase(-1)]
+    public void UpdateEmployee_InvalidId_ShouldThrowArgumentOutOfRangeException(int invalidId)
+    {
+        var dto = new EmployeeDTO { Id = invalidId, FirstName = "John", LastName = "Doe" };
+        Assert.Throws<ArgumentOutOfRangeException>(() => _employeeService.UpdateEmployee(dto));
+    }
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("   ")]
+    public void UpdateEmployee_InvalidFirstName_ShouldThrowArgumentException(string? invalidName)
+    {
+        var created = _employeeService.CreateEmployee(CreateValidEmployeeDto());
+        created.FirstName = invalidName!;
+
+        Assert.Catch<ArgumentException>(() => _employeeService.UpdateEmployee(created));
+    }
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("   ")]
+    public void UpdateEmployee_InvalidLastName_ShouldThrowArgumentException(string? invalidName)
+    {
+        var created = _employeeService.CreateEmployee(CreateValidEmployeeDto());
+        created.LastName = invalidName!;
+
+        Assert.Catch<ArgumentException>(() => _employeeService.UpdateEmployee(created));
+    }
+
     [Test]
     public void UpdateEmployee_NonExistingEmployee_ShouldThrowKeyNotFoundException()
     {
@@ -309,10 +332,6 @@ public class EmployeeServiceTests : BaseRepositoryTests
 
         Assert.Throws<KeyNotFoundException>(() => _employeeService.UpdateEmployee(dto));
     }
-
-    #endregion
-
-    #region UpdateAccount Tests
 
     [Test]
     public void UpdateAccount_ValidData_ShouldModifyAccount()
@@ -334,6 +353,14 @@ public class EmployeeServiceTests : BaseRepositoryTests
         Assert.Throws<ArgumentNullException>(() => _employeeService.UpdateAccount(null!));
     }
 
+    [TestCase(0)]
+    [TestCase(-1)]
+    public void UpdateAccount_InvalidId_ShouldThrowArgumentOutOfRangeException(int invalidId)
+    {
+        var dto = new AccountDTO { Id = invalidId };
+        Assert.Throws<ArgumentOutOfRangeException>(() => _employeeService.UpdateAccount(dto));
+    }
+
     [Test]
     public void UpdateAccount_NonExistingAccount_ShouldThrowKeyNotFoundException()
     {
@@ -344,6 +371,4 @@ public class EmployeeServiceTests : BaseRepositoryTests
 
         Assert.Throws<KeyNotFoundException>(() => _employeeService.UpdateAccount(dto));
     }
-
-    #endregion
 }

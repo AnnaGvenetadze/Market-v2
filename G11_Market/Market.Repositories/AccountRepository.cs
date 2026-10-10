@@ -127,7 +127,7 @@ internal sealed class AccountRepository(DbConnection connection, Func<DbTransact
             new
             {
                 AccountId = accountId,
-                PasswordHash = newPasswordHash
+                NewPasswordHash = newPasswordHash
             },
             transaction: _transaction(),
             commandType: CommandType.StoredProcedure);

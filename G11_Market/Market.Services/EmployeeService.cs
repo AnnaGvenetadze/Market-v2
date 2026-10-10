@@ -1,8 +1,9 @@
 ﻿using Market.DTO;
 using Market.Extensions;
+using Market.Services.Interfaces;
 using Serilog;
 
-namespace Market.Services.Interfaces.Services;
+namespace Market.Services;
 
 public class EmployeeService : IEmployeeService
 {
@@ -43,12 +44,14 @@ public class EmployeeService : IEmployeeService
 
     public EmployeeDTO CreateEmployee(CreateEmployeeDTO dto)
     {
-        PasswordHasher.HashPassword(dto.Password);
         ArgumentNullException.ThrowIfNull(dto);
+        PasswordHasher.HashPassword(dto.Password);
+
         ArgumentException.ThrowIfNullOrWhiteSpace(dto.FirstName);
         ArgumentException.ThrowIfNullOrWhiteSpace(dto.LastName);
         ArgumentException.ThrowIfNullOrWhiteSpace(dto.Username);
         ArgumentException.ThrowIfNullOrWhiteSpace(dto.Password);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dto.PhoneNumber);
         string hashedPassword = PasswordHasher.HashPassword(dto.Password);
         if (dto.RoleId <= 0)
             throw new ArgumentOutOfRangeException(nameof(dto.RoleId));
@@ -72,7 +75,7 @@ public class EmployeeService : IEmployeeService
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
                 Email = dto.Username,
-                PhoneNumber = string.Empty
+                PhoneNumber = dto.PhoneNumber
             };
 
             int employeeId = _unitOfWork.EmployeeRepository.Insert(employeeDto);
@@ -132,12 +135,13 @@ public class EmployeeService : IEmployeeService
         _unitOfWork.BeginTransaction();
         try
         {
-            var employee = _unitOfWork.EmployeeRepository.GetById(employeeId);
-            if (employee == null)
-                throw new KeyNotFoundException($"Employee with ID {employeeId} was not found.");
             _unitOfWork.EmployeeRepository.Restore(employeeId);
-            _unitOfWork.AccountRepository.Restore(employee.AccountId);
             _unitOfWork.Commit();
+        }
+        catch (Exception)
+        {
+            _unitOfWork.Rollback();
+            throw new KeyNotFoundException($"Employee with ID {employeeId} was not found.");
         }
         catch
         {
