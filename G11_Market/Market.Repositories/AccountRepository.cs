@@ -132,13 +132,20 @@ internal sealed class AccountRepository(DbConnection connection, Func<DbTransact
         return await GetRolesByAccountIdAsync(refreshToken.AccountId, cancellationToken);
     }
 
-    public async Task<bool> HasRoleAsync(IReadOnlyList<RoleDTO> roles, string roleName, CancellationToken cancellationToken = default)
+    private async Task<bool> FindRoleAsync(IReadOnlyList<RoleDTO> roles, string roleName, CancellationToken cancellationToken = default)
     {
         if (roles == null) throw new ArgumentNullException(nameof(roles));
         if (string.IsNullOrWhiteSpace(roleName)) throw new ArgumentException("Role name cannot be null or empty.", nameof(roleName));
         bool hasRole = roles.Any(r => r.Name.Equals(roleName, StringComparison.OrdinalIgnoreCase));
         return await Task.FromResult(hasRole);
     }
+
+    public async Task<bool> HasRoleAsync(int accountId, string roleName, CancellationToken cancellationToken = default)
+    {
+        var roles = await GetRolesByAccountIdAsync(accountId, cancellationToken);
+        return await FindRoleAsync(roles, roleName, cancellationToken);
+    }
+
 
     public void ResetPassword(int accountId, string newPasswordHash)
     {

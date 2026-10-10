@@ -1011,17 +1011,36 @@ public class AccountRepositoryTests : BaseRepositoryTests
     }
 
     [Test]
-    public async Task HasRoleAsync_WhenRoleExists_ShouldReturnTrue()
+    public async Task HasRoleAsync_WhenAccountHasRole_ShouldReturnTrue()
     {
         // Arrange
-        var roles = new List<RoleDTO>
+        var account = CreateValidAccount();
+        var accountId = UnitOfWork.AccountRepository.Insert(account);
+
+        var role = UnitOfWork.RoleRepository.GetByName("Administrator");
+        Assert.That(role, Is.Not.Null);
+
+        var employee = new EmployeeDTO
         {
-            new() { Id = 1, Name = "Administrator" },
-            new() { Id = 2, Name = "User" }
+            AccountId = accountId,
+            FirstName = "John",
+            LastName = "Doe",
+            EmployeeCode = "EMP".AddGuid(),
+            Email = $"u_{Guid.NewGuid():N}@test.com",
+            PhoneNumber = "555123456",
+            HireDate = DateTime.UtcNow.Date
         };
 
-        // Act
-        var result = await UnitOfWork.AccountRepository.HasRoleAsync(roles, "administrator");
+        var employeeId = UnitOfWork.EmployeeRepository.Insert(employee);
+
+        UnitOfWork.EmployeeRepository.AssignRole(new EmployeeRoleDTO
+        {
+            EmployeeId = employeeId,
+            RoleId = role!.Id
+        });
+
+        // Act - testing case-insensitivity as well ("administrator" vs "Administrator")
+        var result = await UnitOfWork.AccountRepository.HasRoleAsync(accountId, "administrator");
 
         // Assert
         Assert.That(result, Is.True);
@@ -1029,44 +1048,43 @@ public class AccountRepositoryTests : BaseRepositoryTests
 
 
     [Test]
-    public async Task HasRoleAsync_WhenRoleDoesNotExist_ShouldReturnFalse()
+    public async Task HasRoleAsync_WhenAccountDoesNotHaveRole_ShouldReturnFalse()
     {
         // Arrange
-        var roles = new List<RoleDTO>
-        {
-            new() { Id = 1, Name = "User" }
-        };
+        var account = CreateValidAccount();
+        var accountId = UnitOfWork.AccountRepository.Insert(account);
 
         // Act
-        var result = await UnitOfWork.AccountRepository.HasRoleAsync(roles, "Administrator");
+        var result = await UnitOfWork.AccountRepository.HasRoleAsync(accountId, "Administrator");
 
         // Assert
         Assert.That(result, Is.False);
     }
 
 
-    [Test]
-    public void HasRoleAsync_WhenRolesIsNull_ShouldThrowArgumentNullException()
+    [TestCase(0)]
+    [TestCase(-1)]
+    public void HasRoleAsync_WhenAccountIdIsInvalid_ShouldThrowArgumentOutOfRangeException(
+        int accountId)
     {
         // Act & Assert
-        Assert.ThrowsAsync<ArgumentNullException>(async () =>
-            await UnitOfWork.AccountRepository.HasRoleAsync(null!, "Administrator"));
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
+            await UnitOfWork.AccountRepository.HasRoleAsync(accountId, "Administrator"));
     }
 
 
     [TestCase(null)]
     [TestCase("")]
     [TestCase("   ")]
-    public void HasRoleAsync_WhenRoleNameIsInvalid_ShouldThrowArgumentException(string? roleName)
+    public async Task HasRoleAsync_WhenRoleNameIsInvalid_ShouldThrowArgumentException(
+        string? roleName)
     {
         // Arrange
-        var roles = new List<RoleDTO>
-        {
-            new() { Id = 1, Name = "User" }
-        };
+        var account = CreateValidAccount();
+        var accountId = UnitOfWork.AccountRepository.Insert(account);
 
         // Act & Assert
         Assert.ThrowsAsync<ArgumentException>(async () =>
-            await UnitOfWork.AccountRepository.HasRoleAsync(roles, roleName!));
+            await UnitOfWork.AccountRepository.HasRoleAsync(accountId, roleName!));
     }
 }

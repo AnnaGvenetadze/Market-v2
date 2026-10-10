@@ -15,5 +15,5 @@ public interface IAccountRepository : IBaseRepository<AccountDTO>
     public Task RefreshTokenAsync(int accountId, byte[] tokenHash, DateTime expiredAt, CancellationToken cancellationToken = default);
     public void ResetPassword(int accountId, string newPasswordHash);
     Task<IReadOnlyList<RoleDTO>> GetRolesByRefreshTokenAsync(RefreshTokenDTO refreshToken, CancellationToken cancellationToken = default);
-    Task<bool> HasRoleAsync(IReadOnlyList<RoleDTO> roles, string roleName, CancellationToken cancellationToken = default);
+    Task<bool> HasRoleAsync(int accountId, string roleName, CancellationToken cancellationToken = default);
 }
