@@ -1,11 +1,11 @@
 ﻿using Market.DTO;
 using Market.Extensions;
-using Market.Services;
 using Market.Services.Interfaces;
 using Market.Services.Interfaces.Services;
 
+namespace Market.Services;
 
-public class AuthService
+public class AuthService : IAuthService
 {
 
     private const int MaxFailedAttempts = 5;
