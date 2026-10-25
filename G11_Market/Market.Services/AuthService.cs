@@ -7,7 +7,6 @@ namespace Market.Services;
 
 public class AuthService : IAuthService
 {
-
     private const int MaxFailedAttempts = 5;
     private static readonly TimeSpan LockoutDuration =
         TimeSpan.FromMinutes(15);
