@@ -1,6 +1,7 @@
 ﻿using Market.DTO;
 using Market.Extensions;
 using Market.Services.Interfaces;
+using Market.Services.Interfaces.Services;
 using Serilog;
 
 namespace Market.Services;

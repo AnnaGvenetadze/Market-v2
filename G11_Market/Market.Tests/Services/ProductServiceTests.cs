@@ -3,7 +3,7 @@ using Market.DTO;
 using Market.Tests.Helpers;
 using Microsoft.Data.SqlClient;
 
-namespace Market.Tests;
+namespace Market.Tests.Services;
 
 public sealed class ProductRepositoryTests : BaseRepositoryTests
 {

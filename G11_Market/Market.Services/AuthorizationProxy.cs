@@ -11,7 +11,7 @@ namespace Market.Services;
 // AuthorizationService ამოწმებს მომხმარებლის უფლებებს CurrentUserContext-ით.
 // წარმატებული ავტორიზაციის შემდეგ Proxy მეთოდს იძახებს რეალურ სერვისზე.
 // ProductService proxyService =
-//  AuthorizationProxy<IProductService>.Wrap(someRealService, authorizationService);
+///  AuthorizationProxy<IProductService>.Wrap(someRealService, authorizationService);
 public class AuthorizationProxy<T> : DispatchProxy where T : class
 {
     private T? _target; // რომელ რეალურ სერვისს უნდა გადასცეს გამოძახება

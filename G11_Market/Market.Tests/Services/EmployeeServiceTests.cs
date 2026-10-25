@@ -2,10 +2,9 @@
 using Market.Services;
 using Market.Tests.Helpers;
 using Microsoft.Data.SqlClient;
-using NUnit.Framework;
 using Serilog;
 
-namespace Market.Tests;
+namespace Market.Tests.Services;
 
 [TestFixture]
 public class EmployeeServiceTests : BaseRepositoryTests
