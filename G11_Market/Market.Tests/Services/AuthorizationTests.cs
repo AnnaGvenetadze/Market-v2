@@ -41,6 +41,49 @@ public class AuthorizationTests
             authorizationService);
     }
 
+    [Test]
+    public void GetById_WithoutAttribute_WhenNotAuthenticated_ShouldThrow()
+    {
+        var unitOfWork = new Mock<IUnitOfWork>();
+
+        var service = CreateProxy(
+            false,
+            false,
+            unitOfWork.Object);
+
+        Assert.Throws<UnauthorizedAccessException>(() =>
+            service.GetById(1));
+
+        unitOfWork.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public void GetById_WithoutAttribute_WhenAuthenticated_ShouldExecute()
+    {
+        var employeeRepository = new Mock<IEmployeeRepository>();
+        var unitOfWork = new Mock<IUnitOfWork>();
+
+        employeeRepository
+            .Setup(x => x.GetById(1))
+            .Returns(new EmployeeDTO { Id = 1 });
+
+        unitOfWork
+            .SetupGet(x => x.EmployeeRepository)
+            .Returns(employeeRepository.Object);
+
+        var service = CreateProxy(
+            true,
+            false,
+            unitOfWork.Object);
+
+        Assert.DoesNotThrow(() => service.GetById(1));
+
+        employeeRepository.Verify(
+            x => x.GetById(1),
+            Times.Once);
+    }
+
+
     [TestCase(false, false)]
     [TestCase(true, false)]
     public void CreateEmployee_WithoutPermission_ShouldThrow(

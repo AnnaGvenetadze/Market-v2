@@ -44,14 +44,20 @@ public class AuthorizationProxy<T> : DispatchProxy where T : class
         if (targetMethod.DeclaringType != typeof(object))
         {
             var attribute = targetMethod.GetCustomAttribute<RequireRoleAttribute>();
+            string methodName = targetMethod.Name;
 
-            if (attribute == null)
-                throw new InvalidOperationException(
-                    $"Authorization policy isn't defined for {targetMethod.Name}.");
-
-            _authorizationService.RequireAnyRole(
-                $"{typeof(T).Name}.{targetMethod.Name}", attribute.Roles);
-            // მაგ. "IEmployeeService.ChangeRole", [Role.Cashier] -> UnauthorizedAccessException
+            if (attribute != null)
+            {
+                _authorizationService.RequireAnyRole(
+                $"{typeof(T).Name}.{methodName}", attribute.Roles);
+                // მაგ. "IEmployeeService.ChangeRole", [Role.Cashier] -> UnauthorizedAccessExcepti
+            }
+            else // არაავთენთიფიცირებულს არ გაეხსნება უატრიბუტო მეთოდი
+            {
+                _authorizationService.ThrowIfNotAuthenticated(methodName);
+            }
+            // ავტორიზაცია მაგ. AuthService-ს არ უნდა და ასეთი არც გაივლის AuthorizationService-ში
+            // რადგან პროქსის Wrap()-ს არ გადავცემ
         }
 
         try
