@@ -5,7 +5,7 @@ using Serilog;
 
 namespace Market.Services;
 
-public /*internal sealed*/ class SaleService : ISaleService
+public /*internal sealed*/ class SaleService /*: ISaleService*/
 {
     private readonly ILogger _logger;
     private readonly IUnitOfWork _unitOfWork;
