@@ -58,29 +58,51 @@ public class AuthorizationTests
     }
 
     [Test]
-    public void GetById_WithoutAttribute_WhenAuthenticated_ShouldExecute()
+    public void GetProductById_WithoutAttribute_WhenAuthenticated_ShouldExecute()
     {
-        var employeeRepository = new Mock<IEmployeeRepository>();
+        var userContext = new Mock<ICurrentUserContext>();
+        var productRepository = new Mock<IProductRepository>();
         var unitOfWork = new Mock<IUnitOfWork>();
 
-        employeeRepository
+        userContext
+            .Setup(x => x.IsAuthenticated)
+            .Returns(true);
+
+        var product = new ProductDTO { Id = 1 };
+
+        productRepository
             .Setup(x => x.GetById(1))
-            .Returns(new EmployeeDTO { Id = 1 });
+            .Returns(product);
 
         unitOfWork
-            .SetupGet(x => x.EmployeeRepository)
-            .Returns(employeeRepository.Object);
+            .SetupGet(x => x.ProductRepository)
+            .Returns(productRepository.Object);
 
-        var service = CreateProxy(
-            true,
-            false,
-            unitOfWork.Object);
+        using var logger = new LoggerConfiguration().CreateLogger();
 
-        Assert.DoesNotThrow(() => service.GetById(1));
+        var authorizationService = new AuthorizationService(
+            userContext.Object,
+            logger);
 
-        employeeRepository.Verify(
+        var productService = new ProductService(
+            unitOfWork.Object,
+            logger);
+
+        var service = AuthorizationProxy<IProductService>.Wrap(
+            productService,
+            authorizationService);
+
+        var result = service.GetProductById(1);
+
+        Assert.That(result, Is.SameAs(product));
+
+        productRepository.Verify(
             x => x.GetById(1),
             Times.Once);
+
+        userContext.Verify(
+            x => x.HasRole(It.IsAny<Role>()),
+            Times.Never);
     }
 
     [Test]
