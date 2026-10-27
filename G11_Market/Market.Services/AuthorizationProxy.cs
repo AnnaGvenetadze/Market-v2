@@ -1,40 +1,42 @@
 ﻿using Market.Services.Attributes;
+using Market.Services.Enums;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 
 namespace Market.Services;
-// asp.net-ში Authorization Middleware-ის მაგივრად ვინფორმსში პროქსი კლასებია.
-// AuthorizationProxy<T> ფუთავს რეალურ ბიზნესსერვისს (_target).
-// T არის სერვისის ინტერფეისი (მაგ. IEmployeeService).
-// ყოველი მეთოდის გამოძახებისას Proxy კითხულობს [RequireRole] ატრიბუტს
-// და AuthorizationService-ს გადასცემს საჭირო როლებს შესამოწმებლად.
-// AuthorizationService ამოწმებს მომხმარებლის უფლებებს CurrentUserContext-ით.
-// წარმატებული ავტორიზაციის შემდეგ Proxy მეთოდს იძახებს რეალურ სერვისზე.
-// ProductService proxyService =
-///  AuthorizationProxy<IProductService>.Wrap(someRealService, authorizationService);
+// asp.net-ში Authorization Middleware-ის მაგივრად ვინფორმსში პროქსი კლასია.
+// AuthorizationProxy<T> ფუთავს რეალურ ბიზნესსერვისს (მაგ. EmployeeService)
+
+/// IEmployeeService proxyService =
+///  AuthorizationProxy<IEmployeeService>.Wrap(employeeService, authorizationService);
 public class AuthorizationProxy<T> : DispatchProxy where T : class
 {
     private T? _target; // რომელ რეალურ სერვისს უნდა გადასცეს გამოძახება
     private AuthorizationService? _authorizationService; // ვის უნდა გადაამოწმებინოს მომხმარებლის როლები
 
-
+    // სამიზნე სერვისი და შუალედური სერვისი იფუთება პროქსი ობიექტად.
+    // სანამ სერვისის რეალურ მეთოდს გამოიძახებს აიძულებს ჯერ სხვა ადგილას შევიდეს
     public static T Wrap(T target, AuthorizationService authorizationService)
     {
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(authorizationService);
         if (!typeof(T).IsInterface)
             throw new ArgumentException("T must be an interface.");
+        // რანთაიმზე შექმნის შესაბამის პროქსი ობიექტს
+        var serviceProxy = DispatchProxy.Create<T, AuthorizationProxy<T>>();
+        var authorizationProxy = (AuthorizationProxy<T>)(object)serviceProxy;
 
-        var proxy = DispatchProxy.Create<T, AuthorizationProxy<T>>();
-        var authorizationProxy = (AuthorizationProxy<T>)(object)proxy;
-        
         authorizationProxy._target = target;
         authorizationProxy._authorizationService = authorizationService;
 
-        return proxy;
+        return serviceProxy;
     }
 
 
+    // სამიზნე მეთოდს ყოველი გამოძახებისას Proxy კითხულობს [RequireRole] ატრიბუტს
+    // და AuthorizationService-ს გადასცემს საჭირო როლებს შესამოწმებლად.
+    // გამოიძახებს ბილთინ Invoke()-ს რეალური მეთოდის გამოძახებისთვის.
     protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
     {
         ArgumentNullException.ThrowIfNull(targetMethod);
@@ -43,40 +45,62 @@ public class AuthorizationProxy<T> : DispatchProxy where T : class
 
         if (targetMethod.DeclaringType != typeof(object))
         {
-            var attribute = targetMethod.GetCustomAttribute<RequireRoleAttribute>();
             string methodName = targetMethod.Name;
+            // მეთოდის მეტამონაცემების (მაგ. IEmployeeService.ChangeRole(string))
+            // მიხედვით ვამოწმებთ ქეშს. თუ ჩანაწერი არ არსებობს,
+            // ვკითხულობთ ატრიბუტს და ვინახავთ საჭირო როლებს.
+            Role[] roles =
+                AuthorizationAttributeCache.Roles.GetOrAdd(targetMethod, GetRequiredRoles);
 
-            if (attribute != null)
+            if (roles.Length > 0)
             {
                 _authorizationService.RequireAnyRole(
-                $"{typeof(T).Name}.{methodName}", attribute.Roles);
+                $"{typeof(T).Name}.{methodName}", roles);
                 // მაგ. "IEmployeeService.ChangeRole", [Role.Cashier] -> UnauthorizedAccessExcepti
             }
             else // არაავთენთიფიცირებულს არ გაეხსნება უატრიბუტო მეთოდი
             {
                 _authorizationService.ThrowIfNotAuthenticated(methodName);
             }
-            // ავტორიზაცია მაგ. AuthService-ს არ უნდა და ასეთი არც გაივლის AuthorizationService-ში
+            // უატრიბუტო მეთოდი გაეხსენება ნებისმიერი როლის ავთენთიფიცირებულ
+            // მომხმარებელს, Invoke()-ით გამოიძახება ისიც.
+
+            // AuthService-ს არ უნდა და მსგავსი სერვისი არც გაივლის AuthorizationService-ში
             // რადგან პროქსის Wrap()-ს არ გადავცემ
         }
 
         try
         {
-            return targetMethod.Invoke(_target, args); // რეალური სერვისის მეთოდის
+            return targetMethod.Invoke(_target, args); // რეალური სერვისის მეთოდის გამოძახება
         }
         catch (TargetInvocationException ex)
             when (ex.InnerException != null)
         {
-            // თუ უბრალოდ ვისვრით აჩვენებს სროლის ბოლო ადგილის ხაზს
+            // თუ ExceptionDispatchInfo ვისვრით აჩვენებს სროლის
+            // თავდაპირველ ადგილს და სტექთრეისს. ამის გარეშე შეცვლის სროლის ხაზს.
             ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
             throw;
         }
-        // თუ დისპეჩერიდან ვისვრით აჩვენებს პირველ ადგილს და სტექთრეისს:
-        // ArgumentOutOfRangeException: employeeId
-        //at EmployeeService.ChangeRole(...) line 15
-        //at System.Reflection.MethodBaseInvoker.Invoke(...)
-        //-- - End of stack trace from previous location ---
-        //at AuthorizationProxy.Invoke(...) line 50
-        //at GeneratedProxy.ChangeRole(...)
     }
+
+
+    // GetOrAdd გაუშვებს რეფლექციას მხოლოდ მეთოდის პირველივე გამოძახებისას.
+    private static Role[] GetRequiredRoles(MethodInfo method)
+    {
+        var attribute = method.GetCustomAttribute<RequireRoleAttribute>();
+
+        if (attribute == null)
+            return Array.Empty<Role>();
+
+        return attribute.Roles.ToArray();
+    }
+}
+
+// საერთო ქეში ყველა AuthorizationProxy<T>-ისთვის.
+// მეთოდების ატრიბუტების განმეორებით წაკითხვას თავიდან გვარიდებს
+// და სხვადასხვა Proxy-ს ერთი და იმავე MethodInfo-ს შედეგის გაზიარების საშუალებას აძლევს.
+// file - მხოლოდ მიმდინარე ფაილში ხელმისაწვდომი
+file static class AuthorizationAttributeCache  
+{
+    public static readonly ConcurrentDictionary<MethodInfo, Role[]> Roles = new();
 }

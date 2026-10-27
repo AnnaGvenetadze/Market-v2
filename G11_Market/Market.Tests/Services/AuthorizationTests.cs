@@ -83,6 +83,53 @@ public class AuthorizationTests
             Times.Once);
     }
 
+    [Test]
+    public void ChangeRole_Cache_ShouldReuseRequiredRoles()
+    {
+        var employeeRepository = new Mock<IEmployeeRepository>();
+        var unitOfWork = new Mock<IUnitOfWork>();
+
+        employeeRepository
+            .Setup(x => x.GetRoles(2))
+            .Returns(new[]
+            {
+            new RoleDTO { Id = 2 }
+            });
+
+        employeeRepository
+            .Setup(x => x.GetRoles(3))
+            .Returns(new[]
+            {
+            new RoleDTO { Id = 1 }
+            });
+
+        unitOfWork
+            .SetupGet(x => x.EmployeeRepository)
+            .Returns(employeeRepository.Object);
+
+        var service = CreateProxy(
+            true,
+            true,
+            unitOfWork.Object);
+
+        Assert.DoesNotThrow(() =>
+            service.ChangeRole(2, 3));
+
+        Assert.DoesNotThrow(() =>
+            service.ChangeRole(3, 2));
+
+        employeeRepository.Verify(
+            x => x.GetRoles(2),
+            Times.Once);
+
+        employeeRepository.Verify(
+            x => x.GetRoles(3),
+            Times.Once);
+
+        unitOfWork.Verify(
+            x => x.Commit(),
+            Times.Exactly(2));
+    }
 
     [TestCase(false, false)]
     [TestCase(true, false)]

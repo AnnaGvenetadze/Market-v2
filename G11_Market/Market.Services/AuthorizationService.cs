@@ -1,10 +1,11 @@
 ﻿using Market.Services.Enums;
 using Market.Services.Interfaces;
 using Serilog;
-using System.Reflection;
 
 namespace Market.Services;
 
+// AuthorizationService ამოწმებს მომხმარებლის უფლებებს CurrentUserContext-ით.
+// წარმატებული ავტორიზაციის შემდეგ Proxy მეთოდს იძახებს რეალურ სერვისზე.
 public class AuthorizationService
 {
     private readonly ICurrentUserContext _currentUserContext;
